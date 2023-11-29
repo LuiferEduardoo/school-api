@@ -3,6 +3,7 @@ const passport = require('passport');
 
 const usersRouter = require('./users.router');
 const authRouter = require('./auth.router');
+const fileRegistration = require('./fileRegistration.router')
 
 const routerApi = (app) => {
     const router = express.Router();
@@ -12,7 +13,10 @@ const routerApi = (app) => {
         usersRouter
     );
     router.use('/auth', authRouter);
-
+    router.use('/file', 
+        passport.authenticate('jwt', {session: false}), 
+        fileRegistration
+    );
 }
 
 module.exports = routerApi;
