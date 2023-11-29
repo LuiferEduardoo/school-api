@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const bodyParser = require('body-parser');
 const routerApi = require('./routes');
 
 const { logErrors, errorHandler, boomErrorHandler, ormErrorHandler } = require('./middlewares/error.handler');
@@ -7,6 +8,10 @@ const { logErrors, errorHandler, boomErrorHandler, ormErrorHandler } = require('
 const app = express();
 const port = process.env.PORT || 3000;
 
+app.use(express.json());
+
+app.use(express.urlencoded({ extended: true }));
+// o
 app.use(express.json());
 
 const whitelist = ['http://localhost:8080', 'https://myapp.co'];
@@ -20,6 +25,8 @@ const options = {
         }
     }
 app.use(cors(options));
+require('./utils/auth');
+
 
 routerApi(app);
 
