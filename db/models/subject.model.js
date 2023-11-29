@@ -1,6 +1,7 @@
 const { Model, DataTypes, Sequelize } = require('sequelize'); 
 const { SUBJECT_NAME_TABLE } = require('./subjectName.model');
-const { ROL_USER_TABLE } = require('./rolUser.model');
+const { USER_TABLE } = require('./user.model');
+const { ACADEMIC_LEVELS_TABLE } = require('./academicLevels.model')
 
 const SUBJECT_TABLE = "subject"; 
 
@@ -22,12 +23,23 @@ const SubjectSchema = {
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL'
     },
+    academicLevelId: {
+        field: 'academic_level_id',
+        allowNull: false,
+        type: DataTypes.INTEGER,
+        references: {
+            model: ACADEMIC_LEVELS_TABLE,
+            key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
+    },
     teacherId: {
         field: 'teacher_id',
         allowNull: false,
         type: DataTypes.INTEGER,
         references: {
-            model: ROL_USER_TABLE,
+            model: USER_TABLE,
             key: 'id'
         },
         onUpdate: 'CASCADE',
@@ -36,7 +48,7 @@ const SubjectSchema = {
     createdAt: {
         allowNull: false,
         type: DataTypes.DATE,
-        field: 'create_at',
+        field: 'created_at',
         defaultValue: Sequelize.NOW
     },
     updatedAt: {
@@ -48,14 +60,18 @@ const SubjectSchema = {
 }
 
 class Subject extends Model {
-    static associations(models){
+    static associate(models){
         this.belongsTo(models.SubjectName, {
             as: 'subjectName',
             foreignKey: 'subjectNameId'
         });
-        this.belongsTo(models.RolUser, {
+        this.belongsTo(models.User, {
             as: 'teacher',
             foreignKey: 'teacherId'
+        });
+        this.hasMany(models.AcademicLevels, {
+            as: 'academicLevel',
+            foreignKey: 'academicLevelId',
         });
         this.hasMany(models.Schedule, {
             as: 'schule',

@@ -1,11 +1,11 @@
 const { Model, DataTypes, Sequelize } = require('sequelize'); 
 
 const { IMAGE_REGISTRAION_TABLE } = require('./imageRegistration.model'); 
-const { NEWS_PUBLICATIONS_TABLE } = require('./newsPublications.model')
+const { USER_TABLE } = require('./user.model')
 
-const IMAGE_NEWS_TABLE = "image_news"; 
+const IMAGE_USER_TABLE = "image_user"; 
 
-const imageNewsSchema = {
+const imageUserSchema = {
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -23,12 +23,13 @@ const imageNewsSchema = {
         onUpdate: 'CASCADE',
         onDelete: 'RESTRICT'
     },
-    newsPublicationsId:{
-        field: 'news_publications_id',
+    userId:{
+        field: 'user_id',
         allowNull: false,
         type: DataTypes.INTEGER,
+        unique: true,
         references: {
-            model: NEWS_PUBLICATIONS_TABLE,
+            model: USER_TABLE,
             key: 'id'
         },
         onUpdate: 'CASCADE',
@@ -36,25 +37,25 @@ const imageNewsSchema = {
     }
 }
 
-class ImageNews extends Model {
+class ImageUser extends Model {
     static associate(models){ 
         this.belongsTo(models.ImageRegistration, {
             as: 'image',
             foreignKey: 'imageId'
         });
-        this.belongsTo(models.NewsPublications, {
-            as: 'newsPublications',
-            foreignKey: 'newsPublicationsId'
+        this.belongsTo(models.User, {
+            as: 'user',
+            foreignKey: 'userId'
         });
     }
     static config(sequelize){
         return {
         sequelize,
-        tableName: IMAGE_NEWS_TABLE,
-        modelName: 'ImageNews',
+        tableName: IMAGE_USER_TABLE,
+        modelName: 'ImageUser',
         timestamps: false
         }    
     }
 }
 
-module.exports = { IMAGE_NEWS_TABLE, imageNewsSchema, ImageNews }
+module.exports = { IMAGE_USER_TABLE, imageUserSchema, ImageUser }

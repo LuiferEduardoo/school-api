@@ -21,10 +21,14 @@ const BannersContactSchema = {
         onUpdate: 'CASCADE',
         onDelete: 'RESTRICT'
     },
+    description: {
+        type: DataTypes.TEXT, 
+        allowNull: true,
+    }
 }
 
 class BannersContact extends Model {
-    static associations(models){ 
+    static associate(models){ 
         this.belongsTo(models.ImageBanners, {
             as: 'imageBanner',
             foreignKey: 'bannerId'

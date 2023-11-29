@@ -41,7 +41,7 @@ const InstitutionalProjectsPublicationsAuthorsSchema = {
 }
 
 class InstitutionalProjectsPublicationsAuthors extends Model {
-    static associations(models){ 
+    static associate(models){ 
         this.belongsTo(models.InstitutionalProjectsMember, {
             as: 'author',
             foreignKey: 'authorId'

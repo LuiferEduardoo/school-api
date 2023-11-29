@@ -17,7 +17,7 @@ const ScheduleDaySchema = {
 }
 
 class ScheduleDay extends Model {
-    static associations(models){ 
+    static associate(models){ 
         this.hasMany(models.Schedule, {
             as: 'schule',
             foreignKey: 'dayWeekId',

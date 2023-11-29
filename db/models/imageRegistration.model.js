@@ -30,7 +30,7 @@ const imageRegistrationSchema = {
 }
 
 class ImageRegistration extends Model {
-    static associations(models){ 
+    static associate(models){ 
         this.belongsTo(models.FilesRegistration, {
             as: 'file',
             foreignKey: 'fileId'

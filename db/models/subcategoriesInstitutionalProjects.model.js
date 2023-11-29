@@ -36,7 +36,7 @@ const subcategoriesInstitutionalProjectsSchema = {
 };
 
 class SubcategoriesInstitutionalProjects extends Model {
-    static associations(models) {
+    static associate(models) {
         this.belongsTo(models.Subcategories, { 
             foreignKey: 'subcategoryId', 
             as: 'subcategory' 

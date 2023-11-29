@@ -1,5 +1,8 @@
 const { Model, DataTypes, Sequelize } = require('sequelize'); 
 
+const { ACADEMIC_LEVELS_TABLE } = require('./academicLevels.model');
+const { SCHOOL_GRADE_TABLE } = require('./schoolGrade.model')
+
 const ADMINISTRATION_REQUEST_TABLE = "administration_request"; 
 
 const admissionRequestSchema = {
@@ -7,6 +10,27 @@ const admissionRequestSchema = {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
+    },
+    academicLevel:{
+        field: 'academic_level',
+        allowNull: false,
+        type: DataTypes.INTEGER,
+        references: {
+            model: ACADEMIC_LEVELS_TABLE,
+            key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
+    },
+    grade: {
+        allowNull: false,
+        type: DataTypes.INTEGER,
+        references: {
+            model: SCHOOL_GRADE_TABLE,
+            key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
     },
     firstName: {
         type: DataTypes.TEXT,
@@ -27,6 +51,14 @@ const admissionRequestSchema = {
         field: 'second_surname',
         allowNull: false,
     },
+    birthdate: {
+        allowNull: false,
+        type: DataTypes.DATE,
+    },
+    gender: {
+        allowNull: false,
+        type: DataTypes.TEXT,
+    },
     documentType: {
         type: DataTypes.TEXT,
         field: 'document_tipe',
@@ -42,9 +74,8 @@ const admissionRequestSchema = {
         field: 'phone_number',
         allowNull: false,
     },
-    typeEducation: {
-        type: DataTypes.TEXT,
-        field: 'document_tipe',
+    email: {
+        type: DataTypes.TEXT, 
         allowNull: false,
     },
     status: {
@@ -55,7 +86,7 @@ const admissionRequestSchema = {
     createdAt: {
         allowNull: false,
         type: DataTypes.DATE,
-        field: 'create_at',
+        field: 'created_at',
         defaultValue: Sequelize.NOW
     },
     updatedAt: {
@@ -67,8 +98,15 @@ const admissionRequestSchema = {
 }
 
 class AdmissionRequest extends Model {
-    static associations(){ 
-
+    static associate(models){ 
+        this.belongsTo(models.AcademicLevels, {
+            as: 'academicLevels',
+            foreignKey: 'academicLevel'
+        });
+        this.belongsTo(models.SchoolGrade, {
+            as: 'schoolGrade',
+            foreignKey: 'grade'
+        });
     }
     static config(sequelize){
         return {

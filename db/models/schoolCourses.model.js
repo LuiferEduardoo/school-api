@@ -28,7 +28,7 @@ const schoolCoursesSchema = {
     createdAt: {
         allowNull: false,
         type: DataTypes.DATE,
-        field: 'create_at',
+        field: 'created_at',
         defaultValue: Sequelize.NOW
     },
     updatedAt: {
@@ -40,7 +40,7 @@ const schoolCoursesSchema = {
 }
 
 class SchoolCourses extends Model {
-    static associations(models){ 
+    static associate(models){ 
         this.belongsTo(models.SchoolGrade, {
             as: 'schoolGrade',
             foreignKey: 'schoolGradeId'

@@ -36,7 +36,7 @@ const categoriesPublicationsSchema = {
 }
 
 class CategoriesPublications extends Model {
-    static associations(models){ 
+    static associate(models){ 
         this.belongsTo(models.Categories, {
             as: 'categories',
             foreignKey: 'categoryId'

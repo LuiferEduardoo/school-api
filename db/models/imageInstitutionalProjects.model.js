@@ -37,7 +37,7 @@ const imageInstitutionaProjectsSchema = {
 }
 
 class ImageInstitutionalProjects extends Model {
-    static associations(models){ 
+    static associate(models){ 
         this.belongsTo(models.ImageRegistration, {
             as: 'image',
             foreignKey: 'imageId'

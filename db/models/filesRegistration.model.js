@@ -1,5 +1,5 @@
 const { Model, DataTypes, Sequelize } = require('sequelize'); 
-const { ROL_USER_TABLE } = require('./rolUser.model');
+const { USER_TABLE } = require('./user.model');
 
 const FILES_REGISTRATION_TABLE = "files_registration"; 
 
@@ -33,7 +33,7 @@ const filesRegistrationSchema = {
         allowNull: false,
         type: DataTypes.INTEGER,
         references: {
-            model: ROL_USER_TABLE,
+            model: USER_TABLE,
             key: 'id'
         },
         onUpdate: 'CASCADE',
@@ -47,7 +47,7 @@ const filesRegistrationSchema = {
     createdAt: {
         allowNull: false,
         type: DataTypes.DATE,
-        field: 'create_at',
+        field: 'created_at',
         defaultValue: Sequelize.NOW
     },
     updatedAt: {
@@ -59,8 +59,8 @@ const filesRegistrationSchema = {
 }
 
 class FilesRegistration extends Model {
-    static associations(models){ 
-        this.belongsTo(models.RolUser, {
+    static associate(models){ 
+        this.belongsTo(models.User, {
             as: 'user',
             foreignKey: 'userId'
         });
@@ -70,7 +70,7 @@ class FilesRegistration extends Model {
         sequelize,
         tableName: FILES_REGISTRATION_TABLE,
         modelName: 'FilesRegistration',
-        timestamps: false
+        timestamps: true,
         }    
     }
 }

@@ -36,7 +36,7 @@ const InstitutionalProjectPublicationssSchema = {
 }
 
 class InstitutionalProjectsPublications extends Model {
-    static associations(models){ 
+    static associate(models){ 
         this.belongsTo(models.Publications, {
             as: 'publication',
             foreignKey: 'publicationId'

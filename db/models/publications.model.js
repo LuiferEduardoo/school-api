@@ -37,7 +37,7 @@ const PublicationsSchema = {
     createdAt: {
         allowNull: false,
         type: DataTypes.DATE,
-        field: 'create_at',
+        field: 'created_at',
         defaultValue: Sequelize.NOW
     },
     updatedAt: {
@@ -49,18 +49,18 @@ const PublicationsSchema = {
 }
 
 class Publications extends Model {
-    static associations(models){ 
+    static associate(models){ 
         this.hasMany(models.CategoriesPublications, {
             as: 'categories',
-            foreignKey: 'categoryId',
+            foreignKey: 'publicationId',
         });
         this.hasMany(models.SubcategoriesPublications, {
             as: 'subcategories',
-            foreignKey: 'subcategoryId',
+            foreignKey: 'publicationId',
         });
         this.hasMany(models.TagsPublications, {
             as: 'tags',
-            foreignKey: 'tagId',
+            foreignKey: 'publicationId',
         });
     }
     static config(sequelize){

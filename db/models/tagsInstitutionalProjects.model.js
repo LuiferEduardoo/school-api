@@ -36,7 +36,7 @@ const tagsInstitutionalProjectsSchema = {
 };
 
 class TagsInstitutionalProjects extends Model {
-    static associations(models) {
+    static associate(models) {
         this.belongsTo(models.Tags, {
             foreignKey: 'tagId',
             as: 'tag' 

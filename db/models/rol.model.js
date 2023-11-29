@@ -16,10 +16,11 @@ const RolSchema = {
 }
 
 class Rol extends Model {
-    static associations(models){
-        this.hasMany(models.RolUser, {
-            as: 'rolUser',
-            foreignKey: 'rold',
+    static associate(models){
+        this.belongsToMany(models.User, {
+            through: 'RolUser',
+            foreignKey: 'rolId',
+            as: 'user',
         });
     }
     static config(sequelize){

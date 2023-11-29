@@ -20,10 +20,14 @@ const BannersInstitutionalProjectsSchema = {
         },
         onUpdate: 'CASCADE'
     },
+    description: {
+        type: DataTypes.TEXT, 
+        allowNull: true,
+    }
 }
 
 class BannersInstitutionalProjects extends Model {
-    static associations(models){ 
+    static associate(models){ 
         this.belongsTo(models.ImageBanners, {
             as: 'imageBanners',
             foreignKey: 'bannerId'
@@ -32,8 +36,8 @@ class BannersInstitutionalProjects extends Model {
     static config(sequelize){
         return {
         sequelize,
-        tableName: BANNERS_HOME_TABLE,
-        modelName: 'BannersHome',
+        tableName: BANNERS_INSTITUTIONAL_PROJECTS_TABLE,
+        modelName: 'BannersInstitutionalProjects',
         timestamps: false
         }    
     }

@@ -38,7 +38,7 @@ const RolUserSchema = {
 }
 
 class RolUser extends Model {
-    static associations(models){ 
+    static associate(models){ 
         this.belongsTo(models.User, {
             as: 'user',
             foreignKey: 'userId'
@@ -47,35 +47,11 @@ class RolUser extends Model {
             as: 'rol',
             foreignKey: 'rolId'
         });
-        this.hasMany(models.FilesRegistration, {
-            as: 'filesRegistration',
-            foreignKey: 'userId',
-        });
-        this.hasMany(models.NewsPublications, {
-            as: 'newsPublications',
-            foreignKey: 'userId',
-        });
-        this.hasMany(models.InstitutionalProjects, {
-            as: 'InstitutionalProjects',
-            foreignKey: 'coordinatorId',
-        });
-        this.hasMany(models.InstitutionalProjectsMember, {
-            as: 'InstitutionalProjectsMember',
-            foreignKey: 'userId',
-        });
-        this.hasMany(models.ImageBanners, {
-            as: 'imageBanners',
-            foreignKey: 'userId',
-        });
-        this.hasMany(models.Subject, {
-            as: 'subject',
-            foreignKey: 'teacherId',
-        });
     }
     static config(sequelize){
         return {
         sequelize,
-        tableName: ROL_TABLE,
+        tableName: ROL_USER_TABLE,
         modelName: 'RolUser',
         timestamps: false
         }    

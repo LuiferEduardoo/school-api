@@ -2,9 +2,9 @@ const { Model, DataTypes, Sequelize } = require('sequelize');
 
 const { IMAGE_BANNERS_TABLE } = require('./imageBanners.model'); 
 
-const BANNERS_HOME_TABLE = "banners_home"; 
+const BANNERS_ACADEMIC_LEVELS_TABLE = "image_academic_levels"; 
 
-const BannersHomeSchema = {
+const BannersAcademicLevelsSchema = {
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -16,7 +16,7 @@ const BannersHomeSchema = {
         type: DataTypes.INTEGER,
         references: {
             model: IMAGE_BANNERS_TABLE,
-            key: 'id',
+            key: 'id'
         },
         onUpdate: 'CASCADE',
         onDelete: 'RESTRICT'
@@ -27,7 +27,7 @@ const BannersHomeSchema = {
     }
 }
 
-class BannersHome extends Model {
+class BannerAcademicLevels extends Model {
     static associate(models){ 
         this.belongsTo(models.ImageBanners, {
             as: 'imageBanner',
@@ -37,11 +37,11 @@ class BannersHome extends Model {
     static config(sequelize){
         return {
         sequelize,
-        tableName: BANNERS_HOME_TABLE,
-        modelName: 'BannersHome',
+        tableName: BANNERS_ACADEMIC_LEVELS_TABLE,
+        modelName: 'BannerAcademicLevels',
         timestamps: false
         }    
     }
 }
 
-module.exports = { BANNERS_HOME_TABLE, BannersHomeSchema, BannersHome }
+module.exports = { BANNERS_ACADEMIC_LEVELS_TABLE, BannersAcademicLevelsSchema, BannerAcademicLevels }

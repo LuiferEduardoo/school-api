@@ -25,7 +25,7 @@ const documentRegistrationSchema = {
 }
 
 class DocumentRegistration extends Model {
-    static associations(models){ 
+    static associate(models){ 
         this.belongsTo(models.FilesRegistration, {
             as: 'file',
             foreignKey: 'fileId'

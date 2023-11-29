@@ -1,7 +1,7 @@
 const { Model, DataTypes, Sequelize } = require('sequelize'); 
 
 const { IMAGE_REGISTRAION_TABLE } = require('./imageRegistration.model'); 
-const { ROL_USER_TABLE } = require('./rolUser.model');
+const { USER_TABLE } = require('./user.model');
 
 const IMAGE_BANNERS_TABLE = "image_banners"; 
 
@@ -28,7 +28,7 @@ const imageBannersSchema = {
         allowNull: false,
         type: DataTypes.INTEGER,
         references: {
-            model: ROL_USER_TABLE,
+            model: USER_TABLE,
             key: 'id'
         },
         onUpdate: 'CASCADE',
@@ -37,12 +37,12 @@ const imageBannersSchema = {
 }
 
 class ImageBanners extends Model {
-    static associations(models){ 
+    static associate(models){ 
         this.belongsTo(models.ImageRegistration, {
             as: 'image',
             foreignKey: 'imageId'
         });
-        this.belongsTo(models.RolUser, {
+        this.belongsTo(models.User, {
             as: 'user',
             foreignKey: 'userId'
         });

@@ -58,7 +58,7 @@ const SchuduleSchema = {
     createdAt: {
         allowNull: false,
         type: DataTypes.DATE,
-        field: 'create_at',
+        field: 'created_at',
         defaultValue: Sequelize.NOW
     },
     updatedAt: {
@@ -70,7 +70,7 @@ const SchuduleSchema = {
 }
 
 class Schedule extends Model {
-    static associations(models){
+    static associate(models){
         this.belongsTo(models.Subject, {
             as: 'subject',
             foreignKey: 'subjectId'

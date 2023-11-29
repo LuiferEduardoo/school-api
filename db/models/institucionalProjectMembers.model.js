@@ -1,6 +1,6 @@
 const { Model, DataTypes, Sequelize } = require('sequelize');
-const { ROL_USER_TABLE } = require('./rolUser.model');
-const { INSTITUTIONAL_PROJECTS_TABLE} = require('./institutionalProjects.model')
+const { USER_TABLE } = require('./user.model');
+const { INSTITUTIONAL_PROJECTS_TABLE } = require('./institutionalProjects.model')
 
 const INSTITUTIONAL_PROJECTS_MEMBERS_TABLE = "institutional_projects_members"; 
 
@@ -27,7 +27,7 @@ const InstitutionalProjectsMemberSchema = {
         allowNull: false,
         type: DataTypes.INTEGER,
         references: {
-            model: ROL_USER_TABLE,
+            model: USER_TABLE,
             key: 'id'
         },
         onUpdate: 'CASCADE',
@@ -36,8 +36,8 @@ const InstitutionalProjectsMemberSchema = {
 }
 
 class InstitutionalProjectsMember extends Model {
-    static associations(models){ 
-        this.belongsTo(models.RolUser, {
+    static associate(models){ 
+        this.belongsTo(models.User, {
             as: 'user',
             foreignKey: 'userId'
         });

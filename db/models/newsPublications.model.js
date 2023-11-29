@@ -1,5 +1,5 @@
 const { Model, DataTypes, Sequelize } = require('sequelize');
-const { ROL_USER_TABLE } = require('./rolUser.model');
+const { USER_TABLE } = require('./user.model');
 const { PUBLICATIONS_TABLE } = require('./publications.model');
 
 const NEWS_PUBLICATIONS_TABLE = "news_publications"; 
@@ -27,7 +27,7 @@ const NewsPublicationsSchema = {
         allowNull: false,
         type: DataTypes.INTEGER,
         references: {
-            model: ROL_USER_TABLE,
+            model: USER_TABLE,
             key: 'id'
         },
         onUpdate: 'CASCADE',
@@ -40,8 +40,8 @@ const NewsPublicationsSchema = {
 }
 
 class NewsPublications extends Model {
-    static associations(models){ 
-        this.belongsTo(models.RolUser, {
+    static associate(models){ 
+        this.belongsTo(models.User, {
             as: 'user',
             foreignKey: 'userId'
         });

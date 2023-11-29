@@ -1,5 +1,5 @@
 const { Model, DataTypes, Sequelize } = require('sequelize');
-const { ROL_USER_TABLE } = require('./rolUser.model');
+const { USER_TABLE } = require('./user.model');
 
 const INSTITUTIONAL_PROJECTS_TABLE = "institutional_projects"; 
 
@@ -28,7 +28,7 @@ const InstitutionalProjectsSchema = {
         allowNull: false,
         type: DataTypes.INTEGER,
         references: {
-            model: ROL_USER_TABLE,
+            model: USER_TABLE,
             key: 'id'
         },
         onUpdate: 'CASCADE',
@@ -55,7 +55,7 @@ const InstitutionalProjectsSchema = {
     createdAt: {
         allowNull: false,
         type: DataTypes.DATE,
-        field: 'create_at',
+        field: 'created_at',
         defaultValue: Sequelize.NOW
     },
     updatedAt: {
@@ -67,8 +67,8 @@ const InstitutionalProjectsSchema = {
 }
 
 class InstitutionalProjects extends Model {
-    static associations(models){ 
-        this.belongsTo(models.RolUser, {
+    static associate(models){ 
+        this.belongsTo(models.User, {
             as: 'coordinator',
             foreignKey: 'coordinatorId'
         });
@@ -82,15 +82,15 @@ class InstitutionalProjects extends Model {
         });
         this.hasMany(models.CategoriesInstitutionalProjects, {
             as: 'categories',
-            foreignKey: 'categoryId',
+            foreignKey: 'institutionalProjectsId',
         });
         this.hasMany(models.SubcategoriesInstitutionalProjects, {
             as: 'subcategories',
-            foreignKey: 'subcategoryId',
+            foreignKey: 'institutionalProjectsId',
         });
         this.hasMany(models.TagsInstitutionalProjects, {
             as: 'tags',
-            foreignKey: 'tagId',
+            foreignKey: 'institutionalProjectsId',
         });
     }
     static config(sequelize){

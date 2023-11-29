@@ -16,7 +16,7 @@ const subjectNameSchema = {
 }
 
 class SubjectName extends Model {
-    static associations(){ 
+    static associate(){ 
 
     }
     static config(sequelize){
