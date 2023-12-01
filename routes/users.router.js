@@ -40,7 +40,7 @@ router.post('/',
     validatorHandler(createUserSchema, 'body'),
     async (req, res, next) => {
         try {
-        const body = req.body;
+        const body = req.body || req.fields;
         const newUser = await service.create(body);
         res.status(201).json(newUser);
         } catch (error) {
@@ -57,7 +57,7 @@ router.patch('/:id?',
         const idToken = req.user.sub;
         const idUser = req.params.id;
         const rol = req.user.role;
-        const body = req.body;
+        const body = req.body || req.fields;
         const update = await service.updateUser(idToken, idUser, body, rol);
         res.json(update);
         } catch (error) {

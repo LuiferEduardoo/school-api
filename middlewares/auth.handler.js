@@ -11,6 +11,19 @@ function checkApiKey(req, res, next) {
     }
 }
 
+const superAdmin = ['administrador', 'coordinado', 'rector'];
+
+function checkSuperAdmin(){
+    return (req, res, next) => {
+        const user = req.user;
+        if (superAdmin.includes(user.role)) {
+        next();
+        } else {
+        next(boom.unauthorized());
+        }
+    }
+}
+
 function checkRoles(...roles) {
     return (req, res, next) => {
         const user = req.user;
@@ -24,4 +37,4 @@ function checkRoles(...roles) {
 
 
 
-module.exports = { checkApiKey, checkRoles }
+module.exports = { checkSuperAdmin, checkRoles, superAdmin }

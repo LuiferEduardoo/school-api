@@ -1,19 +1,14 @@
 const express = require('express');
 const cors = require('cors');
-const bodyParser = require('body-parser');
 const routerApi = require('./routes');
 
 const { logErrors, errorHandler, boomErrorHandler, ormErrorHandler } = require('./middlewares/error.handler');
+const handleAttachmentsOrJSON = require('./middlewares/attachementsOrJSON.handler')
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(express.json());
-
-app.use(express.urlencoded({ extended: true }));
-// o
-app.use(express.json());
-
+app.use(handleAttachmentsOrJSON);
 const whitelist = ['http://localhost:8080', 'https://myapp.co'];
 const options = {
     origin: (origin, callback) => {
@@ -35,5 +30,6 @@ app.use(boomErrorHandler);
 app.use(errorHandler);
 app.use(ormErrorHandler);
 
+app.use('/uploads', express.static('uploads'));
 
 app.listen(port);

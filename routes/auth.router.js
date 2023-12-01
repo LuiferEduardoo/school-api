@@ -29,7 +29,7 @@ router.post('/recovery',
     validatorHandler(recovery, 'body'),
     async (req, res, next) => {
         try {
-            const { email } = req.body;
+            const { email } = req.body || req.fields;
             const rta = await service.sendRecoveryPassword(email);
             res.json(rta);
         } catch (error) {
@@ -42,7 +42,7 @@ router.post('/change-password',
     validatorHandler(changePassword, 'body'),
     async (req, res, next) => {
         try {
-            const { token, newPassword } = req.body;
+            const { token, newPassword } = req.body || req.fields;
             const rta = await service.changePassword(token, newPassword);
             res.json(rta);
         } catch (error) {
