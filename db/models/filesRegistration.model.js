@@ -64,6 +64,14 @@ class FilesRegistration extends Model {
             as: 'user',
             foreignKey: 'userId'
         });
+        this.hasMany(models.ImageRegistration, {
+            as: 'image',
+            foreignKey: 'fileId',
+        });
+        this.hasMany(models.DocumentRegistration, {
+            as: 'document',
+            foreignKey: 'fileId',
+        });
     }
     static config(sequelize){
         return {

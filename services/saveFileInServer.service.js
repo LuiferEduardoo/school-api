@@ -1,4 +1,3 @@
-const formidable = require('formidable');
 const boom = require('@hapi/boom');
 
 const { promisify } = require('util');
@@ -6,9 +5,11 @@ const fs = require('fs');
 const renameAsync = promisify(fs.rename);
 const path = require('path');
 const { convertToWebP } = require('./../libs/sharp');
+const { error } = require('console');
 
 class SaveFileInServer {
     constructor(){
+        
     }
     async convertImageToWebp(fileBuffer) {
         try {
@@ -43,65 +44,121 @@ class SaveFileInServer {
     
         return folder ? `${folder}/${userId}/${year}/${month}` : `${userId}/${year}/${month}/`;
     }
+    baseUrl(req){
+        return `${req.protocol}://${req.get('host')}`;
+    }
 
-    async handleFileUpload(req) {
+    createFolder(fullPath){
+        if (!fs.existsSync(fullPath)) {
+            fs.mkdirSync(fullPath, { recursive: true });
+        }
+    }
+
+    async uploadFileInServer(file, fileType, fullPath){
         try {
-            const form = new formidable.IncomingForm();
+            const tempPath = file.path;
+            const fileTypeFile = file.type;
+            if (fileTypeFile.startsWith('image/') && fileType === 'image') {
+                const fileBuffer = fs.readFileSync(tempPath);
+                // Convierte la imagen a WebP
+                const webpFilePath = await this.convertImageToWebp(tempPath);
+                file.name = file.name.replace(/\.[^.]+$/, '.webp');
+                file.type = 'image/webp';
+            }
+            this.createFolder(fullPath);
+            const newFilePath = path.join(fullPath, file.name);
+
+            const uniqueFilePath = this.getUniqueFilename(newFilePath);
+            await renameAsync(tempPath, uniqueFilePath.uniquePath); // Utilizando promisify para fs.rename
+            return uniqueFilePath;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async handleUploadFileInServer(req) {
+        try {
             const informationFile = [];
     
-            const parsedFields = await new Promise((resolve, reject) => {
-                form.parse(req, (err, fields, files) => {
-                    if (err) {
-                        reject(boom.badImplementation(err.message));
-                    }
-                    resolve({ fields, files });
-                });
-            });
-    
-            const { folder, fileType } = parsedFields.fields;
-            const uploadedFiles = Array.isArray(parsedFields.files.files) ? parsedFields.files.files : [parsedFields.files.files];
-    
+            const { folder, fileType, imageCredits } = req.fields;
+            const uploadedFiles = Array.isArray(req.files.files) ? req.files.files : [req.files.files];
+            const imageCreditsArray = imageCredits ? imageCredits.split(",") : [];
+
+            let counter = 0;
             for (const file of uploadedFiles) {
-                if (!file || !file.originalFilename) {
+                if (!file || !file.name) {
                     throw boom.badRequest('No se proporcionó ningún archivo o el nombre del archivo es inválido');
                 }
-                const tempPath = file.filepath;
-                const fileTypeFile = file.mimetype;
+                const fileTypeFile = file.type;
     
                 let uploadPath = '../uploads/';
-    
-                if (fileTypeFile.startsWith('image/') && fileType[0] === 'image') {
+                if (fileTypeFile.startsWith('image/') && fileType === 'image') {
                     uploadPath += 'image/';
-                    const fileBuffer = fs.readFileSync(tempPath);
-                    // Convierte la imagen a WebP
-                    const webpFilePath = await this.convertImageToWebp(tempPath);
-                    file.originalFilename = file.originalFilename.replace(/\.[^.]+$/, '.webp');
-                    file.mimetype = 'image/webp';
-                } else if (fileTypeFile.startsWith('application/') && fileType[0] === 'document') {
+                } else if (fileTypeFile.startsWith('application/') && fileType === 'document') {
                     uploadPath += 'document/';
-                } else {
-                    throw boom.badRequest('Archivo no admitido');
                 }
-                uploadPath += this.getDestinationPath(req.user.sub, folder[0])
-    
+                uploadPath += this.getDestinationPath(req.user.sub, folder)
                 const fullPath = path.join(__dirname, uploadPath);
-    
-                if (!fs.existsSync(fullPath)) {
-                    fs.mkdirSync(fullPath, { recursive: true });
-                }
-    
-                const newFilePath = path.join(fullPath, file.originalFilename);
+                const upload = await this.uploadFileInServer(file, fileType, fullPath);
+                const url = `${this.baseUrl(req)}${uploadPath.substring(2)}/${upload.fileName}`;
 
-                const uniqueFilePath = this.getUniqueFilename(newFilePath)
-    
-                await renameAsync(tempPath, uniqueFilePath.uniquePath); // Utilizando promisify para fs.rename
-    
-                informationFile.push({ outputPath: uploadPath.substring(2), userId: req.user.sub, fileName: uniqueFilePath.fileName, fileType });
+                informationFile.push({  name: upload.fileName, folder: uploadPath.substring(2), url, userId: req.user.sub, fileType, imageCredits: imageCreditsArray[counter] });
+                counter ++;
             }
     
             return informationFile;
         } catch (error) {
             throw error
+        }
+    }
+    async deleteFile(pathFileToDelete){
+        await fs.unlinkSync(pathFileToDelete, (err) => {
+            if(err){
+                throw err
+                return
+            }
+        });
+    }
+    async updateFileInServer(data, req){
+        try {
+            const fullPath = path.join(__dirname, `../${data.path}`);
+            if(fs.existsSync(fullPath) && data.fileType){
+                if(data.newName || data.newFolder){
+                    const exten = path.extname(data.path);
+                    const originalFileName = path.basename(data.path, exten);
+                    const pathNumber = data.path.match(/\/\d+\/\d+\/\d+/);
+
+                    const pathFolder = data.newFolder ? path.join(`/uploads/${data.fileType}`, `${data.newFolder}${pathNumber}`) : data.folder;
+
+                    const fullNewPathFolder = path.join(__dirname, `..${pathFolder}`);
+                    this.createFolder(fullNewPathFolder);
+                    const name = data.newName ? this.getUniqueFilename(path.join(fullNewPathFolder, `${data.newName}${exten}`)).fileName : originalFileName;
+
+                    const fullnewPath = path.join(fullNewPathFolder, `${name}`);
+                    fs.rename(fullPath, fullnewPath, (err)=> {
+                        if(err){
+                            throw err
+                        }
+                    });
+                    return {
+                        name: `${name}`,
+                        url: `${this.baseUrl(req)}${pathFolder}/${name}`,
+                        folder: pathFolder
+                    };
+                } else if(req.files.files){
+                    const file = req.files.files;
+                    const fullPathNewFile = path.join(__dirname, `../${data.folder}`);
+                    const upload = await this.uploadFileInServer(file, data.fileType, fullPathNewFile)
+                    await this.deleteFile(fullPath);
+                    return {
+                        name: file.name,
+                        url: `${this.baseUrl(req)}${data.folder}/${upload.fileName}`
+                    }
+                }
+            } 
+            throw boom.notFound('Archivo no encontrado')
+        } catch (error) {
+            throw error;
         }
     }  
 }

@@ -2,6 +2,7 @@ const Joi = require('joi');
 
 const id = Joi.number().integer();
 const folder = Joi.string();
+const newName = Joi.string();
 const file = Joi.string();
 const imageCredits = Joi.string();
 const fileType = Joi.string();
@@ -20,9 +21,9 @@ const createFile = Joi.object({
 });
 
 const updateFilesRegistration = Joi.object({
-    id: id.required(),
-    file: file.required(),
-    imageCredits: imageCredits,
+    newName,
+    newFolder: folder,
+    imageCredits,
 })
 
 module.exports = { getFilesRegistration, createFilesRegistrationDate, createFile, updateFilesRegistration };
