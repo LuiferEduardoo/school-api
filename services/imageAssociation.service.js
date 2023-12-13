@@ -15,26 +15,11 @@ class ImageAssociation{
         }
         return imageForId;
     }
-    
-    async fileId(id, model){
-        return await this.imageForId(id, model, {
-            model: sequelize.models.ImageRegistration,
-            as: 'image',
-            include: [
-                {
-                    model: sequelize.models.FileRegistration,
-                    as: 'file'
-                        // Puedes agregar condiciones adicionales si es necesario
-                    }
-                ]
-        });
-    }
 
     async createWithImage (req, association, data, folder){
         try {
             req.fields.fileType = 'image';
             req.fields.folder = folder;
-            
             const createImages = [];
             const imagesFileRegistration = await serviceFileRegistration.fileUpload(req);
             for (const  imageUpload of imagesFileRegistration) {
@@ -79,7 +64,7 @@ class ImageAssociation{
     async createOrAdd(req, association, data, folder, ids=null, model = null){
         try {
             if(req.files.files){
-                return await this.createWithImage(req, association, 'create', data, folder)
+                return await this.createWithImage(req, association, data, folder)
             } else if(ids){
                 return await this.createOrUpdateWithId(ids, data, association, 'create', model)
             }
@@ -103,11 +88,13 @@ class ImageAssociation{
             const eliminateImagesArray = eliminateImages ? eliminateImages.split(',').map(item => item.trim() === 'true') : [];
             for(const eliminateImageAssociationId of eliminateImagesAssociationIds){
                 try {
-                    const imageAssociation = await sequelize.models[association].findByPk(eliminateImageAssociationId);
+                    const imageAssociation = await sequelize.models[association].findByPk(eliminateImageAssociationId, {
+                        include: 'image'
+                    });
                     if (imageAssociation) {
                         await imageAssociation.destroy();
                         if (eliminateImagesArray[counter]) {
-                            await serviceFileRegistration.handleFileDelete(imageAssociation.image.file.fileId, req);
+                            await serviceFileRegistration.handleFileDelete(imageAssociation.image.fileId, req);
                         }
                     }
                 } catch (error){
