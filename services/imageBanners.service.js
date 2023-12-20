@@ -7,17 +7,6 @@ const Transactional = require('./Transactional.service');
 const serviceImageAssociation = new ImageAssociation();
 
 class ImageBanners extends Transactional {
-
-    async checkModel(model){
-        try {
-            const modelExist = await sequelize.isDefined(model);
-            if(!modelExist){
-                throw boom.notFound('Banner no existe');
-            }
-        } catch(error){
-            throw error
-        }
-    }
     async bannerForId(id, banner, include){
         try {
             const bannerForId = await sequelize.models[banner].findByPk(id, {
@@ -33,7 +22,7 @@ class ImageBanners extends Transactional {
     }
     async getBanners(id, banner){
         try {
-            await this.checkModel(banner)
+            await this.checkModel(banner, 'Banner')
             const include = [{ association: 'imageBanner', include: [{ association: 'image', include: 'file' }] }]
             if(id){
                 return await this.bannerForId(id, banner, include)
@@ -48,8 +37,8 @@ class ImageBanners extends Transactional {
     }
     async create(req, data, banner){
         return this.withTransaction(async (transaction) => {
-            await this.checkModel(banner);
-            const createImages = await serviceImageAssociation.createOrAdd(req, 'ImageBanners', {userId: req.user.sub}, `banners/${banner}`, data.ids, null, {transaction});
+            await this.checkModel(banner, 'Banner');
+            const createImages = await serviceImageAssociation.createOrAdd(req, 'ImageBanners', {userId: req.user.sub}, `banners/${banner}`, data.ids, null, transaction);
             const description = data.description.split(",");
             const imagesBanner = [];
     
@@ -66,7 +55,7 @@ class ImageBanners extends Transactional {
     }
     async update(req, data, banner){
         return this.withTransaction(async (transaction) => {
-            await this.checkModel(banner);
+            await this.checkModel(banner, 'Banner');
             const updateBanner = [];
             const idsBanner = data.idsBanners ? data.idsBanners.split(',').map(id => parseInt(id, 10)) : [];
             const descriptions = data.description ? data.description.split(',') : [];
@@ -80,7 +69,7 @@ class ImageBanners extends Transactional {
                 if(descriptions[counter] != null){
                     dataUpdateInDataBase.description = descriptions[counter]
                 }
-                updateBanner.push(await imageBanner.update(dataUpdateInDataBase, { transaction }));
+                updateBanner.push(await imageBanner.update(dataUpdateInDataBase, transaction ));
                 counter ++;
             }
             return updateBanner;
@@ -88,7 +77,7 @@ class ImageBanners extends Transactional {
     }
     async delete(req, data, banner){
         return this.withTransaction(async (transaction) => {
-            await this.checkModel(banner);
+            await this.checkModel(banner, 'Banner');
             const eliminateBannersIds = data.idsBanners.split(",");
             let bannersToDelete = [];
             let imagesToDeleteAssociation = [];

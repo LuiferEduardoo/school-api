@@ -39,7 +39,7 @@ class TagsInstitutionalProjects extends Model {
     static associate(models) {
         this.belongsTo(models.Tags, {
             foreignKey: 'tagId',
-            as: 'tag' 
+            as: 'tags' 
         });
         this.belongsTo(models.InstitutionalProjects, {
             foreignKey: 'institutionalProjectId',

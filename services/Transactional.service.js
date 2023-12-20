@@ -13,6 +13,16 @@ class Transactional {
             throw error;
         }
     }
+    async checkModel(model, nameModel){
+        try {
+            const modelExist = await sequelize.isDefined(model);
+            if(!modelExist){
+                throw boom.notFound(`${nameModel} no existe`);
+            }
+        } catch(error){
+            throw error
+        }
+    }
 }
 
 module.exports = Transactional;

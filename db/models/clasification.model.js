@@ -37,7 +37,7 @@ class Clasification extends Model {
         sequelize,
         tableName: CLASIFICATION_TABLE,
         modelName: 'Clasification',
-        timestamps: false
+        timestamps: true
         }    
     }
 }

@@ -1,4 +1,5 @@
 const { Model, DataTypes, Sequelize } = require('sequelize');
+const readingTime = require('./../../utils/manipulation/readingTime');
 
 const PUBLICATIONS_TABLE = "publications"; 
 
@@ -68,7 +69,15 @@ class Publications extends Model {
         sequelize,
         tableName: PUBLICATIONS_TABLE,
         modelName: 'Publications',
-        timestamps: false
+        timestamps: true,
+        hooks: {
+            beforeUpdate: async (user, options) => {
+                if(user.changed('content')){
+                    const readingTimes = readingTime(user.content);
+                    user.reading_time = readingTimes;
+                }
+            }
+            }
         }    
     }
 }
