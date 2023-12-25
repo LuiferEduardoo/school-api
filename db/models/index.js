@@ -19,6 +19,7 @@ const { BannersHome, BannersHomeSchema } = require('./bannersHome.model');
 const { BannersOurSchool, BannersOurSchoolSchema } = require('./bannersOurSchool.model');
 const { BannersInstitutionalProjects, BannersInstitutionalProjectsSchema } = require('./bannersInstitutionalProjects.model');
 const { BannersNews, BannersNewsSchema } = require('./bannersNews.model');
+const { ImageAcademicLevels, ImageAcademicLevelsSchema } = require('./imageAcademicLevels.model');
 const { BannerAcademicLevels, BannersAcademicLevelsSchema } = require('./bannersAcademicLevels.model')
 const { BannersAdmissions, BannersAdmissionsSchema } = require('./bannersAdmissions.model');
 const { BannersContact, BannersContactSchema } = require('./bannersContact.models');
@@ -76,6 +77,7 @@ const setupModels = (sequelize) => {
     BannersOurSchool.init(BannersOurSchoolSchema, BannersOurSchool.config(sequelize));
     BannersInstitutionalProjects.init(BannersInstitutionalProjectsSchema, BannersInstitutionalProjects.config(sequelize));
     BannersNews.init(BannersNewsSchema, BannersNews.config(sequelize));
+    ImageAcademicLevels.init(ImageAcademicLevelsSchema, ImageAcademicLevels.config(sequelize));
     BannersAdmissions.init(BannersAdmissionsSchema, BannersAdmissions.config(sequelize));
     BannerAcademicLevels.init(BannersAcademicLevelsSchema, BannerAcademicLevels.config(sequelize));
     BannersContact.init(BannersContactSchema, BannersContact.config(sequelize));
@@ -117,6 +119,7 @@ const setupModels = (sequelize) => {
     BannersOurSchool.associate(sequelize.models);
     BannersInstitutionalProjects.associate(sequelize.models);
     BannersNews.associate(sequelize.models);
+    ImageAcademicLevels.associate(sequelize.models);
     BannerAcademicLevels.associate(sequelize.models);
     BannersAdmissions.associate(sequelize.models);
     BannersContact.associate(sequelize.models);

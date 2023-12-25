@@ -32,6 +32,12 @@ const InstitutionalProjectsMemberSchema = {
         },
         onUpdate: 'CASCADE',
         onDelete: 'RESTRICT'
+    },
+    isCoordinator:{
+        field: 'is_coordinator',
+        allowNull: true,
+        type: DataTypes.BOOLEAN,    
+        defaultValue: false
     }
 }
 

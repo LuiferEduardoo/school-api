@@ -13,6 +13,7 @@ const {
   IMAGE_INSTITUTIONAL_PROJECTS_PUBLICATIONS_TABLE,
 } = require('../models/imageInstitutionalProjectPublications.model');
 const { IMAGE_BANNERS_TABLE } = require('../models/imageBanners.model');
+const { IMAGE_ACADEMIC_LEVELS_TABLE } = require('../models/imageAcademicLevels.model')
 
 const { SUBJECT_TABLE } = require('../models/subject.model');
 const { SCHOOL_COURSES_TABLE } = require('../models/schoolCourses.model');
@@ -31,6 +32,7 @@ const { NEWS_PUBLICATIONS_TABLE } = require('../models/newsPublications.model');
 const {
   INSTITUTIONAL_PROJECTS_TABLE,
 } = require('../models/institutionalProjects.model');
+const { ACADEMIC_LEVELS_TABLE } = require('../models/academicLevels.model');
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -128,12 +130,7 @@ module.exports = {
           },
           onUpdate: 'CASCADE',
           onDelete: 'SET NULL',
-        },
-        isCoordinator: {
-          allowNull: true,
-          type: Sequelize.DataTypes.BOOLEAN,
-          defaultValue: false,
-        },
+        }
       }
     );
     await queryInterface.createTable(IMAGE_USER_TABLE, {
@@ -290,6 +287,36 @@ module.exports = {
         onDelete: 'SET NULL',
       },
     });
+    await queryInterface.createTable(IMAGE_ACADEMIC_LEVELS_TABLE, {
+      id: {
+        type: Sequelize.DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        allowNull: false,
+      },
+      imageId:{
+          field: 'image_id',
+          allowNull: false,
+          type: Sequelize.DataTypes.INTEGER,
+          references: {
+              model: IMAGE_REGISTRAION_TABLE,
+              key: 'id'
+          },
+          onUpdate: 'CASCADE',
+          onDelete: 'RESTRICT'
+      },
+      academicLevelsId:{
+          field: 'academic_levels_id',
+          allowNull: false,
+          type: Sequelize.DataTypes.INTEGER,
+          references: {
+              model: ACADEMIC_LEVELS_TABLE,
+              key: 'id'
+          },
+          onUpdate: 'CASCADE',
+          onDelete: 'RESTRICT'
+      }
+    })
   },
 
   async down(queryInterface, Sequelize) {
@@ -304,5 +331,6 @@ module.exports = {
       IMAGE_INSTITUTIONAL_PROJECTS_PUBLICATIONS_TABLE
     );
     await queryInterface.dropTable(IMAGE_BANNERS_TABLE);
+    await queryInterface.dropTable(IMAGE_ACADEMIC_LEVELS_TABLE);
   },
 };

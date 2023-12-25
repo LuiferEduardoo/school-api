@@ -338,6 +338,12 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'RESTRICT',
       },
+      isCoordinator:{
+        field: 'is_coordinator',
+        allowNull: true,
+        type: Sequelize.DataTypes.BOOLEAN,    
+        defaultValue: false
+    }
     });
     await queryInterface.createTable(
       INSTITUTIONAL_PROJECTS_PUBLICATIONS_TABLE,
@@ -470,8 +476,6 @@ module.exports = {
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable(ADMINISTRATION_REQUEST_TABLE);
     await queryInterface.dropTable(SCHOOL_COURSES_TABLE);
-    await queryInterface.dropTable(SCHEDULE_DAY_TABLE);
-    await queryInterface.dropTable(CALENDAR_TABLE);
     await queryInterface.dropTable(CATEGORIES_PUBLICATIONS_TABLE);
     await queryInterface.dropTable(SUBCATEGORIES_PUBLICATIONS_TABLE);
     await queryInterface.dropTable(TAGS_PUBLICATIONS_TABLE);

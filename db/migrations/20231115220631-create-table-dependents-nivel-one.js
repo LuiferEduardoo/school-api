@@ -244,17 +244,6 @@ module.exports = {
         type: Sequelize.DataTypes.STRING,
         unique: true,
       },
-      coordinatorId: {
-        field: 'coordinator_id',
-        allowNull: false,
-        type: Sequelize.DataTypes.INTEGER,
-        references: {
-          model: USER_TABLE,
-          key: 'id',
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'RESTRICT',
-      },
       important: {
         defaultValue: false,
         type: Sequelize.DataTypes.BOOLEAN,
@@ -269,9 +258,10 @@ module.exports = {
         field: 'started_at',
       },
       finishedAT: {
-        allowNull: false,
+        allowNull: true,
         type: Sequelize.DataTypes.DATE,
         field: 'finished_at',
+        defaultValue: null
       },
       createdAt: {
         allowNull: false,

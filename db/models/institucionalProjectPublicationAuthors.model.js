@@ -32,11 +32,6 @@ const InstitutionalProjectsPublicationsAuthorsSchema = {
         },
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL'
-    },
-    isCoordinator:{
-        allowNull: true,
-        type: DataTypes.BOOLEAN,    
-        defaultValue: false
     }
 }
 

@@ -1,5 +1,4 @@
 const { Model, DataTypes, Sequelize } = require('sequelize');
-const { USER_TABLE } = require('./user.model');
 
 const INSTITUTIONAL_PROJECTS_TABLE = "institutional_projects"; 
 
@@ -23,17 +22,6 @@ const InstitutionalProjectsSchema = {
         type: DataTypes.STRING,
         unique: true,
     },
-    coordinatorId:{
-        field: 'coordinator_id',
-        allowNull: false,
-        type: DataTypes.INTEGER,
-        references: {
-            model: USER_TABLE,
-            key: 'id'
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'RESTRICT'
-    },
     important: {
         defaultValue: false,
         type: DataTypes.BOOLEAN
@@ -48,9 +36,10 @@ const InstitutionalProjectsSchema = {
         field: 'started_at',
     },
     finishedAT: {
-        allowNull: false,
+        allowNull: true,
         type: DataTypes.DATE,
         field: 'finished_at',
+        defaultValue: null
     },
     createdAt: {
         allowNull: false,
@@ -68,10 +57,6 @@ const InstitutionalProjectsSchema = {
 
 class InstitutionalProjects extends Model {
     static associate(models){ 
-        this.belongsTo(models.User, {
-            as: 'coordinator',
-            foreignKey: 'coordinatorId'
-        });
         this.hasMany(models.ImageInstitutionalProjects, {
             as: 'ImageInstitutionalProjects',
             foreignKey: 'institutionalProjectsId',
@@ -80,17 +65,21 @@ class InstitutionalProjects extends Model {
             as: 'InstitutionalProjectsMember',
             foreignKey: 'institutionalProjectsId',
         });
+        this.hasMany(models.InstitutionalProjectsPublications, {
+            as: 'InstitutionalProjectsPublications',
+            foreignKey: 'InstitutionalProjectId',
+        });
         this.hasMany(models.CategoriesInstitutionalProjects, {
             as: 'categories',
-            foreignKey: 'institutionalProjectsId',
+            foreignKey: 'institutionalProjectId',
         });
         this.hasMany(models.SubcategoriesInstitutionalProjects, {
             as: 'subcategories',
-            foreignKey: 'institutionalProjectsId',
+            foreignKey: 'institutionalProjectId',
         });
         this.hasMany(models.TagsInstitutionalProjects, {
             as: 'tags',
-            foreignKey: 'institutionalProjectsId',
+            foreignKey: 'institutionalProjectId',
         });
     }
     static config(sequelize){
@@ -98,7 +87,7 @@ class InstitutionalProjects extends Model {
         sequelize,
         tableName: INSTITUTIONAL_PROJECTS_TABLE,
         modelName: 'InstitutionalProjects',
-        timestamps: false
+        timestamps: true
         }    
     }
 }

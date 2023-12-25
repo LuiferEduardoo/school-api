@@ -84,10 +84,6 @@ class User extends Model {
             as: 'newsPublications',
             foreignKey: 'userId',
         });
-        this.hasMany(models.InstitutionalProjects, {
-            as: 'InstitutionalProjects',
-            foreignKey: 'coordinatorId',
-        });
         this.hasMany(models.InstitutionalProjectsMember, {
             as: 'InstitutionalProjectsMember',
             foreignKey: 'userId',

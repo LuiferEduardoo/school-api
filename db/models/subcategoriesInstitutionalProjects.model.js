@@ -39,7 +39,7 @@ class SubcategoriesInstitutionalProjects extends Model {
     static associate(models) {
         this.belongsTo(models.Subcategories, { 
             foreignKey: 'subcategoryId', 
-            as: 'subcategory' 
+            as: 'subcategories' 
         });
         this.belongsTo(models.InstitutionalProjects, {
             foreignKey: 'institutionalProjectId', 

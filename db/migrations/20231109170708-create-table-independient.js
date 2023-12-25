@@ -289,5 +289,6 @@ module.exports = {
     await queryInterface.dropTable(CALENDAR_TABLE);
     await queryInterface.dropTable(ACADEMIC_LEVELS_TABLE);
     await queryInterface.dropTable(SUBJECT_NAME_TABLE);
+    await queryInterface.dropTable(SCHEDULE_DAY_TABLE);
   },
 };
