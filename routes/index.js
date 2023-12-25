@@ -6,6 +6,7 @@ const authRouter = require('./auth.router');
 const fileRegistration = require('./fileRegistration.router');
 const imageBanners = require('./imageBanners.router');
 const newsPublication = require('./news.router');
+const institutionalProjects = require('./institutionalProjects.router');
 
 const routerApi = (app) => {
     const router = express.Router();
@@ -21,6 +22,7 @@ const routerApi = (app) => {
     );
     router.use('/banner', imageBanners);
     router.use('/news', newsPublication);
+    router.use('/institutionalProjects', institutionalProjects);
 }
 
 module.exports = routerApi;
