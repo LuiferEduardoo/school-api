@@ -43,7 +43,7 @@ class News extends Transactional {
         return this.withTransaction(async (transaction) => {
             const createPublication = await servicePublications.create(body,transaction);
             const newsPublications = await sequelize.models.NewsPublications.create({publicationId: createPublication.id, userId: req.user.sub}, {transaction});
-            const imagesNewsPublications = await serviceImageAssociation.createOrAdd(req, 'ImageNews', {newsPublicationsId: newsPublications.id}, `news`, body.idImage, null, transaction)
+            const imagesNewsPublications = await serviceImageAssociation.createOrAdd(req, 'ImageNews', {newsPublicationsId: newsPublications.id}, `news`, body.idImage, transaction)
             return {
                 message: 'Noticia creada con exito'
             }

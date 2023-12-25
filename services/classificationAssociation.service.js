@@ -21,10 +21,10 @@ class ClassificationAssociation extends Transactional {
         }
     }
 
-    async deleteTypeClassificationAssociation (id, modelClassificationElement, elementId, transaction){
+    async deleteTypeClassificationAssociation (id, modelClassificationElement, fieldNameElement, elementId, transaction){
         try{
             const classificationToDelete = await serviceClassification.getClassification(modelClassificationElement, id);
-            if(classificationToDelete.publicationId != elementId){
+            if(classificationToDelete[fieldNameElement] != elementId){
                 throw boom.unauthorized();
             }
             await classificationToDelete.destroy({transaction});
@@ -84,7 +84,7 @@ class ClassificationAssociation extends Transactional {
             throw error;
         }
     }
-    async deleteClassificationOfModel(idsEliminateCategories, idsEliminateSubcategories, idsEliminateTags, modelClassificationsElement, transaction, elementId, deleteAll=false){
+    async deleteClassificationOfModel(idsEliminateCategories, idsEliminateSubcategories, idsEliminateTags, modelClassificationsElement, transaction, elementId , fieldNameElement, deleteAll=false){
         try{
             const classificationOfModelDelete =[]
             const typeClassificationToDeleteArray = []
@@ -109,7 +109,7 @@ class ClassificationAssociation extends Transactional {
             const tagsArray = idsToAssign.Tags ? this.createCategoryObjects(idsToAssign.Tags, classifications[2]) : [];
             const idsEliminate = [...categoriesArray, ...subcategoriesArray, ...tagsArray];
             for(const idEliminate of idsEliminate){
-                const classificationToDelete = await this.deleteTypeClassificationAssociation(idEliminate.name, `${idEliminate.modelTypeClassifications}${modelClassificationsElement}`, elementId, transaction); // Borramos los tipos de clasificaciones de la asociación
+                const classificationToDelete = await this.deleteTypeClassificationAssociation(idEliminate.name, `${idEliminate.modelTypeClassifications}${modelClassificationsElement}`, fieldNameElement, elementId, transaction); // Borramos los tipos de clasificaciones de la asociación
                 const idTypeClassificationToDelete = classificationToDelete.categoryId || classificationToDelete.subcategoryId || classificationToDelete.tagId;
                 typeClassificationToDeleteArray.push(await serviceClassification.getClassification(idEliminate.modelTypeClassifications, idTypeClassificationToDelete));
             }

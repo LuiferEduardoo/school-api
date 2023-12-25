@@ -82,7 +82,7 @@ class FilesRegistration extends Transactional {
         if(idFile){
             where.id = idFile;
         }
-        if(!superAdmin.includes(req.user.rol)){
+        if(!superAdmin.includes(req.user.role)){
             where.userId = req.user.sub 
         }
         return sequelize.models.FilesRegistration.findAll({
@@ -94,7 +94,7 @@ class FilesRegistration extends Transactional {
     async fileUpdate(req, data, id){
         try {
             const fileOne = await this.fileOne(id)
-            if(req.user.sub !== fileOne.fileData.userId && !superAdmin.includes(req.user.rol) ){
+            if(req.user.sub !== fileOne.fileData.userId && !superAdmin.includes(req.user.role) ){
                 throw boom.unauthorized();
             }
             const dataUpdate = {
@@ -116,7 +116,7 @@ class FilesRegistration extends Transactional {
     async handleFileDelete (id, req){
         try {
             const fileOne = await this.fileOne(id);// Encuentra la imagen que se va a borrar
-            if(req.user.sub !== fileOne.fileData.userId && !superAdmin.includes(req.user.rol) ){
+            if(req.user.sub !== fileOne.fileData.userId && !superAdmin.includes(req.user.role) ){
                 throw boom.unauthorized();
             }
             const modelFileToDelete = fileOne.fileType === "image" ? sequelize.models.ImageRegistration : sequelize.models.DocumentRegistration
