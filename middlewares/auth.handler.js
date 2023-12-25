@@ -11,7 +11,7 @@ function checkApiKey(req, res, next) {
     }
 }
 
-const superAdmin = ['administrador', 'coordinado', 'rector'];
+const superAdmin = ['administrador', 'coordinador', 'rector'];
 
 function checkSuperAdmin(){
     return (req, res, next) => {
