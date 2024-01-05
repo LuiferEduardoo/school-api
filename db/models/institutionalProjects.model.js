@@ -66,7 +66,7 @@ class InstitutionalProjects extends Model {
             foreignKey: 'institutionalProjectsId',
         });
         this.hasMany(models.InstitutionalProjectsPublications, {
-            as: 'InstitutionalProjectsPublications',
+            as: 'InstitutionalProjectPublication',
             foreignKey: 'InstitutionalProjectId',
         });
         this.hasMany(models.CategoriesInstitutionalProjects, {

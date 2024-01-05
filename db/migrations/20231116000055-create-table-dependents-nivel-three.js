@@ -79,12 +79,12 @@ module.exports = {
       },
       startTime: {
         allowNull: false,
-        type: Sequelize.DataTypes.DATE,
+        type: Sequelize.DataTypes.TIME,
         field: 'start_time',
       },
       endTime: {
         allowNull: false,
-        type: Sequelize.DataTypes.DATE,
+        type: Sequelize.DataTypes.TIME,
         field: 'end_time',
       },
       createdAt: {

@@ -47,12 +47,12 @@ const SchuduleSchema = {
     },
     startTime: {
         allowNull: false,
-        type: DataTypes.DATE,
+        type: DataTypes.TIME,
         field: 'start_time',
     },
     endTime: {
         allowNull: false,
-        type: DataTypes.DATE,
+        type: DataTypes.TIME,
         field: 'end_time',
     },
     createdAt: {
@@ -89,7 +89,7 @@ class Schedule extends Model {
         sequelize,
         tableName: SCHUDULE_TABLE,
         modelName: 'Schedule',
-        timestamps: false
+        timestamps: true
         }    
     }
 }

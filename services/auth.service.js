@@ -4,7 +4,7 @@ const UserService = require('./user.service');
 const service = new UserService();
 const { signToken } = require('../libs/token-sing');
 const { tokenVerify } = require('../libs/token-verify');
-const { SendMain } = require('./../libs/nodemailer')
+const { SendMain } = require('./emails.service');
 
 
 class AuthService {

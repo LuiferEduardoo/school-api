@@ -1,7 +1,29 @@
 const { sequelize } = require('./../libs/sequelize');
 const boom = require('@hapi/boom');
+const { superAdmin } = require('../middlewares/auth.handler'); 
 
 class Transactional {
+    constructor(){
+        this.order = [['important', 'DESC'], ['createdAt', 'DESC']];
+        this.includeClassification = [
+            {association: 'categories', include:[{association: 'categories', include: 'clasification'}]},
+            {association:'subcategories', include:[{association: 'subcategories', include: 'clasification'}]},
+            {association:'tags', include:[{association: 'tags', include: 'clasification'}]}
+        ];
+    }
+    queryParameter(query){
+        const { limit, offset } = query;
+        let queryToReturn = {}
+        queryToReturn.limit = limit || undefined;
+        queryToReturn.offset = offset || undefined;
+        return queryToReturn;
+    }
+
+    checkPermissionToGet(req){
+        const where = req.user ? superAdmin.includes(req.user.role) ? {} : {visible: true} : {visible: true};
+        return where;
+    }
+
     async withTransaction(callback) {
         let transaction;
         try {
@@ -14,10 +36,13 @@ class Transactional {
             throw error;
         }
     }
-    async getElementById(id, model, include = null){
+    async getElementById(id, model, include = null, where = {}, order = null, query = {}){
         return this.withTransaction(async (transaction) => {
             const element = await sequelize.models[model].findByPk(id, {
-                include: include
+                where: { ...where},
+                order: order,
+                include: include,
+                ...query
             });
             if(!element){
                 throw boom.notFound(`${model} no encontrado`);
@@ -26,22 +51,27 @@ class Transactional {
         })
     }
 
-    async getElementWithCondicional(model, where, message, include=null){
+    async getElementWithCondicional(model, include=null, where = {}, order = null, query = {}, attributes = []){
         const element = await sequelize.models[model].findOne({
             where: { ...where },
-            include: include
+            include: include,
+            order: order,
+            attributes: attributes,
+            ...query
         })
         if(!element){
-            throw boom.unauthorized(message);
+            throw boom.notFound(`${model} no encontrado`);
         }
         return element;
     }
 
-    async getAllElements(model, where = null, include = null){
+    async getAllElements(model, where = null, include = null, order = null, query = null){
         return this.withTransaction(async (transaction) => {
             const elements = await sequelize.models[model].findAll({
                 where: { ...where },
-                include: include
+                order: order,
+                include: include,
+                ...query
             })
             return elements
         });

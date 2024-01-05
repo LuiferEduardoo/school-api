@@ -42,4 +42,8 @@ const updatePublication = {
     tags
 };
 
-module.exports = { getPublications, createPublication, updatePublication };
+const deletePublication = {
+    eliminateImage
+}
+
+module.exports = { getPublications, createPublication, updatePublication, deletePublication };

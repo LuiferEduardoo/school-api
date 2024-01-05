@@ -110,12 +110,12 @@ module.exports = {
         allowNull: false,
       },
       numberDocument: {
-        type: Sequelize.DataTypes.INTEGER,
+        type: Sequelize.DataTypes.TEXT,
         field: 'number_document',
         allowNull: false,
       },
       phoneNumber: {
-        type: Sequelize.DataTypes.INTEGER,
+        type: Sequelize.DataTypes.STRING(10),
         field: 'phone_number',
         allowNull: false,
       },
@@ -125,8 +125,8 @@ module.exports = {
       },
       status: {
         allowNull: false,
-        type: Sequelize.DataTypes.TEXT,
-        defaultValue: 'En espera',
+        type: Sequelize.DataTypes.STRING,
+        defaultValue: 'En revisión',
       },
       createdAt: {
         allowNull: false,

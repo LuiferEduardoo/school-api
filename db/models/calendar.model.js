@@ -54,7 +54,7 @@ class Calendar extends Model {
         sequelize,
         tableName: CALENDAR_TABLE,
         modelName: 'Calendar',
-        timestamps: false
+        timestamps: true
         }    
     }
 }

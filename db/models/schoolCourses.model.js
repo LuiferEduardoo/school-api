@@ -55,7 +55,7 @@ class SchoolCourses extends Model {
         sequelize,
         tableName: SCHOOL_COURSES_TABLE,
         modelName: 'SchoolCourses',
-        timestamps: false
+        timestamps: true
         }    
     }
 }

@@ -69,7 +69,7 @@ class Subject extends Model {
             as: 'teacher',
             foreignKey: 'teacherId'
         });
-        this.hasMany(models.AcademicLevels, {
+        this.belongsTo(models.AcademicLevels, {
             as: 'academicLevel',
             foreignKey: 'academicLevelId',
         });
@@ -83,7 +83,7 @@ class Subject extends Model {
         sequelize,
         tableName: SUBJECT_TABLE,
         modelName: 'Subject',
-        timestamps: false
+        timestamps: true
         }    
     }
 }

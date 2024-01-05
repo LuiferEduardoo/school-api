@@ -113,6 +113,7 @@ const setupModels = (sequelize) => {
     TagsInstitutionalProjects.associate(sequelize.models);
     ImageInstitutionalProjects.associate(sequelize.models);
     InstitutionalProjectsPublications.associate(sequelize.models);
+    InstitutionalProjectsPublicationsAuthors.associate(sequelize.models);
     ImageInstitutionalProjectsPublications.associate(sequelize.models);
     ImageBanners.associate(sequelize.models);
     BannersHome.associate(sequelize.models);

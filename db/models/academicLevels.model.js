@@ -74,6 +74,10 @@ class AcademicLevels extends Model {
             as: 'schoolGrade',
             foreignKey: 'academicLevel',
         });
+        this.hasMany(models.ImageAcademicLevels, {
+            as: 'imageAcademicLevels',
+            foreignKey: 'academicLevelsId'
+        })
     }
     static config(sequelize){
         return {

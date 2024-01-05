@@ -65,12 +65,12 @@ const admissionRequestSchema = {
         allowNull: false,
     },
     numberDocument: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.TEXT,
         field: 'number_document',
         allowNull: false,
     },
     phoneNumber: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING(10),
         field: 'phone_number',
         allowNull: false,
     },
@@ -80,8 +80,8 @@ const admissionRequestSchema = {
     },
     status: {
         allowNull: false,
-        type: DataTypes.TEXT,
-        defaultValue: 'En espera'
+        type: DataTypes.STRING,
+        defaultValue: 'En revisión'
     },
     createdAt: {
         allowNull: false,
@@ -113,7 +113,7 @@ class AdmissionRequest extends Model {
         sequelize,
         tableName: ADMINISTRATION_REQUEST_TABLE,
         modelName: 'AdmissionRequest',
-        timestamps: false
+        timestamps: true
         }    
     }
 }

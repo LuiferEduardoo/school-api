@@ -27,7 +27,42 @@ class InstitutionalProjects extends Transactional {
             isCoordinator: coordinator.trim().toLowerCase() === 'true'
         })) : [];    
     }
+    async get(id, req){
+        return this.withTransaction(async (transaction) => {
+            const where = this.checkPermissionToGet(req)
+            const query = this.queryParameter(req.query);
+            const attributes = {attributes: ['id', 'name', 'lastName']}
 
+            const includeInstitutionalProjects = [{ association: 'InstitutionalProjectsMember', include: [{association: 'user', ...attributes}] }, { association: 'ImageInstitutionalProjects', include: [{ association: 'image', include: 'file' }] },...this.includeClassification,
+            ];
+            let institutionalProjectsData;
+            if(!id){
+                institutionalProjectsData = await this.getAllElements('InstitutionalProjects', where, includeInstitutionalProjects, this.order, query)
+            } else{
+                institutionalProjectsData = [await this.getElementWithCondicional('InstitutionalProjects', includeInstitutionalProjects, {id: id, ...where}, this.order, query)];
+            }
+            const idList = institutionalProjectsData.map((element) => element.id);
+            const publicationData = await this.getAllElements('InstitutionalProjectsPublications', { InstitutionalProjectId: idList }, [{association: 'publication', where: where, order: this.order, include: this.includeClassification}, {association: 'ImageInstitutionalProjectPublication', include: [{ association: 'image', include: 'file' }]}, {association: 'InstitutionalProjectsPublicationsAuthors', include:[{association: 'author', include: [{association: 'user', ...attributes}]}]}]);
+            const publicationsByProjectId = publicationData.reduce((result, publication) => {
+                const projectId = publication.InstitutionalProjectId;
+                if (!result[projectId]) {
+                    result[projectId] = [];
+                }
+                result[projectId].push(publication);
+                return result;
+            }, {});
+            const dataToReturn = institutionalProjectsData.map((project) => {
+                const projectId = project.id;
+                const publications = publicationsByProjectId[projectId] || [];
+                return {
+                    InstitutionalProjects: project,
+                    publications
+                }
+            })
+            
+            return dataToReturn
+        });
+    }
     async create(req, body){
         return this.withTransaction(async (transaction) => {
             const createInstitutionalProjects = await serviceContentManagement.create(body, 'InstitutionalProjects', 'institutionalProjectId', transaction);
@@ -62,14 +97,14 @@ class InstitutionalProjects extends Transactional {
             await this.checkPermission(req, getInstitutionalProject);
             const getNewsPublications = await this.getElementById(id, 'InstitutionalProjects', ['ImageInstitutionalProjects']);
             const idsImagesEliminate = getNewsPublications.ImageInstitutionalProjects.map(image => (image.id));
-            const deleteMembers = await serviceIndidualEntity.deleteIndividualEntity(true, null, id, 'InstitutionalProjectsMember', 'institutionalProjectsId', transaction);
             const deleteimagesInstitucionalProjects = await serviceImageAssociation.delete(idsImagesEliminate, 'ImageInstitutionalProjects', body.elimianteImages, req, transaction);
             const deleteInstitutionalProjectsPublications = getInstitutionalProject.InstitutionalProjectsPublications.map(publication => (publication.id));
             if(deleteInstitutionalProjectsPublications[0]){
                 for(const publication of deleteInstitutionalProjectsPublications){
-                    await serviceInstitutionalProjectsPublications.delete(req, body, publication);
+                    await serviceInstitutionalProjectsPublications.delete(req, body, getInstitutionalProject.id, publication);
                 }
             }
+            const deleteMembers = await serviceIndidualEntity.deleteIndividualEntity(true, null, id, 'InstitutionalProjectsMember', 'institutionalProjectsId', transaction);
             const deleteInstitutionalProjects = await serviceContentManagement.delete(id, 'InstitutionalProjects', 'institutionalProjectId', transaction);
             return {
                 message: 'Proyecto institucional eliminado con exito',
