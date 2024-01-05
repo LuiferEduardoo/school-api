@@ -20,10 +20,10 @@ router.get('/:id?',
     }
 );
 router.post('/',
-    validatorHandler(createSubject, 'body'),
+    validatorHandler(createSubject, null, true),
     async (req, res, next) => {
         try {
-            const body = req.body;
+            const body = req.body || req.fields;
             const newSubjet = await service.create(body);
             res.status(201).json(newSubjet);
         } catch (error) {
@@ -34,10 +34,10 @@ router.post('/',
 
 router.patch('/:id?',
     validatorHandler(getSubject, 'params'),
-    validatorHandler(updateSubject, 'body'),
+    validatorHandler(updateSubject, null, true),
     async (req, res, next) => {
         try {
-            const body = req.body;
+            const body = req.body || req.fields;
             const { id } = req.params
             const update = await service.update(body, id);
         res.json(update);

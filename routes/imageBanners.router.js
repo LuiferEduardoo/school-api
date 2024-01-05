@@ -25,7 +25,7 @@ router.get('/:banners/:id?',
 router.post('/:banners',
     passport.authenticate('jwt', {session: false}), 
     checkSuperAdmin(),
-    validatorHandler(createBanner, 'fields'),
+    validatorHandler(createBanner, null, true),
     async (req, res, next) => {
         try {
         const body = req.body || req.fields;
@@ -41,7 +41,7 @@ router.post('/:banners',
 router.patch('/:banners',
     passport.authenticate('jwt', {session: false}), 
     checkSuperAdmin(),
-    validatorHandler(updateBanner, 'fields'),
+    validatorHandler(updateBanner, null, true),
     async (req, res, next) => {
         try {
             const body = req.body || req.fields;

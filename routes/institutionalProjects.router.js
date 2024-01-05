@@ -34,9 +34,9 @@ router.post('/:id?',
     passport.authenticate('jwt', { session: false }), 
     (req, res, next) => {
         if (req.params.id) {
-            validatorHandler(createInstitutionalProjectsPublicationns, 'fields')(req, res, next); // Si hay un ID presente, utiliza el validador específico para publicaciones
+            validatorHandler(createInstitutionalProjectsPublicationns, null, true)(req, res, next); // Si hay un ID presente, utiliza el validador específico para publicaciones
         } else {
-            validatorHandler(createInstitutionalProjects, 'fields')(req, res, next); // Si no hay un ID, utiliza el validador para la creación de proyectos
+            validatorHandler(createInstitutionalProjects, null, true)(req, res, next); // Si no hay un ID, utiliza el validador para la creación de proyectos
         }
     },
     async (req, res, next) => {
@@ -60,9 +60,9 @@ router.patch('/:id/:idPublication?',
     passport.authenticate('jwt', {session: false}),
     (req, res, next) => {
         if(req.params.idPublication) {
-            validatorHandler(updateInstitutionalProjectsPublicationns, 'fields')(req, res, next);
+            validatorHandler(updateInstitutionalProjectsPublicationns, null, true)(req, res, next);
         } else {
-            validatorHandler(updateInstitutionalProjects, 'fields')(req, res, next);
+            validatorHandler(updateInstitutionalProjects, null, true)(req, res, next);
         }
     },
     async (req, res, next) => {
@@ -84,7 +84,7 @@ router.patch('/:id/:idPublication?',
 
 router.delete('/:id/:idPublication?',
     passport.authenticate('jwt', {session: false}),
-    validatorHandler(deleInstitutionalProjectsPublications, 'fields'),
+    validatorHandler(deleInstitutionalProjectsPublications, null, true),
     async (req, res, next) => {
         try {
             const body = req.body || req.fields;

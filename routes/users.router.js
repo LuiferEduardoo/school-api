@@ -37,7 +37,7 @@ router.get('/:id',
 
 router.post('/',
     checkRoles('administrador', 'rector', 'coordinador'),
-    validatorHandler(createUserSchema, 'body'),
+    validatorHandler(createUserSchema, null, true),
     async (req, res, next) => {
         try {
         const body = req.body || req.fields;
@@ -51,7 +51,7 @@ router.post('/',
 
 router.patch('/:id?',
     validatorHandler(getUpdateUserSchema, 'params'),
-    validatorHandler(updateUserSchema, 'body'),
+    validatorHandler(updateUserSchema, null, true),
     async (req, res, next) => {
         try {
         const idToken = req.user.sub;

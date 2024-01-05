@@ -9,7 +9,7 @@ const router = express.Router();
 const service = new AuthService();
 
 router.post('/login',
-    validatorHandler(login, 'body'),
+    validatorHandler(login, null, true),
     passport.authenticate('local', {session: false}),
     async (req, res, next) => {
         try {
@@ -26,7 +26,7 @@ router.post('/login',
 );
 
 router.post('/recovery',
-    validatorHandler(recovery, 'body'),
+    validatorHandler(recovery, null, true),
     async (req, res, next) => {
         try {
             const { email } = req.body || req.fields;
@@ -39,7 +39,7 @@ router.post('/recovery',
 );
 
 router.post('/change-password',
-    validatorHandler(changePassword, 'body'),
+    validatorHandler(changePassword, null, true),
     async (req, res, next) => {
         try {
             const { token, newPassword } = req.body || req.fields;

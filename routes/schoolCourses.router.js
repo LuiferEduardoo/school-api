@@ -20,10 +20,10 @@ router.get('/:id?',
     }
 );
 router.post('/',
-    validatorHandler(createSchoolCourses, 'body'),
+    validatorHandler(createSchoolCourses, null, true),
     async (req, res, next) => {
         try {
-            const body = req.body;
+            const body = req.body || req.fields;
             const newSchoolCourses = await service.create(body);
             res.status(201).json(newSchoolCourses);
         } catch (error) {
@@ -34,10 +34,10 @@ router.post('/',
 
 router.patch('/:id?',
     validatorHandler(getSchoolCourses, 'params'),
-    validatorHandler(updateSchoolCourses, 'body'),
+    validatorHandler(updateSchoolCourses, null, true),
     async (req, res, next) => {
         try {
-            const body = req.body;
+            const body = req.body || req.fields;
             const { id } = req.params
             const update = await service.update(id, body);
         res.json(update);

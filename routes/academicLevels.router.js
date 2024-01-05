@@ -30,7 +30,7 @@ router.get('/:id?',
 router.post('/',
     passport.authenticate('jwt', {session: false}), 
     checkSuperAdmin(),
-    validatorHandler(createAcademicLevels, 'fields'),
+    validatorHandler(createAcademicLevels, null, true),
     async (req, res, next) => {
         try {
         const body = req.body || req.fields;
@@ -46,7 +46,7 @@ router.patch('/:id?',
     passport.authenticate('jwt', {session: false}), 
     checkSuperAdmin(),
     validatorHandler(getAcademicLevels, 'params'),
-    validatorHandler(updateAcademicLevels, 'fields'),
+    validatorHandler(updateAcademicLevels, null, true),
     async (req, res, next) => {
         try {
         const body = req.body || req.fields;

@@ -23,10 +23,10 @@ router.get('/:grade/:course?',
 router.post('/',
     passport.authenticate('jwt', {session: false}), 
     checkSuperAdmin(),
-    validatorHandler(createSchedule, 'body'),
+    validatorHandler(createSchedule, null, true),
     async (req, res, next) => {
         try {
-            const body = req.body;
+            const body = req.body || req.fields;
             const newSchedule = await service.create(body);
             res.status(201).json(newSchedule);
         } catch (error) {
@@ -39,10 +39,10 @@ router.patch('/:id?',
     passport.authenticate('jwt', {session: false}), 
     checkSuperAdmin(),
     validatorHandler(getSchedule, 'params'),
-    validatorHandler(updateSchedule, 'body'),
+    validatorHandler(updateSchedule, null, true),
     async (req, res, next) => {
         try {
-            const body = req.body;
+            const body = req.body || req.fields;
             const { id } = req.params
             const update = await service.update(id, body);
             res.json('Horario actualizado con exito');

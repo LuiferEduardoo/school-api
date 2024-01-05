@@ -30,7 +30,7 @@ router.get('/:id?',
 router.post('/',
     passport.authenticate('jwt', {session: false}), 
     checkSuperAdmin(),
-    validatorHandler(createCalendar, 'body'),
+    validatorHandler(createCalendar, null, true),
     async (req, res, next) => {
         try {
         const body = req.body || req.fields;
@@ -46,7 +46,7 @@ router.patch('/:id?',
     passport.authenticate('jwt', {session: false}), 
     checkSuperAdmin(),
     validatorHandler(getCalendar, 'params'),
-    validatorHandler(updateCalendar, 'body'),
+    validatorHandler(updateCalendar, null, true),
     async (req, res, next) => {
         try {
         const body = req.body || req.fields;

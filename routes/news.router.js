@@ -23,7 +23,7 @@ router.get('/:id?',
 router.post('/',
     passport.authenticate('jwt', {session: false}), 
     checkRoles('administrador', 'rector', 'coordinador'),
-    validatorHandler(createNewsPublication, 'fields'),
+    validatorHandler(createNewsPublication, null, true),
     async (req, res, next) => {
         try {
         const body = req.body || req.fields;
@@ -39,7 +39,7 @@ router.patch('/:id?',
     passport.authenticate('jwt', {session: false}),
     checkRoles('administrador', 'rector', 'coordinador'), 
     validatorHandler(getNewsPublications, 'params'),
-    validatorHandler(updateNewsPublication, 'fields'),
+    validatorHandler(updateNewsPublication, null, true),
     async (req, res, next) => {
         try {
         const body = req.body || req.fields;

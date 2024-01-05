@@ -36,7 +36,7 @@ router.get('/request/:id?',
     }
 );
 router.post('/request',
-    validatorHandler(createAdmissionRequest, 'body'),
+    validatorHandler(createAdmissionRequest, null, true),
     async (req, res, next) => {
         try {
         const body = req.body || req.fields;
@@ -52,7 +52,7 @@ router.patch('/request/:id',
     passport.authenticate('jwt', {session: false}), 
     checkSuperAdmin(),
     validatorHandler(getAdmissionRequest, 'params'),
-    validatorHandler(updateAdmissionRequest, 'body'),
+    validatorHandler(updateAdmissionRequest, null, true),
     async (req, res, next) => {
         try {
         const body = req.body || req.fields;
