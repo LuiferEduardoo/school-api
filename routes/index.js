@@ -1,6 +1,5 @@
 const express = require('express');
-const passport = require('passport');
-const { checkSuperAdmin } = require('../middlewares/auth.handler'); 
+const authCombined = require('../middlewares/authCombined.handler');
 
 const usersRouter = require('./users.router');
 const authRouter = require('./auth.router');
@@ -19,12 +18,12 @@ const routerApi = (app) => {
     const router = express.Router();
     app.use('/api/v1', router);
     router.use('/users',
-        passport.authenticate('jwt', {session: false}), 
+        authCombined('access'),
         usersRouter
     );
     router.use('/auth', authRouter);
     router.use('/file', 
-        passport.authenticate('jwt', {session: false}), 
+        authCombined('access'),
         fileRegistration
     );
     router.use('/banner', imageBanners);
@@ -32,13 +31,11 @@ const routerApi = (app) => {
     router.use('/institutionalProjects', institutionalProjects);
     router.use('/academic-levels', academicLevels);
     router.use('/subject', 
-        passport.authenticate('jwt', {session: false}),
-        checkSuperAdmin(),
+        authCombined('access', true),
         subject
     );
     router.use('/school-courses',
-        passport.authenticate('jwt', {session: false}),
-        checkSuperAdmin(),
+        authCombined('access', true),
         schoolCourses
     );
     router.use('/schedule', schedule);

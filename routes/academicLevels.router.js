@@ -1,6 +1,5 @@
 const express = require('express');
-const passport = require('passport');
-const { checkSuperAdmin } = require('../middlewares/auth.handler'); 
+const authCombined = require('../middlewares/authCombined.handler');
 const validatorHandler = require('../middlewares/validator.handler');
 const { getAcademicLevels, createAcademicLevels, updateAcademicLevels } = require('../schemas/academicLevels.schema');
 const { queryParamets } = require('../schemas/queryParamets.schema');
@@ -15,7 +14,7 @@ router.get('/:id?',
         if (!req.headers.authorization) {
             return next();  // Si no hay token en los headers, continúa sin autenticar
         }
-        passport.authenticate('jwt', { session: false })(req, res, next);
+        authCombined('access')
     },
     async (req, res, next) => {
         try {
@@ -28,8 +27,7 @@ router.get('/:id?',
     }
 );
 router.post('/',
-    passport.authenticate('jwt', {session: false}), 
-    checkSuperAdmin(),
+    authCombined('access', true),
     validatorHandler(createAcademicLevels, null, true),
     async (req, res, next) => {
         try {
@@ -43,8 +41,7 @@ router.post('/',
 );
 
 router.patch('/:id?',
-    passport.authenticate('jwt', {session: false}), 
-    checkSuperAdmin(),
+    authCombined('access', true),
     validatorHandler(getAcademicLevels, 'params'),
     validatorHandler(updateAcademicLevels, null, true),
     async (req, res, next) => {
@@ -60,8 +57,7 @@ router.patch('/:id?',
 );
 
 router.delete('/:id',
-    passport.authenticate('jwt', {session: false}), 
-    checkSuperAdmin(),
+    authCombined('access', true),
     validatorHandler(getAcademicLevels, 'params'),
     async (req, res, next) => {
         try {

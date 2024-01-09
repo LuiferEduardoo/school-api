@@ -51,12 +51,13 @@ class Transactional {
         })
     }
 
-    async getElementWithCondicional(model, include=null, where = {}, order = null, query = {}, attributes = []){
+    async getElementWithCondicional(model, include=null, where = {}, order = null, query = {}, attributesArray = []){
+        const attributes = attributesArray[0] ? {attributes: attributesArray } : {};
         const element = await sequelize.models[model].findOne({
             where: { ...where },
             include: include,
             order: order,
-            attributes: attributes,
+            ...attributes,
             ...query
         })
         if(!element){

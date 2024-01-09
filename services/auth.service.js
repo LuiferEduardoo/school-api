@@ -1,78 +1,108 @@
 const boom = require('@hapi/boom');
 const bcrypt = require('bcrypt');
-const UserService = require('./user.service');
-const service = new UserService();
+const Transactional = require('./Transactional.service');
 const { signToken } = require('../libs/token-sing');
 const { tokenVerify } = require('../libs/token-verify');
 const { SendMain } = require('./emails.service');
+const { deleteKeysStartingWith, deleteTokensDevice } = require('./../config/redisConfigToken')
 
 
-class AuthService {
-    async getUser(email, password){
-        const user = await service.findByEmail(email);
-        if (!user) {
-            throw boom.unauthorized();
+class AuthService extends Transactional{
+    async authenticationUser(email, password){
+        const user = await this.getElementWithCondicional('User', 'rol', {email: email});
+        try {
+            const checkPassword = await bcrypt.compare(password, user.password);
+            if(!checkPassword){
+                throw boom.unauthorized('Contraseña o correo incorrecto');
+            }
+            if (!user.active){
+                throw boom.unauthorized('Usuario inactivo');
+            }
+            delete user.dataValues.password;
+            return user
+        } catch (error) {
+            throw error;
         }
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            throw boom.unauthorized('Email o contraseña incorrecta');
-        }
-        if (!user.active){
-            throw boom.unauthorized('Usuario inactivo');
-        }
-        delete user.dataValues.password;
-        const rta = {
-            user,
-            userRol: user.rol[0].rol
-        }
-        return rta;
     }
-    signToken(user){
-        const payload = {
-            sub: user.user.id,
-            role: user.userRol
+    async tokenAccess(user, refreshToken){
+        try {
+            const payload = {
+                sub: user.id,
+                role: user.rol[0].rol
+            }
+            return await signToken(payload, '8h', 'access', refreshToken);
+        } catch (error) {
+            throw error
         }
-        const token = signToken(payload, '7d');
-        return token;
+    }
+    async login(req){
+        try {
+            const user = req.user 
+            const tokenRefresh = await signToken({ sub: user.id }, '180d', 'refresh'); // Generamos el refresh token
+            const tokenAccess = await this.tokenAccess(user, `refresh${user.id}${tokenRefresh}`); // Generamos el access token
+            return {
+                user,
+                tokenAccess,
+                tokenRefresh
+            };
+        } catch (error) {
+            throw error
+        }
+    }
+    async logOut(req){
+        return this.withTransaction(async (transaction) => {
+            const tokenAccessInformation = req.user;
+            const authHeader = req.headers.authorization;
+            const tokenAccess = authHeader.split(' ')[1]; // Extraer solo el token eliminando 'Bearer '
+            await deleteTokensDevice(`access${tokenAccessInformation.sub}${tokenAccess}`) // se eliminan los tokens por medio del access token
+        })
+    }
+    async returnTokenAccess(req){
+        return this.withTransaction(async (transaction) => {
+            const tokenRefreshInformation = req.user; // Traemos la información de token
+            const authHeader = req.headers.authorization;
+            const tokenRefresh = authHeader.split(' ')[1]; // Extraer solo el token eliminando 'Bearer '
+            const user = await this.getElementById(tokenRefreshInformation.sub, 'User', 'rol');
+            const token = await this.tokenAccess(user, `refresh${user.id}${tokenRefresh}`) // generamos el access token
+            return {
+                message: 'Token creado con exito',
+                token,
+            };
+        });
     }
     async sendRecoveryPassword(email){
-        const user = await service.findByEmail(email);
-        if (!user) {
+        try {
+            const user = await this.getElementWithCondicional('User', [], {email: email});
+            const token = await signToken({ sub: user.id }, '25min', 'recovery');
+            await user.update({ recoveryToken: token });
+            await SendMain(user.email, '¿Has solicitado un cambio de contraseña en su cuenta?', 'recoveryPassword', {name: user.name, linkRecoveryPassword: `http://localhost:3000/recovery?toke=${token}` }); 
+            return {
+                message: 'mail enviado'
+            }
+        } catch (error) {
             throw boom.notFound();
-        }
-        const payload = {
-            sub: user.id,
-        }
-        const token = signToken(payload, '15min');
-        const contentHtml = `<p>Para recuperar tu contraseña ingresa atraves de este link: http://myfrontend.com/recovery?token=${token}</p>`;
-        await service.update(user.id, { recoveryToken: token })
-        await SendMain(user.email, 'Email para recuperar contraseña', '', contentHtml); 
-        
-        return {
-            message: 'mail enviado'
         }
     }
 
     async changePassword(token, newPassword){
-        try {
-            const payload = tokenVerify(token);
-            const user = await service.findOne(payload.sub);
+        return this.withTransaction(async (transaction) => {
+            const payload = tokenVerify(token, 'jwtSecretRecoveryPassword');
+            const user = await this.getElementById(payload.sub, 'User');
             if ( user.recoveryToken !== token){
                 throw boom.unauthorized();
             }
-            const updatePassword = service.update(user.id, {
+            await user.update({
                 recoveryToken: null,
-                password: newPassword,
-            })
+                password: newPassword
+            }, {transaction})
+            await deleteKeysStartingWith(`access${user.id}`);
+            await deleteKeysStartingWith(`refresh${user.id}`);
+            await SendMain(user.email, '¿Has cambiado la contraseña de tu cuenta?', 'changePassword', {name: user.name }); 
             return {
-                message: 'contraseña cambiada con exito'
+                message: 'Contraseña cambiada con exito'
             }
-
-        } catch (error){
-            throw boom.unauthorized();
-        }
+        });
     }
-
 }
 
 module.exports = AuthService;

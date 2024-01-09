@@ -1,8 +1,6 @@
 const express = require('express');
-const passport = require('passport');
-
+const authCombined = require('../middlewares/authCombined.handler');
 const validatorHandler = require('../middlewares/validator.handler');
-const { checkRoles } = require('../middlewares/auth.handler'); 
 const { getNewsPublications, createNewsPublication, updateNewsPublication } = require('../schemas/newsPublication.schema');
 
 const News = require('../services/news.service');
@@ -21,8 +19,7 @@ router.get('/:id?',
     }
 );
 router.post('/',
-    passport.authenticate('jwt', {session: false}), 
-    checkRoles('administrador', 'rector', 'coordinador'),
+    authCombined('access', true),
     validatorHandler(createNewsPublication, null, true),
     async (req, res, next) => {
         try {
@@ -36,8 +33,7 @@ router.post('/',
 );
 
 router.patch('/:id?',
-    passport.authenticate('jwt', {session: false}),
-    checkRoles('administrador', 'rector', 'coordinador'), 
+    authCombined('access', true),
     validatorHandler(getNewsPublications, 'params'),
     validatorHandler(updateNewsPublication, null, true),
     async (req, res, next) => {
@@ -53,8 +49,7 @@ router.patch('/:id?',
 );
 
 router.delete('/:id',
-    passport.authenticate('jwt', {session: false}),
-    checkRoles('administrador', 'rector', 'coordinador'),
+    authCombined('access', true),
     validatorHandler(getNewsPublications, 'params'),
     async (req, res, next) => {
         try {

@@ -22,6 +22,12 @@ async function SendMain(email, subject, type, date) {
         case 'admissionDecision':
             template = path.join(__dirname, '../views/admissionDecision.ejs');
             break;
+        case 'recoveryPassword':
+            template = path.join(__dirname, '../views/recoveryPassword.ejs');
+            break
+        case 'changePassword': 
+            template = path.join(__dirname, '../views/changePassword.ejs');
+            break
         default:
             break;
     }

@@ -1,6 +1,5 @@
 const express = require('express');
-const passport = require('passport');
-const { checkSuperAdmin } = require('../middlewares/auth.handler'); 
+const authCombined = require('../middlewares/authCombined.handler');
 const validatorHandler = require('../middlewares/validator.handler');
 const { getAdmissionRequest, createAdmissionRequest, updateAdmissionRequest } = require('../schemas/admissionRequest.schema');
 const { queryParamets } = require('../schemas/queryParamets.schema');
@@ -22,8 +21,7 @@ router.get('/status/:numberDocument',
 );
 
 router.get('/request/:id?',
-    passport.authenticate('jwt', {session: false}), 
-    checkSuperAdmin(),
+    authCombined('access', true),
     validatorHandler(queryParamets, 'query'),
     async (req, res, next) => {
         try {
@@ -49,8 +47,7 @@ router.post('/request',
 );
 
 router.patch('/request/:id',
-    passport.authenticate('jwt', {session: false}), 
-    checkSuperAdmin(),
+    authCombined('access', true),
     validatorHandler(getAdmissionRequest, 'params'),
     validatorHandler(updateAdmissionRequest, null, true),
     async (req, res, next) => {
@@ -66,8 +63,7 @@ router.patch('/request/:id',
 );
 
 router.delete('/request/:id',
-    passport.authenticate('jwt', {session: false}), 
-    checkSuperAdmin(),
+    authCombined('access', true),
     validatorHandler(getAdmissionRequest, 'params'),
     async (req, res, next) => {
         try {

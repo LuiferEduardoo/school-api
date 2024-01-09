@@ -3,14 +3,14 @@ const passport = require('passport');
 
 const UserService = require('../services/user.service');
 const validatorHandler = require('../middlewares/validator.handler');
-const { checkRoles } = require('../middlewares/auth.handler'); 
+const { checkSuperAdmin } = require('../middlewares/auth.handler'); 
 const { updateUserSchema, createUserSchema, getUserSchema, getUpdateUserSchema } = require('./../schemas/user.schema');
 
 const router = express.Router();
 const service = new UserService();
 
 router.get('/',
-    checkRoles('administrador', 'rector', 'coordinador'),
+    checkSuperAdmin(),
     async (req, res, next) => {
         try {
             const users = await service.find();
@@ -22,7 +22,7 @@ router.get('/',
 );
 
 router.get('/:id',
-    checkRoles('administrador', 'rector', 'coordinador'),
+    checkSuperAdmin(),
     validatorHandler(getUserSchema, 'params'),
     async (req, res, next) => {
         try {
@@ -36,7 +36,7 @@ router.get('/:id',
 );
 
 router.post('/',
-    checkRoles('administrador', 'rector', 'coordinador'),
+    checkSuperAdmin(),
     validatorHandler(createUserSchema, null, true),
     async (req, res, next) => {
         try {
@@ -67,7 +67,7 @@ router.patch('/:id?',
 );
 
 router.delete('/:id',
-    checkRoles('administrador', 'rector', 'coordinador'),
+    checkSuperAdmin(),
     validatorHandler(getUserSchema, 'params'),
     async (req, res, next) => {
         try {

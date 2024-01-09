@@ -1,4 +1,5 @@
 const express = require('express');
+const authCombined = require('../middlewares/authCombined.handler');
 const passport = require('passport');
 const AuthService = require('../services/auth.service');
 const validatorHandler = require('../middlewares/validator.handler');
@@ -13,17 +14,25 @@ router.post('/login',
     passport.authenticate('local', {session: false}),
     async (req, res, next) => {
         try {
-            const user = req.user;
-            const token = service.signToken(user);
-            res.json({
-                ...user,
-                token: token,
-            });
+            const login = await service.login(req);
+            res.json(login);
         } catch (error) {
             next(error);
         }
     }
 );
+
+router.post('/token-access', 
+    authCombined('refresh'),
+    async (req, res, next) => {
+        try {
+            const tokenAccess = await service.returnTokenAccess(req);
+            res.json(tokenAccess);
+        } catch (error) {
+            next(error);
+        }
+    }
+)
 
 router.post('/recovery',
     validatorHandler(recovery, null, true),
@@ -50,5 +59,19 @@ router.post('/change-password',
         }
     }
 );
+
+router.post('/log-out', 
+    authCombined('access'),
+    async (req, res, next) => {
+        try {
+            await service.logOut(req)
+            res.json({
+                message: 'Sesión cerrada con exito'
+            })
+        } catch (error) {
+            next(error);
+        }
+    }
+)
 
 module.exports = router;

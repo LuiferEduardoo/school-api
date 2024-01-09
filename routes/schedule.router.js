@@ -1,7 +1,6 @@
 const express = require('express'); 
+const authCombined = require('../middlewares/authCombined.handler');
 const validatorHandler = require('../middlewares/validator.handler');
-const passport = require('passport');
-const { checkSuperAdmin } = require('../middlewares/auth.handler'); 
 const { getSchedule, createSchedule, updateSchedule } = require('../schemas/schedule.schema');
 const { queryParamets } = require('../schemas/queryParamets.schema');
 
@@ -21,8 +20,7 @@ router.get('/:grade/:course?',
     }
 );
 router.post('/',
-    passport.authenticate('jwt', {session: false}), 
-    checkSuperAdmin(),
+    authCombined('access', true),
     validatorHandler(createSchedule, null, true),
     async (req, res, next) => {
         try {
@@ -36,8 +34,7 @@ router.post('/',
 );
 
 router.patch('/:id?',
-    passport.authenticate('jwt', {session: false}), 
-    checkSuperAdmin(),
+    authCombined('access', true),
     validatorHandler(getSchedule, 'params'),
     validatorHandler(updateSchedule, null, true),
     async (req, res, next) => {
@@ -53,8 +50,7 @@ router.patch('/:id?',
 );
 
 router.delete('/:id',
-    passport.authenticate('jwt', {session: false}), 
-    checkSuperAdmin(),
+    authCombined('access', true),
     validatorHandler(getSchedule, 'params'),
     async (req, res, next) => {
         try {

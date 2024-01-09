@@ -1,6 +1,6 @@
 const express = require('express');
-const passport = require('passport');
 
+const authCombined = require('../middlewares/authCombined.handler');
 const validatorHandler = require('../middlewares/validator.handler');
 const { createInstitutionalProjects, updateInstitutionalProjects } = require('../schemas/institutionalProjects.schema');
 const { createInstitutionalProjectsPublicationns, updateInstitutionalProjectsPublicationns, deleInstitutionalProjectsPublications } = require('../schemas/institutionalProjectsPublications.schema');
@@ -18,7 +18,7 @@ router.get('/:id?',
         if (!req.headers.authorization) {
             return next();  // Si no hay token en los headers, continúa sin autenticar
         }
-        passport.authenticate('jwt', { session: false })(req, res, next);
+        authCombined('access')(req, res, next);
     },
     async (req, res, next) => {
         try {
@@ -31,7 +31,7 @@ router.get('/:id?',
     }
 );
 router.post('/:id?',
-    passport.authenticate('jwt', { session: false }), 
+    authCombined('access'), 
     (req, res, next) => {
         if (req.params.id) {
             validatorHandler(createInstitutionalProjectsPublicationns, null, true)(req, res, next); // Si hay un ID presente, utiliza el validador específico para publicaciones
@@ -57,7 +57,7 @@ router.post('/:id?',
 );
 
 router.patch('/:id/:idPublication?',
-    passport.authenticate('jwt', {session: false}),
+    authCombined('access'),
     (req, res, next) => {
         if(req.params.idPublication) {
             validatorHandler(updateInstitutionalProjectsPublicationns, null, true)(req, res, next);
@@ -83,7 +83,7 @@ router.patch('/:id/:idPublication?',
 );
 
 router.delete('/:id/:idPublication?',
-    passport.authenticate('jwt', {session: false}),
+    authCombined('access'),
     validatorHandler(deleInstitutionalProjectsPublications, null, true),
     async (req, res, next) => {
         try {

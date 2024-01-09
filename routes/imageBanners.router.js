@@ -1,7 +1,6 @@
 const express = require('express');
-const passport = require('passport');
+const authCombined = require('../middlewares/authCombined.handler');
 const validatorHandler = require('../middlewares/validator.handler');
-const { checkSuperAdmin } = require('../middlewares/auth.handler'); 
 const { getBanner, createBanner, updateBanner } = require('./../schemas/imageBanners.schema');
 const ImageBanners = require('./../services/imageBanners.service');
 
@@ -23,8 +22,7 @@ router.get('/:banners/:id?',
 );
 
 router.post('/:banners',
-    passport.authenticate('jwt', {session: false}), 
-    checkSuperAdmin(),
+    authCombined('access', true),
     validatorHandler(createBanner, null, true),
     async (req, res, next) => {
         try {
@@ -39,8 +37,7 @@ router.post('/:banners',
 );
 
 router.patch('/:banners',
-    passport.authenticate('jwt', {session: false}), 
-    checkSuperAdmin(),
+    authCombined('access', true),
     validatorHandler(updateBanner, null, true),
     async (req, res, next) => {
         try {
@@ -55,8 +52,7 @@ router.patch('/:banners',
 );
 
 router.delete('/:banners',
-    passport.authenticate('jwt', {session: false}), 
-    checkSuperAdmin(),
+    authCombined('access', true),
     async (req, res, next) => {
         try {
             const body = req.body || req.fields;
