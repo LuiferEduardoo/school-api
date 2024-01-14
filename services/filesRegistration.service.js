@@ -9,124 +9,86 @@ const path = require('path');
 
 const serviceSaveFileInServer = new SaveFileInServer();
 
-class FilesRegistration extends Transactional {
-    async saveFilesInDatabase(req, datasFiles){
-        const createdFiles = [];
-        for (const dataFile of datasFiles) {
-            const newFile = await sequelize.models.FilesRegistration.create(dataFile);
-            createdFiles.push(newFile);
+class FilesRegistration extends Transactional{
+    async fileUpload(req, transaction) {
+        const saveFilesInDatabase = async (req, datasFiles, transaction) => {
+            const createdFiles = [];
+            for (const dataFile of datasFiles) {
+                const newFile = await sequelize.models.FilesRegistration.create(dataFile, {transaction});
+                createdFiles.push(newFile);
+            }
+            return createdFiles;
         }
-        return createdFiles;
-    }
-    async relation(save, methodDatabase){
-        let counter = 0;
-        const relationFile = []
-        for (const data of methodDatabase) {
-            const relationInTable = await save[counter].fileType === 'image' ?
-            await sequelize.models.ImageRegistration.create({ fileId: data.id, imageCredits: save[counter].imageCredits }) :
-            await sequelize.models.DocumentRegistration.create({ fileId: data.id });
-            relationFile.push(relationInTable);
-            counter++;
+        const relation = async (save, methodDatabase, transaction) =>{
+            let counter = 0;
+            const relationFile = []
+            for (const data of methodDatabase) {
+                const relationInTable = await save[counter].fileType === 'image' ?
+                await sequelize.models.ImageRegistration.create({ fileId: data.id, imageCredits: save[counter].imageCredits }, {transaction}) :
+                await sequelize.models.DocumentRegistration.create({ fileId: data.id }, {transaction});
+                relationFile.push(relationInTable);
+                counter++;
+            }
+            return relationFile;
         }
-        return relationFile;
-    }
-
-    async fileUpload(req) {
         try {
             const saveInServer = await serviceSaveFileInServer.handleUploadFileInServer(req);
-            const methodDatabase = await this.saveFilesInDatabase(req, saveInServer);
-            return await this.relation(saveInServer, methodDatabase);
+            const methodDatabase = await saveFilesInDatabase(req, saveInServer, transaction);
+            return await relation(saveInServer, methodDatabase, transaction);
         } catch (error) {
             throw error;
         }
     }
 
-    async fileOne(id){
-        try {
-            const fileOne = await sequelize.models.FilesRegistration.findByPk(id, {
-                include: ['image', 'document']
-            });
-            if(!fileOne){
-                throw boom.notFound('Archivo no encontrado')
+    async get(id){
+        return this.withTransaction(async (transaction) => {
+            const include = ['image', 'document']
+            if(id){
+                return await this.getElementById(id, 'FilesRegistration', include)
             }
-            let fileType; 
-            if(fileOne.image[0]){
-                fileType = 'image';
-            } else if(fileOne.document[0]){
-                fileType = 'document';
-            }
-            return {
-                fileType,
-                fileData: fileOne
-            }
-        } catch (error) {
-            throw error
-        }
+            return await this.getAllElements('FilesRegistration', {}, include)
+        })
     }
 
-    async getFiles(req, id){
-        const idFile = id || null;
-        const where = {}
-        const include = [
-            {
-                model: sequelize.models.ImageRegistration,
-                as: 'image',
-                required: false // Usamos 'false' para permitir que se devuelvan archivos sin imágenes
-            },
-            {
-                model: sequelize.models.DocumentRegistration,
-                as: 'document',
-                required: false // Usamos 'false' para permitir que se devuelvan archivos sin documentos
-            }
-        ]; 
-        if(idFile){
-            where.id = idFile;
-        }
-        if(!superAdmin.includes(req.user.role)){
-            where.userId = req.user.sub 
-        }
-        return sequelize.models.FilesRegistration.findAll({
-            include,
-            where
-        });
-    }
-
-    async fileUpdate(req, data, id){
+    async fileUpdate(req, data, id, transaction){
         try {
-            const fileOne = await this.fileOne(id)
-            if(req.user.sub !== fileOne.fileData.userId && !superAdmin.includes(req.user.role) ){
+            const file = await this.get(id)
+            if(req.user.sub !== file.userId && !superAdmin.includes(req.user.role) ){
                 throw boom.unauthorized();
             }
+            const fileType = file.image[0] || file.document[0]
             const dataUpdate = {
-                path: path.join(fileOne.fileData.folder, fileOne.fileData.name),
-                folder: fileOne.fileData.folder,
-                userId: fileOne.fileData.userId,
-                fileType: fileOne.fileType,
+                path: path.join(file.folder, file.name),
+                folder: file.folder,
+                userId: file.userId,
+                fileType: fileType,
                 newName: data.newName || null,
                 newFolder: data.newFolder || null,
+                isPublic: data.isPublic
             }
             const updateFileInServer = await serviceSaveFileInServer.updateFileInServer(dataUpdate, req);
-            await fileOne.fileData.update(updateFileInServer); // Actualiza la información en la base de datos utilizando Sequelize
-            return fileOne.fileData;
+            await file.update(updateFileInServer, {transaction}); // Actualiza la información en la base de datos utilizando Sequelize
+            return file;
         } catch (error) {
             throw error
         }
     }
 
-    async handleFileDelete (id, req){
+    async handleFileDelete (id, req, transaction){
         try {
-            const fileOne = await this.fileOne(id);// Encuentra la imagen que se va a borrar
-            if(req.user.sub !== fileOne.fileData.userId && !superAdmin.includes(req.user.role) ){
+            const file = await this.get(id);// Encuentra la imagen que se va a borrar
+            const fileType = file.image[0] ? 'image' : file.document[0] ? 'document' : null
+            if(req.user.sub !== file.userId && !superAdmin.includes(req.user.role) ){
                 throw boom.unauthorized();
             }
-            const modelFileToDelete = fileOne.fileType === "image" ? sequelize.models.ImageRegistration : sequelize.models.DocumentRegistration
+            const modelFileToDelete = fileType === "image" ? sequelize.models.ImageRegistration : sequelize.models.DocumentRegistration
             await modelFileToDelete.destroy({
                 where: {
-                    fileId: fileOne.fileData.id
+                    fileId: file.id
                 }
             });
-            await fileOne.fileData.destroy();
-            const fullPathToFileToDelete = path.join(__dirname, `..${fileOne.fileData.folder}`, fileOne.fileData.name);
+            await file.destroy({transaction});
+            const fullPathToFileToDelete = path.join(__dirname, `..${file.folder}`, file.name);
             await serviceSaveFileInServer.deleteFile(fullPathToFileToDelete);
             return {
                 message: 'Archivo eliminado con exito',

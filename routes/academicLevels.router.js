@@ -1,8 +1,9 @@
 const express = require('express');
 const authCombined = require('../middlewares/authCombined.handler');
 const validatorHandler = require('../middlewares/validator.handler');
-const { getAcademicLevels, createAcademicLevels, updateAcademicLevels } = require('../schemas/academicLevels.schema');
+const { getAcademicLevels, createAcademicLevels, updateAcademicLevels, deleteAcademicLevels } = require('../schemas/academicLevels.schema');
 const { queryParamets } = require('../schemas/queryParamets.schema');
+const { checkFiles } = require('../schemas/files.schema');
 
 const AcademicLevels = require('../services/academicLevels.service');
 const service = new AcademicLevels();
@@ -14,7 +15,7 @@ router.get('/:id?',
         if (!req.headers.authorization) {
             return next();  // Si no hay token en los headers, continúa sin autenticar
         }
-        authCombined('access')
+        authCombined('access')(req, res, next)
     },
     async (req, res, next) => {
         try {
@@ -28,6 +29,7 @@ router.get('/:id?',
 );
 router.post('/',
     authCombined('access', true),
+    validatorHandler(checkFiles, 'files.files'),
     validatorHandler(createAcademicLevels, null, true),
     async (req, res, next) => {
         try {
@@ -35,7 +37,7 @@ router.post('/',
         const newAcademicLevels = await service.create(req, body);
         res.status(201).json(newAcademicLevels);
         } catch (error) {
-        next(error);
+            next(error);
         }
     }
 );
@@ -43,6 +45,7 @@ router.post('/',
 router.patch('/:id?',
     authCombined('access', true),
     validatorHandler(getAcademicLevels, 'params'),
+    validatorHandler(checkFiles, 'files.files'),
     validatorHandler(updateAcademicLevels, null, true),
     async (req, res, next) => {
         try {
@@ -59,6 +62,7 @@ router.patch('/:id?',
 router.delete('/:id',
     authCombined('access', true),
     validatorHandler(getAcademicLevels, 'params'),
+    validatorHandler(deleteAcademicLevels, null, true),
     async (req, res, next) => {
         try {
             const body = req.body || req.fields;

@@ -3,7 +3,7 @@ const authCombined = require('../middlewares/authCombined.handler');
 
 const usersRouter = require('./users.router');
 const authRouter = require('./auth.router');
-const fileRegistration = require('./fileRegistration.router');
+const files = require('./files.router');
 const imageBanners = require('./imageBanners.router');
 const newsPublication = require('./news.router');
 const institutionalProjects = require('./institutionalProjects.router');
@@ -24,11 +24,11 @@ const routerApi = (app) => {
     router.use('/auth', authRouter);
     router.use('/file', 
         authCombined('access'),
-        fileRegistration
+        files
     );
     router.use('/banner', imageBanners);
     router.use('/news', newsPublication);
-    router.use('/institutionalProjects', institutionalProjects);
+    router.use('/institutional-projects', institutionalProjects);
     router.use('/academic-levels', academicLevels);
     router.use('/subject', 
         authCombined('access', true),

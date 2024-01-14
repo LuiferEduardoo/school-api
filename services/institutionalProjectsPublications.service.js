@@ -17,7 +17,13 @@ class InstitutionalProjectsPublications extends Transactional {
         const authorArray = authorIds ? authorIds.split(',').map(author => author.trim()) : [];
         const authorsToCheck = [...(mainAuthorId ? [mainAuthorId] : []), ...authorArray];
         for(const author of authorsToCheck){
-            const getInMember = await this.getElementWithCondicional('InstitutionalProjectsMember', {userId: author}, 'No hace parte de este proyecto institucional', ['InstitutionalProjects'])
+            const getInMember = await sequelize.models.InstitutionalProjectsMember.findOne({
+                where: {userId: author},
+                include: ['InstitutionalProjects'],
+            })
+            if(!getInMember){
+                throw boom.unauthorized();
+            }
             if(getInMember.institutionalProjectsId != idInstitutionalProyect){
                 throw boom.unauthorized();
             }
@@ -62,7 +68,7 @@ class InstitutionalProjectsPublications extends Transactional {
             const createPublication = await servicePublications.create(body,transaction);
             const createInstitutionalProjectsPublications = await sequelize.models.InstitutionalProjectsPublications.create({publicationId: createPublication.id, InstitutionalProjectId: id}, {transaction});
             const createAuthors = await serviceIndidualEntity.createIndividualEntity(authors, 'authorId', createInstitutionalProjectsPublications.id, 'InstitutionalProjectsPublicationsAuthors', 'institutionalProjectsPublicationId', {}, transaction);
-            const imagesNewPublications = await serviceImageAssociation.createOrAdd(req, 'ImageInstitutionalProjectsPublications', {institutionalProjectsPublicationsId: createInstitutionalProjectsPublications.id}, `institutionalProjectsPublications`, body.idImage, transaction);
+            const imagesNewPublications = await serviceImageAssociation.createOrAdd(req, 'ImageInstitutionalProjectsPublications', {institutionalProjectsPublicationsId: createInstitutionalProjectsPublications.id}, `institutionalProjects/${id}/publications/${createInstitutionalProjectsPublications.id}`, body.idImage, transaction);
             return {
                 message: 'Publicación de proyecto institucional creado con exito'
             }
@@ -77,7 +83,7 @@ class InstitutionalProjectsPublications extends Transactional {
                 const updateMembers = await serviceIndidualEntity.updateIndividualEntity(authors, body.idsEliminateAuthors, 'authorId', idPublication, 'InstitutionalProjectsPublicationsAuthors', 'institutionalProjectsPublicationId', {}, transaction);
             }
             const updateInstitutionalProjectsPublication = await servicePublications.upate(body, getInstitutionalProjectsPublication.publicationId, transaction);
-            const updateimagesInstitutionalProjectsPublication = await serviceImageAssociation.update(req, 'ImageInstitutionalProjectsPublications', {institutionalProjectsPublicationsId: getInstitutionalProjectsPublication.id}, body.idNewImage, `institutionalProjectsPublications`, body.idImageEliminate, body.eliminateImage, transaction);
+            const updateimagesInstitutionalProjectsPublication = await serviceImageAssociation.update(req, 'ImageInstitutionalProjectsPublications', {institutionalProjectsPublicationsId: getInstitutionalProjectsPublication.id}, body.idNewImage, `institutionalProjects/${idProyect}/publications/${idPublication}`, body.idImageEliminate, body.eliminateImage, transaction);
             return {
                 message: 'Publicación de proyecto institucional actualizado con exito'
             }

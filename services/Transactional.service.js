@@ -19,8 +19,8 @@ class Transactional {
         return queryToReturn;
     }
 
-    checkPermissionToGet(req){
-        const where = req.user ? superAdmin.includes(req.user.role) ? {} : {visible: true} : {visible: true};
+    checkPermissionToGet(req, property = 'visible'){
+        const where = req.user ? superAdmin.includes(req.user.role) ? {} : {[property]: true} : {[property]: true};
         return where;
     }
 
@@ -51,8 +51,8 @@ class Transactional {
         })
     }
 
-    async getElementWithCondicional(model, include=null, where = {}, order = null, query = {}, attributesArray = []){
-        const attributes = attributesArray[0] ? {attributes: attributesArray } : {};
+    async getElementWithCondicional(model, include=null, where = {}, order = null, query = {}, attributesObject = {}){
+        const attributes = Object.keys(attributesObject).length > 0 ? attributesObject : {};
         const element = await sequelize.models[model].findOne({
             where: { ...where },
             include: include,
@@ -66,12 +66,14 @@ class Transactional {
         return element;
     }
 
-    async getAllElements(model, where = null, include = null, order = null, query = null){
+    async getAllElements(model, where = null, include = null, order = null, query = {}, attributesObject = {}){
         return this.withTransaction(async (transaction) => {
+            const attributes = Object.keys(attributesObject).length > 0 ? attributesObject : {};
             const elements = await sequelize.models[model].findAll({
                 where: { ...where },
                 order: order,
                 include: include,
+                ...attributes,
                 ...query
             })
             return elements

@@ -69,7 +69,7 @@ class InstitutionalProjects extends Transactional {
             const members = body.members.split(',');
             const isCoordinator = this.isCoordinator(body);
             const createMembers = await serviceIndidualEntity.createIndividualEntity(members, 'userId', createInstitutionalProjects.id, 'InstitutionalProjectsMember', 'institutionalProjectsId', isCoordinator, transaction);
-            const imagesNewsPublications = await serviceImageAssociation.createOrAdd(req, 'ImageInstitutionalProjects', {institutionalProjectsId: createInstitutionalProjects.id}, `institutionalProjects`, body.idImage, transaction)
+            const imagesInstitutionalPublications = await serviceImageAssociation.createOrAdd(req, 'ImageInstitutionalProjects', {institutionalProjectsId: createInstitutionalProjects.id}, `institutionalProjects/${createInstitutionalProjects.id}`, body.idImage, transaction)
             return {
                 message: 'Proyecto institucional creado con exito'
             }
@@ -84,7 +84,7 @@ class InstitutionalProjects extends Transactional {
             const isCoordinator = this.isCoordinator(body);
             const updateInstitutionalProjects = await serviceContentManagement.upate(body, id, 'InstitutionalProjects', 'institutionalProjectId', transaction);
             const updateMembers = await serviceIndidualEntity.updateIndividualEntity(idsNewMembers, body.idsEliminateMembers, 'userId', id, 'InstitutionalProjectsMember', 'institutionalProjectsId', isCoordinator, transaction);
-            const updateimagesNewsPublications = await serviceImageAssociation.update(req, 'ImageInstitutionalProjects', {institutionalProjectsId: id}, body.idNewImage, `institutionalProjects`, body.idImageEliminate, body.eliminateImage, transaction);
+            const updateimagesNewsPublications = await serviceImageAssociation.update(req, 'ImageInstitutionalProjects', {institutionalProjectsId: id}, body.idNewImage, `institutionalProjects/${id}`, body.idImageEliminate, body.eliminateImage, transaction);
             return {
                 message: 'Proyecto institucional actualizado con exito'
             }
@@ -93,12 +93,12 @@ class InstitutionalProjects extends Transactional {
 
     async delete(req, body, id){
         return this.withTransaction(async (transaction) => {
-            const getInstitutionalProject = await this.getElementById(id, 'InstitutionalProjects', ['InstitutionalProjectsMember', 'InstitutionalProjectsPublications']);
+            const getInstitutionalProject = await this.getElementById(id, 'InstitutionalProjects', ['InstitutionalProjectsMember', 'InstitutionalProjectPublication']);
             await this.checkPermission(req, getInstitutionalProject);
             const getNewsPublications = await this.getElementById(id, 'InstitutionalProjects', ['ImageInstitutionalProjects']);
             const idsImagesEliminate = getNewsPublications.ImageInstitutionalProjects.map(image => (image.id));
-            const deleteimagesInstitucionalProjects = await serviceImageAssociation.delete(idsImagesEliminate, 'ImageInstitutionalProjects', body.elimianteImages, req, transaction);
-            const deleteInstitutionalProjectsPublications = getInstitutionalProject.InstitutionalProjectsPublications.map(publication => (publication.id));
+            const deleteimagesInstitucionalProjects = await serviceImageAssociation.delete(idsImagesEliminate, 'ImageInstitutionalProjects', body.eliminateImage, req, transaction);
+            const deleteInstitutionalProjectsPublications = getInstitutionalProject.InstitutionalProjectPublication.map(publication => (publication.id));
             if(deleteInstitutionalProjectsPublications[0]){
                 for(const publication of deleteInstitutionalProjectsPublications){
                     await serviceInstitutionalProjectsPublications.delete(req, body, getInstitutionalProject.id, publication);

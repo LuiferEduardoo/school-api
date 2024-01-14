@@ -5,6 +5,7 @@ const validatorHandler = require('../middlewares/validator.handler');
 const { createInstitutionalProjects, updateInstitutionalProjects } = require('../schemas/institutionalProjects.schema');
 const { createInstitutionalProjectsPublicationns, updateInstitutionalProjectsPublicationns, deleInstitutionalProjectsPublications } = require('../schemas/institutionalProjectsPublications.schema');
 const { queryParamets } = require('../schemas/queryParamets.schema');
+const { checkFiles } = require('../schemas/files.schema');
 
 const InstitutionalProjects = require('../services/institutionalProjects.service');
 const InstitutionalProjectsPublications = require('../services/institutionalProjectsPublications.service')
@@ -32,6 +33,7 @@ router.get('/:id?',
 );
 router.post('/:id?',
     authCombined('access'), 
+    validatorHandler(checkFiles, 'files.files'),
     (req, res, next) => {
         if (req.params.id) {
             validatorHandler(createInstitutionalProjectsPublicationns, null, true)(req, res, next); // Si hay un ID presente, utiliza el validador específico para publicaciones
@@ -58,6 +60,7 @@ router.post('/:id?',
 
 router.patch('/:id/:idPublication?',
     authCombined('access'),
+    validatorHandler(checkFiles, 'files.files'),
     (req, res, next) => {
         if(req.params.idPublication) {
             validatorHandler(updateInstitutionalProjectsPublicationns, null, true)(req, res, next);

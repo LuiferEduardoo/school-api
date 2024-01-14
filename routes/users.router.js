@@ -4,33 +4,21 @@ const passport = require('passport');
 const UserService = require('../services/user.service');
 const validatorHandler = require('../middlewares/validator.handler');
 const { checkSuperAdmin } = require('../middlewares/auth.handler'); 
-const { updateUserSchema, createUserSchema, getUserSchema, getUpdateUserSchema } = require('./../schemas/user.schema');
+const { updateUserSchema, createUserSchema, deleteUserSchema, getUserSchema, getUpdateUserSchema } = require('./../schemas/user.schema');
+const { checkFiles } = require('../schemas/files.schema');
 
 const router = express.Router();
 const service = new UserService();
 
-router.get('/',
+router.get('/:id?',
     checkSuperAdmin(),
     async (req, res, next) => {
         try {
-            const users = await service.find();
+            const { id } = req.params;
+            const users = await service.get(id, req);
             res.json(users);
         } catch (error) {
             next(error);
-        }
-    }
-);
-
-router.get('/:id',
-    checkSuperAdmin(),
-    validatorHandler(getUserSchema, 'params'),
-    async (req, res, next) => {
-        try {
-        const { id } = req.params;
-        const user = await service.findOne(id);
-        res.json(user);
-        } catch (error) {
-        next(error);
         }
     }
 );
@@ -51,14 +39,12 @@ router.post('/',
 
 router.patch('/:id?',
     validatorHandler(getUpdateUserSchema, 'params'),
+    validatorHandler(checkFiles, 'files.files'),
     validatorHandler(updateUserSchema, null, true),
     async (req, res, next) => {
         try {
-        const idToken = req.user.sub;
-        const idUser = req.params.id;
-        const rol = req.user.role;
         const body = req.body || req.fields;
-        const update = await service.updateUser(idToken, idUser, body, rol);
+        const update = await service.update(req, body);
         res.json(update);
         } catch (error) {
         next(error);
@@ -69,10 +55,12 @@ router.patch('/:id?',
 router.delete('/:id',
     checkSuperAdmin(),
     validatorHandler(getUserSchema, 'params'),
+    validatorHandler(deleteUserSchema, null, true),
     async (req, res, next) => {
         try {
         const { id } = req.params;
-        await service.delete(id);
+        const body = req.body || req.fields;
+        await service.delete(req, id, body);
         res.status(201).json({id});
         } catch (error) {
         next(error);

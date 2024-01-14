@@ -1,31 +1,36 @@
-const boom = require('@hapi/boom');
 const passport = require('passport');
-const checkIfIsInRedis = require('./checkIfIsInRedis.handler');
-const { checkSuperAdmin } = require('./auth.handler'); 
+const { checkSuperAdmin } = require('./auth.handler');
+const boom = require('@hapi/boom');
 
 const authCombined = (type, isForSuperAdmin = false) => async (req, res, next) => {
     try {
         const jwt = type === 'access' ? 'jwt-access' : type === 'refresh' ? 'jwt-refresh' : null;
-        passport.authenticate(jwt, {session: false})(req, res, async (error) => { // Verificamos si el token es valido
-            if(error){
-                return next(error);
-            }
-        });
-        await checkIfIsInRedis(type)(req, res, async (error) => { // Verificamos que el token este guardo en redis
-            if(error){
-                return next(error);
-            }
-        });
-        if(isForSuperAdmin){
-            checkSuperAdmin()(req, res, async (error) => { // Verificamos si el rol pertenece a los superAdmin
-                if(error){
-                    return(next(error));
+
+        // Utilizamos promisify para convertir la función en Passport a una función que devuelve una Promesa
+        const passportAuthenticateAsync = (req, res) => {
+            return new Promise((resolve, reject) => {
+                passport.authenticate(jwt, { session: false })(req, res, (error) => {
+                    if (error) {
+                        reject(boom.conflict());
+                    } else {
+                        resolve();
+                    }
+                });
+            });
+        };
+        await passportAuthenticateAsync(req, res);
+
+        if (isForSuperAdmin) {
+            checkSuperAdmin()(req, res, (error) => {
+                if (error) {
+                    next(error);
                 }
             });
         }
+
         next();
     } catch (error) {
-        next(error);
+        next(error)
     }
 };
 

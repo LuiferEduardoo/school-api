@@ -21,7 +21,7 @@ class AcademicLevels extends Transactional {
     async create(req, body){
         return this.withTransaction(async (transaction) => {
             const createAcademicLevels = await sequelize.models.AcademicLevels.create(body, {transaction});
-            const imagesAcademicLevels = await serviceImageAssociation.createOrAdd(req, 'ImageAcademicLevels', {academicLevelsId: createAcademicLevels.id}, `academicLevels`, body.idImage, transaction)
+            const imagesAcademicLevels = await serviceImageAssociation.createOrAdd(req, 'ImageAcademicLevels', {academicLevelsId: createAcademicLevels.id}, `academicLevels/${createAcademicLevels.id}`, body.idImage, transaction)
             return {
                 message: 'Nivel academico creado con exito'
             }
@@ -31,7 +31,7 @@ class AcademicLevels extends Transactional {
     async update(req, body, id){
         return this.withTransaction(async (transaction) => {
             const getAcademicLevels = await this.getElementById(id, 'AcademicLevels');
-            const updateAcademicLevels = await serviceImageAssociation.update(req, 'ImageAcademicLevels', {academicLevelsId: id}, body.idNewImage, `academicLevels`, body.idImageEliminate, body.eliminateImage, transaction);
+            const updateAcademicLevels = await serviceImageAssociation.update(req, 'ImageAcademicLevels', {academicLevelsId: id}, body.idNewImage, `academicLevels/${id}`, body.idImageEliminate, body.eliminateImage, transaction);
             return {
                 message: 'Nivel academico con exito'
             }
@@ -42,7 +42,7 @@ class AcademicLevels extends Transactional {
         return this.withTransaction(async (transaction) => {
             const getAcademicLevels = await this.getElementById(id, 'AcademicLevels', ['imageAcademicLevels']);
             const idsImagesEliminate = getAcademicLevels.imageAcademicLevels.map(image => (image.id));
-            const deleteAcademicLevels = await serviceImageAssociation.delete(idsImagesEliminate, 'ImageAcademicLevels', body.elimianteImages, req, transaction);
+            const deleteAcademicLevels = await serviceImageAssociation.delete(idsImagesEliminate, 'ImageAcademicLevels', body.eliminateImage, req, transaction);
             await getAcademicLevels.destroy({transaction});
             return {
                 message: 'Nivel academico borrado con exito',

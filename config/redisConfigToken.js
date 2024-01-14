@@ -13,6 +13,9 @@ const verifyToken = async (type, userId, token) =>{
         } return false
     })
 } 
+const getTokens = async (pattern) => {
+    return await redis.keys(`${pattern}*`);
+}
 
 const deleteKeysStartingWith = async (pattern) => {
     const keysToDelete = await redis.keys(`${pattern}*`);
@@ -31,7 +34,9 @@ const deleteTokensDevice = async (accessToken) => {
             if(refreshToken){
                 const multi = redis.multi();
                 multi.del(accessToken);
-                multi.del(refreshToken);
+                if(redis.keys(refreshToken)){
+                    multi.del(refreshToken);
+                }
                 multi.exec();
             }
         })
@@ -41,6 +46,7 @@ const deleteTokensDevice = async (accessToken) => {
 }
 
 module.exports = {
+    getTokens,
     saveToken,
     verifyToken,
     deleteKeysStartingWith,

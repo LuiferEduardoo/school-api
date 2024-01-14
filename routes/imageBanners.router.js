@@ -3,6 +3,7 @@ const authCombined = require('../middlewares/authCombined.handler');
 const validatorHandler = require('../middlewares/validator.handler');
 const { getBanner, createBanner, updateBanner } = require('./../schemas/imageBanners.schema');
 const ImageBanners = require('./../services/imageBanners.service');
+const { checkFiles } = require('../schemas/files.schema');
 
 const router = express.Router();
 const serviceImageBanners = new ImageBanners();
@@ -13,7 +14,7 @@ router.get('/:banners/:id?',
     async (req, res, next) => {
         try {
         const { banners, id } = req.params;
-        const getBanners = await serviceImageBanners.getBanners(id, banners);
+        const getBanners = await serviceImageBanners.get(id, banners, req);
         res.json(getBanners);
         } catch (error) {
         next(error);
@@ -23,6 +24,7 @@ router.get('/:banners/:id?',
 
 router.post('/:banners',
     authCombined('access', true),
+    validatorHandler(checkFiles, 'files.files'),
     validatorHandler(createBanner, null, true),
     async (req, res, next) => {
         try {

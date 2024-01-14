@@ -30,5 +30,4 @@ const updateInstitutionalProjects = Joi.object({
     idsEliminateMembers: members
 });
 
-
 module.exports = { createInstitutionalProjects, updateInstitutionalProjects };

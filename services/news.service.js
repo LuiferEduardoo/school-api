@@ -9,21 +9,11 @@ const servicePublications = new Publications();
 const serviceImageAssociation = new ImageAssociation();
 
 class News extends Transactional {
-    async getPublication(id, include = null){
-        return this.withTransaction(async (transaction) => {
-            const publication = await sequelize.models.NewsPublications.findByPk(id, {
-                include: include
-            });
-                if(!publication){
-                    throw boom.notFound('Noticia no encontrada');
-                }
-                return publication;
-        })
-    }
-
-    async get(id){
+    async get(id, req){
+        const where = this.checkPermissionToGet(req)
+        const query = this.queryParameter(req.query);
         const include = [
-            { association: 'publication', include: [
+            { association: 'publication', where: where, order: this.order, include: [
                 {association: 'categories', include:[{association: 'categories', include: 'clasification'}]},
                 {association:'subcategories', include:[{association: 'subcategories', include: 'clasification'}]},
                 {association:'tags', include:[{association: 'tags', include: 'clasification'}]}
@@ -32,18 +22,16 @@ class News extends Transactional {
         ]
         return this.withTransaction(async (transaction) => {
             if(id){
-                return await this.getPublication(id, include);
+                return await this.getElementWithCondicional('NewsPublications', include, {id: id});
             }
-            return await sequelize.models.NewsPublications.findAll({
-                include: include
-            });
+            return await this.getAllElements('NewsPublications', null, include, null, query )
         })
     }
     async create(req, body){
         return this.withTransaction(async (transaction) => {
             const createPublication = await servicePublications.create(body,transaction);
             const newsPublications = await sequelize.models.NewsPublications.create({publicationId: createPublication.id, userId: req.user.sub}, {transaction});
-            const imagesNewsPublications = await serviceImageAssociation.createOrAdd(req, 'ImageNews', {newsPublicationsId: newsPublications.id}, `news`, body.idImage, transaction)
+            const imagesNewsPublications = await serviceImageAssociation.createOrAdd(req, 'ImageNews', {newsPublicationsId: newsPublications.id}, `news/${newsPublications.id}`, body.idImage, transaction)
             return {
                 message: 'Noticia creada con exito'
             }
@@ -52,9 +40,9 @@ class News extends Transactional {
 
     async update(req, body, id){
         return this.withTransaction(async (transaction) => {
-            const getNewsPublications = await this.getPublication(id);
+            const getNewsPublications = await this.getElementById(id, 'NewsPublications');
             const updateNewsPublications = await servicePublications.upate(body, getNewsPublications.publicationId, transaction);
-            const updateimagesNewsPublications = await serviceImageAssociation.update(req, 'ImageNews', {newsPublicationsId: id}, body.idNewImage, `news`, body.idImageEliminate, body.eliminateImage, transaction);
+            const updateimagesNewsPublications = await serviceImageAssociation.update(req, 'ImageNews', {newsPublicationsId: id}, body.idNewImage, `news/${id}`, body.idImageEliminate, body.eliminateImage, transaction);
             return {
                 message: 'Noticia actualizada con exito'
             }
@@ -63,9 +51,9 @@ class News extends Transactional {
 
     async delete(id, body, req){
         return this.withTransaction(async (transaction) => {
-            const getNewsPublications = await this.getPublication(id, ['imageNews']);
+            const getNewsPublications = await this.getElementById(id, 'NewsPublications', ['imageNews']);
             const idsImagesEliminate = getNewsPublications.imageNews.map(news => (news.id));
-            const deleteimagesNewsPublications = await serviceImageAssociation.delete(idsImagesEliminate, 'ImageNews', body.elimianteImages, req, transaction);
+            const deleteimagesNewsPublications = await serviceImageAssociation.delete(idsImagesEliminate, 'ImageNews', body.eliminateImage, req, transaction);
             await getNewsPublications.destroy({transaction});
             const deletePublication = await servicePublications.delete(getNewsPublications.publicationId, transaction);
             return {

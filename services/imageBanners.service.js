@@ -1,5 +1,3 @@
-const boom = require('@hapi/boom');
-
 const { sequelize } = require('./../libs/sequelize');
 const ImageAssociation = require('./imageAssociation.service');
 const Transactional = require('./Transactional.service');
@@ -7,39 +5,22 @@ const Transactional = require('./Transactional.service');
 const serviceImageAssociation = new ImageAssociation();
 
 class ImageBanners extends Transactional {
-    async bannerForId(id, banner, include){
-        try {
-            const bannerForId = await sequelize.models[banner].findByPk(id, {
-                include: include
-            });
-            if(!bannerForId){
-                throw boom.notFound('Banner no encontrado');
-            }
-            return bannerForId;
-        } catch(error){
-            throw error;
-        }
-    }
-    async getBanners(id, banner){
-        try {
-            await this.checkModel(banner, 'Banner')
+    async get(id, banner, req){
+        return this.withTransaction(async (transaction) => {
+            const query = this.queryParameter(req.query);
             const include = [{ association: 'imageBanner', include: [{ association: 'image', include: 'file' }] }]
+            await this.checkModel(banner, 'Banner')
             if(id){
-                return await this.bannerForId(id, banner, include)
+                return await this.getElementWithCondicional(banner, include, {id: id})
             }
-            return await sequelize.models[banner].findAll({
-                include: include
-            });
-        } catch(error){
-            throw boom.notFound('Banner no encontrado');
-        }
-
+            return await this.getAllElements(banner, {}, include, null, query)
+        })
     }
     async create(req, data, banner){
         return this.withTransaction(async (transaction) => {
             await this.checkModel(banner, 'Banner');
             const createImages = await serviceImageAssociation.createOrAdd(req, 'ImageBanners', {userId: req.user.sub}, `banners/${banner}`, data.ids, null, transaction);
-            const description = data.description.split(",");
+            const description = data.description ? data.description.split(",") : [];
             const imagesBanner = [];
     
             let counter = 0;
@@ -63,7 +44,7 @@ class ImageBanners extends Transactional {
             
             let counter = 0;
             for (const idBanner of idsBanner ){
-                const imageBanner = await this.bannerForId(idBanner, banner);
+                const imageBanner = await this.getElementById(idBanner, banner);
                 bannerForId.push(imageBanner.bannerId);
                 const dataUpdateInDataBase = {};
                 if(descriptions[counter] != null){
@@ -82,7 +63,7 @@ class ImageBanners extends Transactional {
             let bannersToDelete = [];
             let imagesToDeleteAssociation = [];
             for(const eliminateBannerId of eliminateBannersIds){
-                const bannerToDelete = await this.bannerForId(eliminateBannerId, banner);
+                const bannerToDelete = await this.getElementById(eliminateBannerId, banner);
                 imagesToDeleteAssociation.push(bannerToDelete.bannerId);
                 bannerToDelete.destroy();
                 bannersToDelete.push(bannerToDelete);

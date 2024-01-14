@@ -1,34 +1,49 @@
 const Joi = require('joi');
 
 const id = Joi.number().integer();
-const username = Joi.string();
+const string = Joi.string();
 const email = Joi.string().email();
-const name = Joi.string();
-const lastName = Joi.string();
-const currentPassword = Joi.string().min(8);
-const newPassword = Joi.string().min(8);
-const password = Joi.string().min(8);
-const rol = Joi.string();
-const active = Joi.boolean();
+const password = string
+    .min(8)
+    .regex(/[a-z]/) // Al menos una minúscula
+    .regex(/[A-Z]/) // Al menos una mayúscula
+    .regex(/\d/) // Al menos un número
+    .regex(/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/) // Al menos un carácter especial
+const boolean = Joi.boolean();
+const { imagesUpdates } = require('./images');
+
+const imageUpdateSchema = imagesUpdates('idNewImage', 'idImageEliminate')
 
 const createUserSchema = Joi.object({
-    name: name.required(),
-    lastName: lastName.required(),
-    username: username.required(),
+    name: string.required(),
+    lastName: string.required(),
+    username: string.required(),
     email: email.required(),
     password: password.required(),
-    rol: rol.required()
+    rol: string.required()
 });
 
 const updateUserSchema = Joi.object({
-    name,
-    lastName,
+    name: string,
+    lastName: string,
     email,
-    username,
-    currentPassword,
-    password: newPassword,
-    rol,
-    active,
+    username: string,
+    currentPassword: string,
+    password: Joi.when('currentPassword', {
+        is: Joi.exist(),
+        then: password
+            .invalid(Joi.ref('currentPassword'))
+            .required(),
+        otherwise: Joi.forbidden()
+    }),
+    closeOtherDevices: Joi.when('password', {
+        is: Joi.exist(),
+        then: boolean.required(),
+        otherwise: Joi.forbidden()
+    }),
+    rol: string,
+    active: boolean,
+    ...imageUpdateSchema
 });
 
 const getUserSchema = Joi.object({
@@ -37,5 +52,8 @@ const getUserSchema = Joi.object({
 const getUpdateUserSchema = Joi.object({
     id
 });
+const deleteUserSchema = Joi.object({
+    eliminateImage: Joi.boolean()
+})
 
-module.exports = { createUserSchema, updateUserSchema, getUserSchema, getUpdateUserSchema}
+module.exports = { createUserSchema, updateUserSchema, deleteUserSchema, getUserSchema, getUpdateUserSchema}
