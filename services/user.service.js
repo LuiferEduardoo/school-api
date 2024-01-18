@@ -7,7 +7,7 @@ const RolService = require('./rol.service');
 const Transactional = require('./Transactional.service');
 const { superAdmin } = require('../middlewares/auth.handler');
 const { SendMain } = require('./emails.service'); 
-const { getTokens, deleteTokensDevice } = require('./../config/redisConfigToken')
+const { getTokens, deleteTokensDevice, deleteKeysStartingWith } = require('./../config/redisConfigToken')
 const Rol = new RolService(); 
 const serviceImageAssociation = new ImageAssociation();
 
@@ -64,6 +64,7 @@ class UserService extends Transactional {
             if (changes.rol !== user.rol[0].rol) {
                 const role = await Rol.create(changes.rol);
                 await user.setRol([role.id]);
+                await deleteKeysStartingWith(`access${user.id}`);
             }
         }
         async function closeOtherDevices(isClose, req){

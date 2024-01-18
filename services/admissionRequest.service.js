@@ -18,7 +18,7 @@ class AdmissionRequest extends Transactional {
     }
     async getStatus(numberDocument){
         return this.withTransaction(async (transaction) => {
-            return await this.getElementWithCondicional('AdmissionRequest', null, {numberDocument: numberDocument}, null, {}, ['status'] );
+            return await this.getElementWithCondicional('AdmissionRequest', null, {numberDocument: numberDocument}, null, {}, {attributes: ['status']} );
         });
     }
     async create (body){
