@@ -9,21 +9,30 @@ class Subject extends Transactional {
         const createSubjectName = await sequelize.models.SubjectName.findCreateFind({where: {name: subjectName}, transaction});
         return createSubjectName[0]
     }
-    async get(req, id){
+    async get(req, id, academicLevelId){
         return this.withTransaction(async (transaction) => {
+            const where = { academicLevelId: academicLevelId };
+            const { search, teacher } = req.query;
             const include = [{association: 'subjectName'}, {association: 'academicLevel'}, {association: 'teacher', attributes: ['id', 'name', 'lastName']}];
             const query = this.queryParameter(req.query);
-            if(!id){
-                return await this.getAllElements('Subject', {}, include, null, query)
+            const dataFilter= ['$subjectName.name$', '$teacher.name$', '$teacher.last_name$', '$teacher.username$', '$teacher.email$'];
+            this.querySearch(dataFilter, search, where);
+
+            if (teacher) {
+                where['$teacher.id$'] = teacher;
             }
-            return await this.getElementWithCondicional('Subject', include, {id: id}, null, query);
+            
+            if(!id){
+                return await this.getAllElements('Subject', where, include, null, query)
+            }
+            return await this.getElementWithCondicional('Subject', include, {id: id, ...where}, null, query);
         });
     }
-    async create (body){
+    async create (body, academicLevelId){
         return this.withTransaction(async (transaction) => {
             await this.getElementWithCondicional('User', [{association: 'rol', where: { rol: 'docente' }}], {id: body.teacherId}, null, {});
             const createSubjectName = await this.createSubjectName(body.name, transaction);
-            const createSubject = await sequelize.models.Subject.create({...body, subjectNameId: createSubjectName.id }, {transaction});
+            await sequelize.models.Subject.create({...body, subjectNameId: createSubjectName.id, academicLevelId: academicLevelId }, {transaction});
             return {
                 message: 'Asignatura creada con exito'
             }

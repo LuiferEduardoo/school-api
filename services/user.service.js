@@ -23,12 +23,24 @@ class UserService extends Transactional {
     async get (id, req){
         return this.withTransaction(async (transaction) => {
             const query = this.queryParameter(req.query);
+            const { search, active, rol} = req.query;
+            const whereClause = {};
+            const dataFilter= ['name', 'lastName', 'username', 'email'];
+            this.querySearch(dataFilter, search, whereClause);
+
+            if (active) {
+                whereClause.active = active;
+            }
+
+            if (rol) {
+                whereClause['$rol.rol$'] = rol;
+            }
             const attributes = { attributes: { exclude: ['recoveryToken', 'password']}}
             const include = [{association: 'rol'}, {association: 'image', include: [{association: 'image', include: 'file'}]}];
             if(id){
                 return await this.getElementWithCondicional('User', include, {}, null, query, attributes);
             } 
-            return await this.getAllElements('User', {}, include, null, query, attributes);
+            return await this.getAllElements('User', whereClause, include, null, query, attributes);
         });
     }
 

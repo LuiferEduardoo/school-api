@@ -13,6 +13,7 @@ const schoolCourses = require('./schoolCourses.router');
 const schedule = require('./schedule.router');
 const admissionRequest = require('./admissionRequest.router');
 const calendar = require('./calendar.router');
+const Search = require('./search.router')
 
 const routerApi = (app) => {
     const router = express.Router();
@@ -41,6 +42,7 @@ const routerApi = (app) => {
     router.use('/schedule', schedule);
     router.use('/admission', admissionRequest);
     router.use('/calendar', calendar);
+    router.use('/search', Search);
 }
 
 module.exports = routerApi;

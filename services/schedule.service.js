@@ -11,17 +11,19 @@ class Schedule extends Transactional {
     }
     async get (req){
         return this.withTransaction(async (transaction) => {
-            const { grade, course } = req.params;
-            const whereCourse = course ? { course: course } : {};
-            const include = [{association: 'dayWeek'}, {association: 'schoolCourses', where: whereCourse , include: [{association: 'schoolGrade', where: { grade: grade }}]}, {association: 'subject', include: [ {association:'subjectName'}, {association: 'teacher', attributes: ['id', 'name', 'lastName']}]}];
+            const { id, schoolCoursesId } = req.params;
+            const include = [{association: 'dayWeek'}, {association: 'schoolCourses', where: { id: schoolCoursesId }, include: [{association: 'schoolGrade'}]}, {association: 'subject', include: [ {association:'subjectName'}, {association: 'teacher', attributes: ['id', 'name', 'lastName']}]}];
             const query = this.queryParameter(req.query);
-            return await this.getAllElements('Schedule', {}, include, null, query)
+            if(id){
+                return await this.getElementById(id, 'Schedule', include);
+            }
+            return await this.getAllElements('Schedule', {}, include, null, query);
         })
     }
-    async create (body){
+    async create (body, schoolCoursesId){
         return this.withTransaction(async (transaction) => {
             const createSchuleDay = await this.createSchuleDay(body.dayWeek, transaction);
-            const createSchedule = await sequelize.models.Schedule.create({...body, dayWeekId: createSchuleDay.id }, {transaction});
+            await sequelize.models.Schedule.create({...body, dayWeekId: createSchuleDay.id, schoolCoursesId: schoolCoursesId }, {transaction});
             return {
                 message: 'Horario creado con exito'
             }

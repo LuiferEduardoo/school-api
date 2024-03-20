@@ -2,15 +2,23 @@ const Joi = require('joi');
 
 const id = Joi.number().integer();
 const number = Joi.number();
+const { query } = require('./queryParamets.schema');
+
+const queryParameterSchoolCourse = Joi.object({
+    ...query
+})
 
 const getSchoolCourses  = Joi.object({
-    id: id.required()
+    academicLevelId: number.required(),
+    id: id
 });
 
 const createSchoolCourses = Joi.object({
     grade: number.required(),
-    course: number.required(),
-    academicLevelId: number.required(),
+    course: number.required()
+});
+const parameterSchoolCourses = Joi.object({
+    academicLevelId: number.required()
 });
 const updateSchoolCourses  = Joi.object({
     course: number,
@@ -23,4 +31,4 @@ const updateSchoolCourses  = Joi.object({
 });
 
 
-module.exports = { getSchoolCourses, createSchoolCourses, updateSchoolCourses }
+module.exports = { getSchoolCourses, createSchoolCourses, updateSchoolCourses, parameterSchoolCourses, queryParameterSchoolCourse }

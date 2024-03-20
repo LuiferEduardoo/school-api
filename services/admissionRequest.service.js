@@ -3,19 +3,44 @@ const boom = require('@hapi/boom');
 const { sequelize } = require('./../libs/sequelize');
 const Transactional = require('./Transactional.service');
 const { SendMain } = require('./emails.service');
-const { required } = require('joi');
+const { Op } = require('sequelize'); 
 
 class AdmissionRequest extends Transactional {
-    async get(req, id){
+    async get(req, id) {
         return this.withTransaction(async (transaction) => {
-            const include = [{association: 'academicLevels'}, {association: 'schoolGrade'}];
+            const { search, startDate, endDate, academicLevels, gender, grade, status } = req.query;
+            const include = [{ association: 'academicLevels' }, { association: 'schoolGrade' }];
             const query = this.queryParameter(req.query);
-            if(!id){
-                return await this.getAllElements('AdmissionRequest', {}, include, null, query)
+            const where = startDate && endDate ? {
+                createdAt: {
+                    [Op.between]: [startDate, endDate] // Filtra por el rango de fecha
+                }
+            } : {}
+            const dataFilter= ['firstName', 'secondName', 'surname', 'secondSurname', 'numberDocument', 'email'];
+            this.querySearch(dataFilter, search, where);
+
+            if (academicLevels) {
+                where['$academicLevels.name_level$'] = academicLevels;
             }
-            return await this.getElementWithCondicional('AdmissionRequest', include, {id: id}, null, query);
+
+            if (gender) {
+                where.gender = gender;
+            }
+
+            if (grade) {
+                where['$schoolGrade.grade$'] = grade;
+            }
+
+            if (status) {
+                where.status = status;
+            }
+
+            if (!id) {
+                return await this.getAllElements('AdmissionRequest', where, include, null, query)
+            }
+            return await this.getElementWithCondicional('AdmissionRequest', include, { id: id }, null, query);
         });
-    }
+    }    
     async getStatus(numberDocument){
         return this.withTransaction(async (transaction) => {
             return await this.getElementWithCondicional('AdmissionRequest', null, {numberDocument: numberDocument}, null, {}, {attributes: ['status']} );

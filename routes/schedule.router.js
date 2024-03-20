@@ -1,15 +1,16 @@
 const express = require('express'); 
 const authCombined = require('../middlewares/authCombined.handler');
 const validatorHandler = require('../middlewares/validator.handler');
-const { getSchedule, createSchedule, updateSchedule } = require('../schemas/schedule.schema');
+const { getSchedule, createSchedule, updateSchedule, parametersSchedule } = require('../schemas/schedule.schema');
 const { queryParamets } = require('../schemas/queryParamets.schema');
 
 const Schedule = require('../services/schedule.service');
 const service = new Schedule();
 const router = express.Router();
 
-router.get('/:grade/:course?',
+router.get('/:schoolCoursesId/:id?',
     validatorHandler(queryParamets, 'query'),
+    validatorHandler(getSchedule, 'params'),
     async (req, res, next) => {
         try {
             const getScheduleReturn = await service.get(req);
@@ -19,13 +20,15 @@ router.get('/:grade/:course?',
         }
     }
 );
-router.post('/',
+router.post('/:schoolCoursesId',
     authCombined('access', true),
+    validatorHandler(parametersSchedule, 'params'),
     validatorHandler(createSchedule, null, true),
     async (req, res, next) => {
         try {
             const body = req.body || req.fields;
-            const newSchedule = await service.create(body);
+            const { schoolCoursesId } = req.params;
+            const newSchedule = await service.create(body, schoolCoursesId);
             res.status(201).json(newSchedule);
         } catch (error) {
         next(error);
@@ -33,7 +36,7 @@ router.post('/',
     }
 );
 
-router.patch('/:id?',
+router.patch('/:id',
     authCombined('access', true),
     validatorHandler(getSchedule, 'params'),
     validatorHandler(updateSchedule, null, true),

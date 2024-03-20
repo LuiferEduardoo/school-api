@@ -7,7 +7,7 @@ const { verifyToken } = require('./../../../config/redisConfigToken');
 const checkIfExistInRedis = async (type, req, user, done) => {
     const authHeader  = req.headers.authorization;
     const token = authHeader.split(' ')[1]; // Extraer solo el token eliminando 'Bearer '
-    const verify = verifyToken(type, user, token);
+    const verify = await verifyToken(type, user, token);
     if(!verify){
         return done(null, false)
     }
@@ -38,7 +38,7 @@ const JwtAccessStrategy = new Strategy(optionsForAccess, async(req, payload, don
 });
 
 const JwtRefreshStrategy = new Strategy(optionsForRefresh, async (req, payload, done) => {
-    await checkIfExistInRedis('refresh', req, payload.sub);
+    await checkIfExistInRedis('refresh', req, payload.sub, done);
     return done(null, payload);
 });
 

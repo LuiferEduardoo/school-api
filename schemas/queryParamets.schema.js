@@ -3,8 +3,13 @@ const Joi = require('joi');
 const limit = Joi.number().integer();
 const offset = Joi.number().integer(); 
 
-const queryParamets = Joi.object({
+const query = {
     limit,
-    offset
+    offset,
+    search: Joi.string()
+}
+
+const queryParamets = Joi.object({
+    ...query
 });
-module.exports = { queryParamets }
+module.exports = { queryParamets, query }

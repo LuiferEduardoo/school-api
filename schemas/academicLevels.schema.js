@@ -1,13 +1,22 @@
 const Joi = require('joi');
 
-const { imagesUploads, imagesUpdates } = require('./images')
+const { imagesUploads, imagesUpdates } = require('./images');
 
+const { query } = require('./queryParamets.schema');
 const id = Joi.number().integer();
 const string = Joi.string();
 const number = Joi.number();
 const boolean = Joi.boolean();
 const imageUploadSchema = imagesUploads('idImage');
 const imageUpdateSchema = imagesUpdates('idNewImage', 'idImageEliminate')
+
+const queryParameterUser = Joi.object({
+    ...query,
+    visible: boolean,
+    campusNumber: number,
+    educationDay: string,
+    modality: string
+})
 
 const getAcademicLevels = Joi.object({
     id: id.required()
@@ -17,7 +26,8 @@ const createAcademicLevels = Joi.object({
     nameLevel: string.required(),
     description: string.required(),
     levelCode: number.required(),
-    campus: number.required(),
+    campusNumber: number.required(),
+    educationDay: string.required(),
     modality: string.required(),
     educationalObjectives: string.required(),
     admissionRequirements: string.required(),
@@ -27,8 +37,9 @@ const createAcademicLevels = Joi.object({
 const updateAcademicLevels = Joi.object({
     nameLevel: string,
     description: string,
-    levelCode: string,
-    campus: string,
+    levelCode: number,
+    campusNumber: number,
+    educationDay: string,
     modality: string,
     educationalObjectives: string,
     admissionRequirements: string,
@@ -40,4 +51,4 @@ const deleteAcademicLevels = Joi.object({
 })
 
 
-module.exports = { getAcademicLevels, createAcademicLevels, updateAcademicLevels, deleteAcademicLevels }
+module.exports = { getAcademicLevels, createAcademicLevels, updateAcademicLevels, deleteAcademicLevels, queryParameterUser }

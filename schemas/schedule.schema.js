@@ -11,12 +11,16 @@ const parseTime = (timeString) => {
 }
 
 const getSchedule  = Joi.object({
-    id: id.required()
+    schoolCoursesId: id.required(),
+    id: id
 });
+
+const parametersSchedule = Joi.object({
+    schoolCoursesId: id.required()
+}) 
 
 const createSchedule = Joi.object({
     subjectId: id.required(),
-    schoolCoursesId: id.required(),
     dayWeek: string.required(),
     startTime: hour.required(),
     endTime: hour.required().custom((value, helpers) => {
@@ -42,4 +46,4 @@ const updateSchedule  = Joi.object({
 });
 
 
-module.exports = { getSchedule, createSchedule, updateSchedule }
+module.exports = { getSchedule, createSchedule, updateSchedule, parametersSchedule }

@@ -1,5 +1,8 @@
 const { User, UserSchema} = require('./user.model');
 const { Rol, RolSchema} = require('./rol.model');
+const { EducationDayAcademicLevels, educationDayAcademiclevels } = require('./educationAcademicLevels.model');
+const { ModalityAcademicLevels, modalityAcademicLevels } = require('./modalityAcademicLevels.model');
+const { CampusAcademicLevels, campusAcademicLevels } = require('./campusAcademicLevels.model')
 const { RolUser, RolUserSchema } = require('./rolUser.model');
 const { FilesRegistration, filesRegistrationSchema} = require('./filesRegistration.model');
 const { DocumentRegistration, documentRegistrationSchema} = require('./documentRegistration.model');
@@ -45,6 +48,9 @@ const { SchoolCourses, schoolCoursesSchema } = require('./schoolCourses.model');
 
 const setupModels = (sequelize) => {
     User.init(UserSchema, User.config(sequelize));
+    EducationDayAcademicLevels.init(educationDayAcademiclevels, EducationDayAcademicLevels.config(sequelize));
+    ModalityAcademicLevels.init(modalityAcademicLevels, ModalityAcademicLevels.config(sequelize));
+    CampusAcademicLevels.init(campusAcademicLevels, CampusAcademicLevels.config(sequelize));
     Rol.init(RolSchema, Rol.config(sequelize));
     RolUser.init(RolUserSchema, RolUser.config(sequelize));
     FilesRegistration.init(filesRegistrationSchema, FilesRegistration.config(sequelize));

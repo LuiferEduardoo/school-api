@@ -1,30 +1,32 @@
 const express = require('express'); 
 const validatorHandler = require('../middlewares/validator.handler');
-const { getSchoolCourses, createSchoolCourses, updateSchoolCourses } = require('../schemas/schoolCourses.schema');
-const { queryParamets } = require('../schemas/queryParamets.schema');
+const { getSchoolCourses, createSchoolCourses, updateSchoolCourses, parameterSchoolCourses, queryParameterSchoolCourse } = require('../schemas/schoolCourses.schema');
 
 const SchoolCourses = require('../services/schoolCourses.service');
 const service = new SchoolCourses();
 const router = express.Router();
 
-router.get('/:id?',
-    validatorHandler(queryParamets, 'query'),
+router.get('/:academicLevelId/:id?',
+    validatorHandler(queryParameterSchoolCourse, 'query'),
+    validatorHandler(getSchoolCourses, 'params'),
     async (req, res, next) => {
         try {
-            const { id } = req.params;
-            const getSchoolCoursesToReturn = await service.get(req, id);
+            const { academicLevelId, id } = req.params;
+            const getSchoolCoursesToReturn = await service.get(req, academicLevelId, id);
             res.status(200).json(getSchoolCoursesToReturn);
         } catch (error) {
         next(error);
         }
     }
 );
-router.post('/',
+router.post('/:academicLevelId',
+    validatorHandler(parameterSchoolCourses, 'params'),
     validatorHandler(createSchoolCourses, null, true),
     async (req, res, next) => {
         try {
+            const { academicLevelId } = req.params;
             const body = req.body || req.fields;
-            const newSchoolCourses = await service.create(body);
+            const newSchoolCourses = await service.create(body, academicLevelId);
             res.status(201).json(newSchoolCourses);
         } catch (error) {
         next(error);

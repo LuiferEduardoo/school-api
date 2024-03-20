@@ -5,6 +5,17 @@ const email = Joi.string().email();
 const string = Joi.string();
 const number = Joi.number();
 const date = Joi.date().iso();
+const { query } = require('./queryParamets.schema');
+
+const queryParameterAdmissionRequest = Joi.object({
+    ...query,
+    startDate: date,
+    endDate: date,
+    academicLevels: string,
+    gender: string,
+    grade: string,
+    status: string
+});
 
 const getAdmissionRequest  = Joi.object({
     id: id.required()
@@ -41,4 +52,4 @@ const updateAdmissionRequest  = Joi.object({
 });
 
 
-module.exports = { getAdmissionRequest, createAdmissionRequest, updateAdmissionRequest }
+module.exports = { getAdmissionRequest, createAdmissionRequest, updateAdmissionRequest, queryParameterAdmissionRequest }

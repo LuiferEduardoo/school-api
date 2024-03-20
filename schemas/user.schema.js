@@ -1,5 +1,6 @@
 const Joi = require('joi');
 
+const { query } = require('./queryParamets.schema');
 const id = Joi.number().integer();
 const string = Joi.string();
 const email = Joi.string().email();
@@ -12,7 +13,13 @@ const password = string
 const boolean = Joi.boolean();
 const { imagesUpdates } = require('./images');
 
-const imageUpdateSchema = imagesUpdates('idNewImage', 'idImageEliminate')
+const imageUpdateSchema = imagesUpdates('idNewImage', 'idImageEliminate');
+
+const queryParameterUser = Joi.object({
+    ...query,
+    rol: string,
+    active: boolean,
+})
 
 const createUserSchema = Joi.object({
     name: string.required(),
@@ -56,4 +63,4 @@ const deleteUserSchema = Joi.object({
     eliminateImage: Joi.boolean()
 })
 
-module.exports = { createUserSchema, updateUserSchema, deleteUserSchema, getUserSchema, getUpdateUserSchema}
+module.exports = { createUserSchema, updateUserSchema, deleteUserSchema, getUserSchema, getUpdateUserSchema, queryParameterUser}

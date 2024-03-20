@@ -39,6 +39,10 @@ class SchoolGrade extends Model {
             as: 'schoolCourses',
             foreignKey: 'schoolGradeId',
         });
+        this.hasMany(models.AdmissionRequest, {
+            as: 'AdmissionRequest',
+            foreignKey: 'grade',
+        });
     }
     static config(sequelize){
         return {

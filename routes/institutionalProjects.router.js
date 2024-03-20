@@ -2,9 +2,8 @@ const express = require('express');
 
 const authCombined = require('../middlewares/authCombined.handler');
 const validatorHandler = require('../middlewares/validator.handler');
-const { createInstitutionalProjects, updateInstitutionalProjects } = require('../schemas/institutionalProjects.schema');
-const { createInstitutionalProjectsPublicationns, updateInstitutionalProjectsPublicationns, deleInstitutionalProjectsPublications } = require('../schemas/institutionalProjectsPublications.schema');
-const { queryParamets } = require('../schemas/queryParamets.schema');
+const { createInstitutionalProjects, updateInstitutionalProjects, queryInstitutionalProjects } = require('../schemas/institutionalProjects.schema');
+const { createInstitutionalProjectsPublicationns, updateInstitutionalProjectsPublicationns, deleInstitutionalProjectsPublications, queryInstitutionalProjectsPublications } = require('../schemas/institutionalProjectsPublications.schema');
 const { checkFiles } = require('../schemas/files.schema');
 
 const InstitutionalProjects = require('../services/institutionalProjects.service');
@@ -14,7 +13,7 @@ const serviceInstitutionalProjectsPublications = new InstitutionalProjectsPublic
 const router = express.Router();
 
 router.get('/:id?',
-    validatorHandler(queryParamets, 'query'),
+    validatorHandler(queryInstitutionalProjects, 'query'),
     (req, res, next) => {
         if (!req.headers.authorization) {
             return next();  // Si no hay token en los headers, continúa sin autenticar
@@ -31,6 +30,24 @@ router.get('/:id?',
         }
     }
 );
+router.get('/:institutionalProjectsId/publication/:id?',
+    validatorHandler(queryInstitutionalProjectsPublications, 'query'),
+    (req, res, next) => {
+        if (!req.headers.authorization) {
+            return next();  // Si no hay token en los headers, continúa sin autenticar
+        }
+        authCombined('access')(req, res, next);
+    },
+    async (req, res, next) => {
+        try {
+            const { institutionalProjectsId, id } = req.params;
+            const getInstitutionalProject = await serviceInstitutionalProjectsPublications.get(req, id, institutionalProjectsId);
+            res.status(200).json(getInstitutionalProject);
+        } catch (error) {
+        next(error);
+        }
+    }
+)
 router.post('/:id?',
     authCombined('access'), 
     validatorHandler(checkFiles, 'files.files'),

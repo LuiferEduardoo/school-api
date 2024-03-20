@@ -61,6 +61,32 @@ class InstitutionalProjectsPublications extends Transactional {
         }
         return getInstitutionalProjectsPublication;
     }
+
+    async get(req, id, institutionalProjectId) {
+        return this.withTransaction(async (transaction) => {
+            const where= this.checkPermissionToGet(req);
+            const { search, important, visible } = req.query;
+            const whereClause = {}
+            const dataFilter = ['$publication.title$', '$publication.categories.categories.clasification.name$', '$publication.subcategories.subcategories.clasification.name$', '$publication.tags.tags.clasification.name$']
+            const query = this.queryParameter(req.query);
+            const attributes = {attributes: ['id', 'name', 'lastName']};
+            const include = [{association: 'publication', where: where, order: this.order, include: this.includeClassification}, {association: 'ImageInstitutionalProjectPublication', include: [{ association: 'image', include: 'file' }]}, {association: 'InstitutionalProjectsPublicationsAuthors', include:[{association: 'author', include: [{association: 'user', ...attributes}]}]}];
+            this.querySearch(dataFilter, search, whereClause);
+
+            if (important) {
+                whereClause['$publication.important$'] = important;
+            }
+
+            if (visible) {
+                whereClause['$publication.visible$'] = visible;
+            }
+            
+            if(id){
+                return await this.getElementWithCondicional('InstitutionalProjectsPublications', include, {id: id, ...whereClause}, null, query);
+            }
+            return await this.getAllElements('InstitutionalProjectsPublications', { InstitutionalProjectId: institutionalProjectId, ...whereClause }, include, null, query);
+        })
+    }
     
     async create(req, body, id){
         return this.withTransaction(async (transaction) => {

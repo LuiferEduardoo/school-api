@@ -1,5 +1,8 @@
 'use strict';
 
+const {
+  ADMINISTRATION_REQUEST_TABLE,
+} = require('../models/admissionRequest.model');
 const { SCHUDULE_TABLE } = require('../models/schedule.model');
 const {
   INSTITUTIONAL_PROJECTS_PUBLICATIONS_AUTHORS_TABLE,
@@ -33,10 +36,102 @@ const {
   INSTITUTIONAL_PROJECTS_TABLE,
 } = require('../models/institutionalProjects.model');
 const { ACADEMIC_LEVELS_TABLE } = require('../models/academicLevels.model');
+const { SCHOOL_GRADE_TABLE } = require('../models/schoolGrade.model');
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
+    await queryInterface.createTable(ADMINISTRATION_REQUEST_TABLE, {
+      id: {
+        type: Sequelize.DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      academicLevel: {
+        field: 'academic_level',
+        allowNull: false,
+        type: Sequelize.DataTypes.INTEGER,
+        references: {
+          model: ACADEMIC_LEVELS_TABLE,
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',
+      },
+      grade: {
+        allowNull: false,
+        type: Sequelize.DataTypes.INTEGER,
+        references: {
+          model: SCHOOL_GRADE_TABLE,
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',
+      },
+      firstName: {
+        type: Sequelize.DataTypes.TEXT,
+        field: 'first_name',
+        allowNull: false,
+      },
+      secondName: {
+        type: Sequelize.DataTypes.TEXT,
+        field: 'second_name',
+        allowNull: false,
+      },
+      surname: {
+        type: Sequelize.DataTypes.TEXT,
+        allowNull: false,
+      },
+      secondSurname: {
+        type: Sequelize.DataTypes.TEXT,
+        field: 'second_surname',
+        allowNull: false,
+      },
+      birthdate: {
+        allowNull: false,
+        type: Sequelize.DataTypes.DATE,
+      },
+      gender: {
+        allowNull: false,
+        type: Sequelize.DataTypes.TEXT,
+      },
+      documentType: {
+        type: Sequelize.DataTypes.TEXT,
+        field: 'document_tipe',
+        allowNull: false,
+      },
+      numberDocument: {
+        type: Sequelize.DataTypes.TEXT,
+        field: 'number_document',
+        allowNull: false,
+      },
+      phoneNumber: {
+        type: Sequelize.DataTypes.STRING(10),
+        field: 'phone_number',
+        allowNull: false,
+      },
+      email: {
+        type: Sequelize.DataTypes.TEXT,
+        allowNull: false,
+      },
+      status: {
+        allowNull: false,
+        type: Sequelize.DataTypes.STRING,
+        defaultValue: 'En revisión',
+      },
+      createdAt: {
+        allowNull: false,
+        type: Sequelize.DataTypes.DATE,
+        field: 'created_at',
+        defaultValue: Sequelize.NOW,
+      },
+      updatedAt: {
+        allowNull: false,
+        type: Sequelize.DataTypes.DATE,
+        field: 'updated_at',
+        defaultValue: Sequelize.NOW,
+      },
+    });
     await queryInterface.createTable(SCHUDULE_TABLE, {
       id: {
         allowNull: false,
@@ -320,6 +415,7 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
+    await queryInterface.dropTable(ADMINISTRATION_REQUEST_TABLE);
     await queryInterface.dropTable(SCHUDULE_TABLE);
     await queryInterface.dropTable(
       INSTITUTIONAL_PROJECTS_PUBLICATIONS_AUTHORS_TABLE

@@ -12,6 +12,9 @@ class News extends Transactional {
     async get(id, req){
         const where = this.checkPermissionToGet(req)
         const query = this.queryParameter(req.query);
+        const { search, important, visible } = req.query;
+        const whereClause = {};
+        const dataFilter = ['$publication.title$', '$publication.categories.categories.clasification.name$', '$publication.subcategories.subcategories.clasification.name$', '$publication.tags.tags.clasification.name$']
         const include = [
             { association: 'publication', where: where, order: this.order, include: [
                 {association: 'categories', include:[{association: 'categories', include: 'clasification'}]},
@@ -20,11 +23,21 @@ class News extends Transactional {
             ]},
             { association: 'imageNews', include: [{association: 'image', include: 'file'}] }
         ]
+        this.querySearch(dataFilter, search, whereClause);
+        
+        if (important) {
+            whereClause['$publication.important$'] = important;
+        }
+
+        if (visible) {
+            whereClause['$publication.visible$'] = visible;
+        }
+
         return this.withTransaction(async (transaction) => {
             if(id){
                 return await this.getElementWithCondicional('NewsPublications', include, {id: id});
             }
-            return await this.getAllElements('NewsPublications', null, include, null, query )
+            return await this.getAllElements('NewsPublications', whereClause, include, null, query )
         })
     }
     async create(req, body){

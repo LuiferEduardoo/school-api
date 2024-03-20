@@ -1,30 +1,33 @@
 const express = require('express'); 
 const validatorHandler = require('../middlewares/validator.handler');
-const { getSubject, createSubject, updateSubject } = require('../schemas/subject.schema');
+const { getSubject, createSubject, updateSubject, parameterSubject, queryParameterSubject } = require('../schemas/subject.schema');
 const { queryParamets } = require('../schemas/queryParamets.schema');
 
 const Subject = require('../services/subject.service');
 const service = new Subject();
 const router = express.Router();
 
-router.get('/:id?',
-    validatorHandler(queryParamets, 'query'),
+router.get('/:academicLevelId/:id?',
+    validatorHandler(queryParameterSubject, 'query'),
+    validatorHandler(getSubject, 'params'),
     async (req, res, next) => {
         try {
-            const { id } = req.params;
-            const getSubject = await service.get(req, id);
+            const { academicLevelId, id } = req.params;
+            const getSubject = await service.get(req, id, academicLevelId);
             res.status(200).json(getSubject);
         } catch (error) {
             next(error);
         }
     }
 );
-router.post('/',
+router.post('/:academicLevelId',
     validatorHandler(createSubject, null, true),
+    validatorHandler(parameterSubject, 'params'),
     async (req, res, next) => {
         try {
+            const { academicLevelId } = req.params;
             const body = req.body || req.fields;
-            const newSubjet = await service.create(body);
+            const newSubjet = await service.create(body, academicLevelId);
             res.status(201).json(newSubjet);
         } catch (error) {
             next(error);
@@ -32,7 +35,7 @@ router.post('/',
     }
 );
 
-router.patch('/:id?',
+router.patch('/:id',
     validatorHandler(getSubject, 'params'),
     validatorHandler(updateSubject, null, true),
     async (req, res, next) => {

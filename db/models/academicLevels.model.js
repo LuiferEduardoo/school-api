@@ -1,5 +1,9 @@
 const { Model, DataTypes, Sequelize } = require('sequelize');
 
+const { CAMPUS_ACADEMIC_LEVELS_TABLE } = require('./campusAcademicLevels.model');
+const { EDUCATION_DAY_ACADEMIC_LEVELS_TABLE } = require('./educationAcademicLevels.model');
+const { MODALITY_ACADEMIC_LEVELS_TABLE } = require('./modalityAcademicLevels.model')
+
 const ACADEMIC_LEVELS_TABLE = "academic_levels"; 
 
 const AcademicLevelsSchema = {
@@ -24,13 +28,38 @@ const AcademicLevelsSchema = {
         type: DataTypes.TEXT,
         unique: true,
     },
-    campus: {
+    campusId:{
+        field: 'campus_id',
         allowNull: false,
-        type: DataTypes.INTEGER
+        type: DataTypes.INTEGER,
+        references: {
+            model: CAMPUS_ACADEMIC_LEVELS_TABLE,
+            key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'RESTRICT'
     },
-    modality: {
+    educationDayId:{
+        field: 'education_day_id',
         allowNull: false,
-        type: DataTypes.TEXT,
+        type: DataTypes.INTEGER,
+        references: {
+            model: EDUCATION_DAY_ACADEMIC_LEVELS_TABLE,
+            key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'RESTRICT'
+    },
+    modalityId:{
+        field: 'modality_id',
+        allowNull: false,
+        type: DataTypes.INTEGER,
+        references: {
+            model: MODALITY_ACADEMIC_LEVELS_TABLE,
+            key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'RESTRICT'
     },
     educationalObjectives: {
         field: 'educational_objetive',
@@ -77,7 +106,19 @@ class AcademicLevels extends Model {
         this.hasMany(models.ImageAcademicLevels, {
             as: 'imageAcademicLevels',
             foreignKey: 'academicLevelsId'
-        })
+        });
+        this.belongsTo(models.CampusAcademicLevels, {
+            as: 'campus',
+            foreignKey: 'campusId'
+        });
+        this.belongsTo(models.EducationDayAcademicLevels, {
+            as: 'educationDay',
+            foreignKey: 'educationDayId'
+        });
+        this.belongsTo(models.ModalityAcademicLevels, {
+            as: 'modality',
+            foreignKey: 'modalityId'
+        });
     }
     static config(sequelize){
         return {

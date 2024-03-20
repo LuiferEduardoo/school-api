@@ -1,9 +1,17 @@
 const Joi = require('joi');
 const { getPublications, createPublication, updatePublication } = require('./publications');
 
+const { query } = require('./queryParamets.schema');
+
 const id = Joi.number();
 const members = Joi.string();
 const date = Joi.date().iso();
+
+const queryInstitutionalProjects = Joi.object({
+    ...query,
+    important: Joi.boolean(),
+    visible: Joi.boolean()
+})
 
 const createInstitutionalProjects = Joi.object({
     ...createPublication,
@@ -30,4 +38,4 @@ const updateInstitutionalProjects = Joi.object({
     idsEliminateMembers: members
 });
 
-module.exports = { createInstitutionalProjects, updateInstitutionalProjects };
+module.exports = { createInstitutionalProjects, updateInstitutionalProjects, queryInstitutionalProjects };

@@ -29,38 +29,25 @@ class InstitutionalProjects extends Transactional {
     }
     async get(id, req){
         return this.withTransaction(async (transaction) => {
-            const where = this.checkPermissionToGet(req)
+            const where= this.checkPermissionToGet(req);
+            const { search, important, visible } = req.query;
             const query = this.queryParameter(req.query);
             const attributes = {attributes: ['id', 'name', 'lastName']}
+            const dataFilter= ['title', '$categories.categories.clasification.name$', '$subcategories.subcategories.clasification.name$', '$tags.tags.clasification.name$'];
+            this.querySearch(dataFilter, search, where);
 
-            const includeInstitutionalProjects = [{ association: 'InstitutionalProjectsMember', include: [{association: 'user', ...attributes}] }, { association: 'ImageInstitutionalProjects', include: [{ association: 'image', include: 'file' }] },...this.includeClassification,
-            ];
-            let institutionalProjectsData;
-            if(!id){
-                institutionalProjectsData = await this.getAllElements('InstitutionalProjects', where, includeInstitutionalProjects, this.order, query)
-            } else{
-                institutionalProjectsData = [await this.getElementWithCondicional('InstitutionalProjects', includeInstitutionalProjects, {id: id, ...where}, this.order, query)];
+            if (important) {
+                where.important = important;
             }
-            const idList = institutionalProjectsData.map((element) => element.id);
-            const publicationData = await this.getAllElements('InstitutionalProjectsPublications', { InstitutionalProjectId: idList }, [{association: 'publication', where: where, order: this.order, include: this.includeClassification}, {association: 'ImageInstitutionalProjectPublication', include: [{ association: 'image', include: 'file' }]}, {association: 'InstitutionalProjectsPublicationsAuthors', include:[{association: 'author', include: [{association: 'user', ...attributes}]}]}]);
-            const publicationsByProjectId = publicationData.reduce((result, publication) => {
-                const projectId = publication.InstitutionalProjectId;
-                if (!result[projectId]) {
-                    result[projectId] = [];
-                }
-                result[projectId].push(publication);
-                return result;
-            }, {});
-            const dataToReturn = institutionalProjectsData.map((project) => {
-                const projectId = project.id;
-                const publications = publicationsByProjectId[projectId] || [];
-                return {
-                    InstitutionalProjects: project,
-                    publications
-                }
-            })
-            
-            return dataToReturn
+
+            if (visible) {
+                where.visible = visible;
+            }
+            const includeInstitutionalProjects = [{ association: 'InstitutionalProjectsMember', include: [{association: 'user', ...attributes}] }, { association: 'ImageInstitutionalProjects', include: [{ association: 'image', include: 'file' }] },...this.includeClassification];
+            if(!id){
+                return await this.getAllElements('InstitutionalProjects', where, includeInstitutionalProjects, this.order, query)
+            }
+            return await this.getElementWithCondicional('InstitutionalProjects', includeInstitutionalProjects, {id: id, ...where}, this.order, query);
         });
     }
     async create(req, body){

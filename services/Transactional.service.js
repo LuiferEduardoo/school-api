@@ -1,6 +1,7 @@
 const { sequelize } = require('./../libs/sequelize');
 const boom = require('@hapi/boom');
-const { superAdmin } = require('../middlewares/auth.handler'); 
+const { superAdmin } = require('../middlewares/auth.handler');
+const { Op } = require('sequelize'); 
 
 class Transactional {
     constructor(){
@@ -18,6 +19,22 @@ class Transactional {
         queryToReturn.offset = offset || undefined;
         return queryToReturn;
     }
+
+    querySearch(filter, query, where) {
+        if (query) {
+            const words = query.split(' ');
+            const verifyDate = (date, word) => {
+                if(isNaN(word)){
+                    return {[date]: { [Op.iLike]: `%${word.toLowerCase()}%` }} // Convertir términos de búsqueda a minúsculas
+                }
+                return {[date]: word} // Se coloca el dato directo
+            }
+            const searchConditions = words.map(word => ({
+                [Op.or]: filter.map(element => (verifyDate(element, word)))
+            }));
+            where[Op.and] = searchConditions;
+        }
+    }        
 
     checkPermissionToGet(req, property = 'visible'){
         const where = req.user ? superAdmin.includes(req.user.role) ? {} : {[property]: true} : {[property]: true};
@@ -66,7 +83,7 @@ class Transactional {
         return element;
     }
 
-    async getAllElements(model, where = null, include = null, order = null, query = {}, attributesObject = {}){
+    async getAllElements(model, where = null, include = null, order = null, query = {}, attributesObject = {}, otherElements){
         return this.withTransaction(async (transaction) => {
             const attributes = Object.keys(attributesObject).length > 0 ? attributesObject : {};
             const elements = await sequelize.models[model].findAll({
@@ -74,7 +91,8 @@ class Transactional {
                 order: order,
                 include: include,
                 ...attributes,
-                ...query
+                ...query,
+                ...otherElements
             })
             return elements
         });

@@ -11,7 +11,7 @@ const config = {
     apiKey: process.env.API_KEY,
     jwtSecretRecoveryPassword: process.env.JWT_SECRET_RECOVERY_PASSWORD,
     jwtSecretRefreshToren: process.env.JWT_SECRET_REFRESH_TOKEN,
-    jwtSecretAccessToken: process.env.JWT_SECRET_REFRESH_TOKEN,
+    jwtSecretAccessToken: process.env.JWT_SECRET_ACCESS_TOKEN,
     emailHost: process.env.EMAIL_HOST,
     emailPort: process.env.EMAIL_PORT,
     emailUser: process.env.EMAIL_USER,

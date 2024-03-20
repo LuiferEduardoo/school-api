@@ -33,7 +33,7 @@ async function SendMain(email, subject, type, date) {
     }
     const html = await ejs.renderFile(template, date);
     const info = await transporter.sendMail({
-          from: config.emailHost, // sender address
+          from: config.emailUser, // sender address
           to: email, // list of receivers
           subject: subject, // Subject line
           html: html, // html body

@@ -5,33 +5,37 @@ const Transactional = require('./Transactional.service');
 
 class SchoolCourses extends Transactional {
 
-    async createSchoolGrade(body, transaction){
+    async createSchoolGrade(body, academicLevelId, transaction){
         const createSchoolGrade = await sequelize.models.SchoolGrade.findCreateFind({
             where: {
                 grade: body.grade,
-                academicLevel: body.academicLevelId
+                academicLevel: academicLevelId
             }, 
             defaults: {
-                academicLevel: body.academicLevelId
+                academicLevel: academicLevelId
             },
             transaction: transaction
         });
         return createSchoolGrade[0]
     }
-    async get(req, id){
+    async get(req, academicLevelId, id){
         return this.withTransaction(async (transaction) => {
-            const include = [{association: 'schoolGrade', include: 'academic'}];
+            const where = { };
+            const { search } = req.query;
+            const dataFilter = ['course', '$schoolGrade.grade$'];
+            const include = [{association: 'schoolGrade', include: {association: 'academic', where: { id: academicLevelId }, include: ['campus', 'educationDay', 'modality']}}];
+            this.querySearch(dataFilter, search, where);
             const query = this.queryParameter(req.query);
             if(!id){
-                return await this.getAllElements('SchoolCourses', {}, include, null, query)
+                return await this.getAllElements('SchoolCourses', where, include, null, query)
             }
             return await this.getElementWithCondicional('SchoolCourses', include, {id: id}, null, query);
         });
     }
-    async create (body){
+    async create (body, academicLevelId){
         return this.withTransaction(async (transaction) => {
-            const createSchoolGrade = await this.createSchoolGrade(body, transaction);
-            const createSchoolCourses = await sequelize.models.SchoolCourses.create({...body, schoolGradeId: createSchoolGrade.id }, {transaction});
+            const createSchoolGrade = await this.createSchoolGrade(body, academicLevelId, transaction);
+            await sequelize.models.SchoolCourses.create({...body, schoolGradeId: createSchoolGrade.id }, {transaction});
             return {
                 message: 'Asignatura creada con exito'
             }
@@ -40,11 +44,11 @@ class SchoolCourses extends Transactional {
 
     async update (id, body){
         return this.withTransaction(async (transaction) => {
-            if(body.grade){
-                const createSchoolGrade = await this.createSchoolGrade(body, transaction);
+            const getSchoolCourses = await this.getElementById(id, 'SchoolCourses');
+            if(body.grade && body.academicLevelId){
+                const createSchoolGrade = await this.createSchoolGrade(body, body.academicLevelId, transaction);
                 body.schoolGradeId = createSchoolGrade.id;
             }
-            const getSchoolCourses = await this.getElementById(id, 'SchoolCourses');
             await getSchoolCourses.update(body, {transaction});
         });
     }

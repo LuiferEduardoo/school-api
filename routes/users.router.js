@@ -3,15 +3,17 @@ const passport = require('passport');
 
 const UserService = require('../services/user.service');
 const validatorHandler = require('../middlewares/validator.handler');
-const { checkSuperAdmin } = require('../middlewares/auth.handler'); 
-const { updateUserSchema, createUserSchema, deleteUserSchema, getUserSchema, getUpdateUserSchema } = require('./../schemas/user.schema');
+const authCombined = require('../middlewares/authCombined.handler');
+const { updateUserSchema, createUserSchema, deleteUserSchema, getUserSchema, getUpdateUserSchema, queryParameterUser } = require('./../schemas/user.schema');
+const { queryParamets } = require('../schemas/queryParamets.schema');
 const { checkFiles } = require('../schemas/files.schema');
 
 const router = express.Router();
 const service = new UserService();
 
 router.get('/:id?',
-    checkSuperAdmin(),
+    validatorHandler(queryParameterUser, 'query'),
+    authCombined('access', true),
     async (req, res, next) => {
         try {
             const { id } = req.params;
@@ -24,7 +26,7 @@ router.get('/:id?',
 );
 
 router.post('/',
-    checkSuperAdmin(),
+    authCombined('access', true),
     validatorHandler(createUserSchema, null, true),
     async (req, res, next) => {
         try {
@@ -37,7 +39,7 @@ router.post('/',
     }
 );
 
-router.patch('/:id?',
+router.patch('/:id',
     validatorHandler(getUpdateUserSchema, 'params'),
     validatorHandler(checkFiles, 'files.files'),
     validatorHandler(updateUserSchema, null, true),
@@ -53,7 +55,7 @@ router.patch('/:id?',
 );
 
 router.delete('/:id',
-    checkSuperAdmin(),
+    authCombined('access', true),
     validatorHandler(getUserSchema, 'params'),
     validatorHandler(deleteUserSchema, null, true),
     async (req, res, next) => {

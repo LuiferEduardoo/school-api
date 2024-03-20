@@ -1,8 +1,5 @@
 'use strict';
 
-const {
-  ADMINISTRATION_REQUEST_TABLE,
-} = require('../models/admissionRequest.model');
 const { SCHOOL_COURSES_TABLE } = require('../models/schoolCourses.model');
 const {
   CATEGORIES_PUBLICATIONS_TABLE,
@@ -32,9 +29,9 @@ const {
 const {
   TAGS_INSTITUTIONAL_PROJECTS_TABLE,
 } = require('../models/tagsInstitutionalProjects.model');
+const { SCHOOL_GRADE_TABLE } = require('../models/schoolGrade.model');
 
 const { USER_TABLE } = require('../models/user.model');
-const { SCHOOL_GRADE_TABLE } = require('../models/schoolGrade.model');
 const { ACADEMIC_LEVELS_TABLE } = require('../models/academicLevels.model');
 const { CATEGORIES_TABLE } = require('../models/categories.model');
 const { SUBCATEGORIES_TABLE } = require('../models/subcategories.model');
@@ -50,95 +47,28 @@ const {
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable(ADMINISTRATION_REQUEST_TABLE, {
+    await queryInterface.createTable(SCHOOL_GRADE_TABLE, {
       id: {
-        type: Sequelize.DataTypes.INTEGER,
-        primaryKey: true,
+        allowNull: false,
         autoIncrement: true,
+        primaryKey: true,
+        type: Sequelize.DataTypes.INTEGER,
+      },
+      grade: {
+        allowNull: false,
+        type: Sequelize.DataTypes.INTEGER,
       },
       academicLevel: {
         field: 'academic_level',
         allowNull: false,
         type: Sequelize.DataTypes.INTEGER,
+        unique: true,
         references: {
           model: ACADEMIC_LEVELS_TABLE,
           key: 'id',
         },
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL',
-      },
-      grade: {
-        allowNull: false,
-        type: Sequelize.DataTypes.INTEGER,
-        references: {
-          model: SCHOOL_GRADE_TABLE,
-          key: 'id',
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'SET NULL',
-      },
-      firstName: {
-        type: Sequelize.DataTypes.TEXT,
-        field: 'first_name',
-        allowNull: false,
-      },
-      secondName: {
-        type: Sequelize.DataTypes.TEXT,
-        field: 'second_name',
-        allowNull: false,
-      },
-      surname: {
-        type: Sequelize.DataTypes.TEXT,
-        allowNull: false,
-      },
-      secondSurname: {
-        type: Sequelize.DataTypes.TEXT,
-        field: 'second_surname',
-        allowNull: false,
-      },
-      birthdate: {
-        allowNull: false,
-        type: Sequelize.DataTypes.DATE,
-      },
-      gender: {
-        allowNull: false,
-        type: Sequelize.DataTypes.TEXT,
-      },
-      documentType: {
-        type: Sequelize.DataTypes.TEXT,
-        field: 'document_tipe',
-        allowNull: false,
-      },
-      numberDocument: {
-        type: Sequelize.DataTypes.TEXT,
-        field: 'number_document',
-        allowNull: false,
-      },
-      phoneNumber: {
-        type: Sequelize.DataTypes.STRING(10),
-        field: 'phone_number',
-        allowNull: false,
-      },
-      email: {
-        type: Sequelize.DataTypes.TEXT,
-        allowNull: false,
-      },
-      status: {
-        allowNull: false,
-        type: Sequelize.DataTypes.STRING,
-        defaultValue: 'En revisión',
-      },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DataTypes.DATE,
-        field: 'created_at',
-        defaultValue: Sequelize.NOW,
-      },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DataTypes.DATE,
-        field: 'updated_at',
-        defaultValue: Sequelize.NOW,
       },
     });
     await queryInterface.createTable(SCHOOL_COURSES_TABLE, {
@@ -474,7 +404,7 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable(ADMINISTRATION_REQUEST_TABLE);
+    await queryInterface.dropTable(SCHOOL_GRADE_TABLE);
     await queryInterface.dropTable(SCHOOL_COURSES_TABLE);
     await queryInterface.dropTable(CATEGORIES_PUBLICATIONS_TABLE);
     await queryInterface.dropTable(SUBCATEGORIES_PUBLICATIONS_TABLE);

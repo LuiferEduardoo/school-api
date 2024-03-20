@@ -4,7 +4,6 @@ const {
   FILES_REGISTRATION_TABLE,
 } = require('../models/filesRegistration.model');
 const { ROL_USER_TABLE } = require('../models/rolUser.model');
-const { SCHOOL_GRADE_TABLE } = require('../models/schoolGrade.model');
 const { CATEGORIES_TABLE } = require('../models/categories.model');
 const { SUBCATEGORIES_TABLE } = require('../models/subcategories.model');
 const { TAGS_TABLE } = require('../models/tags.model');
@@ -13,13 +12,16 @@ const {
   INSTITUTIONAL_PROJECTS_TABLE,
 } = require('../models/institutionalProjects.model');
 const { SUBJECT_TABLE } = require('../models/subject.model');
+const { ACADEMIC_LEVELS_TABLE } = require('../models/academicLevels.model');
 
 const { USER_TABLE } = require('../models/user.model');
 const { ROL_TABLE } = require('../models/rol.model');
-const { ACADEMIC_LEVELS_TABLE } = require('../models/academicLevels.model');
 const { CLASIFICATION_TABLE } = require('../models/clasification.model');
 const { PUBLICATIONS_TABLE } = require('../models/publications.model');
 const { SUBJECT_NAME_TABLE } = require('../models/subjectName.model');
+const { CAMPUS_ACADEMIC_LEVELS_TABLE } = require('../models/campusAcademicLevels.model');
+const { EDUCATION_DAY_ACADEMIC_LEVELS_TABLE } = require('../models/educationAcademicLevels.model');
+const { MODALITY_ACADEMIC_LEVELS_TABLE } = require('../models/modalityAcademicLevels.model');
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -109,29 +111,87 @@ module.exports = {
         onDelete: 'SET NULL',
       },
     });
-    await queryInterface.createTable(SCHOOL_GRADE_TABLE, {
+    await queryInterface.createTable(ACADEMIC_LEVELS_TABLE, {
       id: {
         allowNull: false,
-        autoIncrement: true,
+        autoIncrement: true, 
         primaryKey: true,
-        type: Sequelize.DataTypes.INTEGER,
+        type: Sequelize.DataTypes.INTEGER
       },
-      grade: {
+      nameLevel: {
+        field: 'name_level',
+        allowNull: false,
+        type: Sequelize.DataTypes.TEXT,
+      },
+      description: {
+        allowNull: false,
+        type: Sequelize.DataTypes.TEXT,
+      },
+      levelCode: {
+          field: 'level_code',
+          allowNull: false,
+          type: Sequelize.DataTypes.TEXT,
+          unique: true,
+      },
+      campusId:{
+          field: 'campus_id',
+          allowNull: false,
+          type: Sequelize.DataTypes.INTEGER,
+          references: {
+              model: CAMPUS_ACADEMIC_LEVELS_TABLE,
+              key: 'id'
+          },
+          onUpdate: 'CASCADE',
+          onDelete: 'RESTRICT'
+      },
+      educationDayId:{
+        field: 'education_day_id',
         allowNull: false,
         type: Sequelize.DataTypes.INTEGER,
-      },
-      academicLevel: {
-        field: 'academic_level',
-        allowNull: false,
-        type: Sequelize.DataTypes.INTEGER,
-        unique: true,
         references: {
-          model: ACADEMIC_LEVELS_TABLE,
-          key: 'id',
+          model: EDUCATION_DAY_ACADEMIC_LEVELS_TABLE,
+          key: 'id'
         },
         onUpdate: 'CASCADE',
-        onDelete: 'SET NULL',
+        onDelete: 'RESTRICT'
       },
+      modalityId:{
+        field: 'modality_id',
+        allowNull: false,
+        type: Sequelize.DataTypes.INTEGER,
+        references: {
+          model: MODALITY_ACADEMIC_LEVELS_TABLE,
+          key: 'id'
+        },
+          onUpdate: 'CASCADE',
+          onDelete: 'RESTRICT'
+      },
+      educationalObjectives: {
+        field: 'educational_objetive',
+        allowNull: true,
+        type: Sequelize.DataTypes.TEXT,
+      },
+      admissionRequirements: {
+        field: 'admission_requirements',
+        allowNull: true,
+        type: Sequelize.DataTypes.TEXT,
+      },
+      visible: {
+        defaultValue: true,
+        type: Sequelize.DataTypes.BOOLEAN
+      },
+      createdAt: {
+        allowNull: false,
+        type: Sequelize.DataTypes.DATE,
+        field: 'created_at',
+        defaultValue: Sequelize.NOW
+      },
+      updatedAt: {
+        allowNull: false,
+        type: Sequelize.DataTypes.DATE,
+        field: 'updated_at',
+        defaultValue: Sequelize.NOW
+      }
     });
     await queryInterface.createTable(CATEGORIES_TABLE, {
       id: {
@@ -333,8 +393,8 @@ module.exports = {
 
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable(FILES_REGISTRATION_TABLE);
+    await queryInterface.dropTable(ACADEMIC_LEVELS_TABLE);
     await queryInterface.dropTable(ROL_USER_TABLE);
-    await queryInterface.dropTable(SCHOOL_GRADE_TABLE);
     await queryInterface.dropTable(CATEGORIES_TABLE);
     await queryInterface.dropTable(SUBCATEGORIES_TABLE);
     await queryInterface.dropTable(TAGS_TABLE);

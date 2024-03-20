@@ -1,7 +1,7 @@
 const express = require('express');
 const authCombined = require('../middlewares/authCombined.handler');
 const validatorHandler = require('../middlewares/validator.handler');
-const { getAdmissionRequest, createAdmissionRequest, updateAdmissionRequest } = require('../schemas/admissionRequest.schema');
+const { getAdmissionRequest, createAdmissionRequest, updateAdmissionRequest, queryParameterAdmissionRequest } = require('../schemas/admissionRequest.schema');
 const { queryParamets } = require('../schemas/queryParamets.schema');
 
 const AdmissionRequest = require('../services/admissionRequest.service');
@@ -22,7 +22,7 @@ router.get('/status/:numberDocument',
 
 router.get('/request/:id?',
     authCombined('access', true),
-    validatorHandler(queryParamets, 'query'),
+    validatorHandler(queryParameterAdmissionRequest, 'query'),
     async (req, res, next) => {
         try {
             const { id } = req.params;
