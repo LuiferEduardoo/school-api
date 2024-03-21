@@ -11,7 +11,8 @@
         "migrations:run": "sequelize-cli db:migrate",
         "migrations:revert": "sequelize-cli db:migrate:undo",
         "migrations:delete": "sequelize-cli db:migrate:undo:all",
-        "migration:delete": "sequelize-cli db:migrate:undo --name"
+        "migration:delete": "sequelize-cli db:migrate:undo --name",
+        "deploy": "npm run migrations:run && npm start"
     },
     "keywords": [],
     "author": "",
