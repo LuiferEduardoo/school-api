@@ -393,6 +393,7 @@ module.exports = {
 
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable(FILES_REGISTRATION_TABLE);
+    await queryInterface.dropTable(SUBJECT_TABLE);
     await queryInterface.dropTable(ACADEMIC_LEVELS_TABLE);
     await queryInterface.dropTable(ROL_USER_TABLE);
     await queryInterface.dropTable(CATEGORIES_TABLE);
@@ -400,6 +401,5 @@ module.exports = {
     await queryInterface.dropTable(TAGS_TABLE);
     await queryInterface.dropTable(NEWS_PUBLICATIONS_TABLE);
     await queryInterface.dropTable(INSTITUTIONAL_PROJECTS_TABLE);
-    await queryInterface.dropTable(SUBJECT_TABLE);
   },
 };

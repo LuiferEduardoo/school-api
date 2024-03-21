@@ -404,8 +404,8 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable(SCHOOL_GRADE_TABLE);
     await queryInterface.dropTable(SCHOOL_COURSES_TABLE);
+    await queryInterface.dropTable(SCHOOL_GRADE_TABLE);
     await queryInterface.dropTable(CATEGORIES_PUBLICATIONS_TABLE);
     await queryInterface.dropTable(SUBCATEGORIES_PUBLICATIONS_TABLE);
     await queryInterface.dropTable(TAGS_PUBLICATIONS_TABLE);

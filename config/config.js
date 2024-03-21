@@ -18,7 +18,12 @@ const config = {
     emailHost: process.env.EMAIL_HOST,
     emailPort: process.env.EMAIL_PORT,
     emailUser: process.env.EMAIL_USER,
-    emailPassword: process.env.EMAIL_PASSWORD
+    emailPassword: process.env.EMAIL_PASSWORD,
+    defaultUserName: process.env.DEFAULT_USER_NAME,
+    defaultUserLastName: process.env.DEFAULT_USER_LASTNAME,
+    defaultUserEmail: process.env.DEFAULT_USER_EMAIL,
+    defaultUserUserUsername: process.env.DEFAULT_USER_USERNAME,
+    defaultUserPassword: process.env.DEFAULT_USER_PASSWORD
 }
 
 module.exports = { config };

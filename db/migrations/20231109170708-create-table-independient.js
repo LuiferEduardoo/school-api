@@ -63,13 +63,13 @@ module.exports = {
           field: 'last_online',
       },
       createdAt: {
-          allowNull: false,
+          allowNull: true,
           type: Sequelize.DataTypes.DATE,
           field: 'created_at',
           defaultValue: Sequelize.NOW
       },
       updatedAt: {
-          allowNull: false,
+          allowNull: true,
           type: Sequelize.DataTypes.DATE,
           field: 'updated_at',
           defaultValue: Sequelize.NOW
