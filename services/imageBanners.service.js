@@ -7,7 +7,7 @@ const serviceImageAssociation = new ImageAssociation();
 class ImageBanners extends Transactional {
     async get(id, banner, req){
         return this.withTransaction(async (transaction) => {
-            const query = this.queryParameter(req.query);
+            const query = this.queryParameterPagination(req.query);
             const include = [{ association: 'imageBanner', include: [{ association: 'image', include: 'file' }] }]
             await this.checkModel(banner, 'Banner')
             if(id){

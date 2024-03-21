@@ -14,7 +14,7 @@ class Files extends Transactional {
                 throw boom.notFound(`Cannot ${req.method} ${req.originalUrl}`);
             }
             const where = superAdmin.includes(req.user.role) ? {} : {userId: req.user.sub}
-            const query = this.queryParameter(req.query);
+            const query = this.queryParameterPagination(req.query);
             if(id){
                 return await this.getElementWithCondicional(model, [{association: 'file', where: where}], {id: id});
             }

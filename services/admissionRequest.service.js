@@ -10,7 +10,7 @@ class AdmissionRequest extends Transactional {
         return this.withTransaction(async (transaction) => {
             const { search, startDate, endDate, academicLevels, gender, grade, status } = req.query;
             const include = [{ association: 'academicLevels' }, { association: 'schoolGrade' }];
-            const query = this.queryParameter(req.query);
+            const query = this.queryParameterPagination(req.query);
             const where = startDate && endDate ? {
                 createdAt: {
                     [Op.between]: [startDate, endDate] // Filtra por el rango de fecha
@@ -38,7 +38,7 @@ class AdmissionRequest extends Transactional {
             if (!id) {
                 return await this.getAllElements('AdmissionRequest', where, include, null, query)
             }
-            return await this.getElementWithCondicional('AdmissionRequest', include, { id: id }, null, query);
+            return await this.getElementWithCondicional('AdmissionRequest', include, { id: id });
         });
     }    
     async getStatus(numberDocument){

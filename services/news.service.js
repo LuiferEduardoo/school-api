@@ -11,7 +11,7 @@ const serviceImageAssociation = new ImageAssociation();
 class News extends Transactional {
     async get(id, req){
         const where = this.checkPermissionToGet(req)
-        const query = this.queryParameter(req.query);
+        const query = this.queryParameterPagination(req.query);
         const { search, important, visible } = req.query;
         const whereClause = {};
         const dataFilter = ['$publication.title$', '$publication.categories.categories.clasification.name$', '$publication.subcategories.subcategories.clasification.name$', '$publication.tags.tags.clasification.name$']

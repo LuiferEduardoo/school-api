@@ -12,10 +12,10 @@ class Transactional {
             {association:'tags', include:[{association: 'tags', include: 'clasification'}]}
         ];
     }
-    queryParameter(query){
+    queryParameterPagination(query){
         const { limit, offset } = query;
         let queryToReturn = {}
-        queryToReturn.limit = limit || undefined;
+        queryToReturn.limit = limit || 10;
         queryToReturn.offset = offset || undefined;
         return queryToReturn;
     }
@@ -86,6 +86,7 @@ class Transactional {
     async getAllElements(model, where = null, include = null, order = null, query = {}, attributesObject = {}, otherElements){
         return this.withTransaction(async (transaction) => {
             const attributes = Object.keys(attributesObject).length > 0 ? attributesObject : {};
+            const totalCount = await sequelize.models[model].count();
             const elements = await sequelize.models[model].findAll({
                 where: { ...where },
                 order: order,
@@ -93,8 +94,9 @@ class Transactional {
                 ...attributes,
                 ...query,
                 ...otherElements
-            })
-            return elements
+            });
+            const totalPages = Math.ceil(totalCount / query.limit);
+            return {totalPages, elements}
         });
     }
     async checkModel(model, nameModel){

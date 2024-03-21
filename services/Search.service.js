@@ -5,7 +5,6 @@ class Search extends Transactional {
     async get (req){
         return this.withTransaction(async (transaction) => {
             const where = this.checkPermissionToGet(req)
-            const query = this.queryParameter(req.query);
             const includePublication = [
                 { association: 'publication', where: where, order: this.order, include: [
                     {association: 'categories', include:[{association: 'categories', include: 'clasification'}]},
@@ -23,7 +22,7 @@ class Search extends Transactional {
             const results = await Promise.all(searchData.map(async ({ model, fields, include, where }) => {
                 const whereClause = {};
                 this.querySearch(fields, term, whereClause);
-                const data = await model.findAll({ where: {...whereClause, ...where}, include: include, ...query });
+                const data = await model.findAll({ where: {...whereClause, ...where}, include: include });
                 return data;
             }));
             return results.flat();

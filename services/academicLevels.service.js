@@ -11,7 +11,7 @@ class AcademicLevels extends Transactional {
         return this.withTransaction(async (transaction) => {
             const where = this.checkPermissionToGet(req);
             const include = [{association: 'schoolGrade'}, {association: 'campus'}, {association: 'educationDay'}, {association: 'modality'}, {association: 'imageAcademicLevels', include:[{ association: 'image', include: 'file' }]}];
-            const query = this.queryParameter(req.query);
+            const queryPagination = this.queryParameterPagination(req.query);
             const { search, visible, campusNumber, educationDay, modality} = req.query;
             const dataFilter= ['nameLevel', 'levelCode'];
             this.querySearch(dataFilter, search, where);
@@ -32,9 +32,9 @@ class AcademicLevels extends Transactional {
                 where['$modality.modality$'] = modality;
             }
             if(!id){
-                return await this.getAllElements('AcademicLevels', where, include, null, query)
+                return await this.getAllElements('AcademicLevels', where, include, null, queryPagination)
             }
-            return await this.getElementWithCondicional('AcademicLevels', include, {id: id, ...where}, null, query)
+            return await this.getElementWithCondicional('AcademicLevels', include, {id: id, ...where})
         });
     }
     async create(req, body){

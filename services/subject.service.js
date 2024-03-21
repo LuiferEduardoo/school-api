@@ -14,7 +14,7 @@ class Subject extends Transactional {
             const where = { academicLevelId: academicLevelId };
             const { search, teacher } = req.query;
             const include = [{association: 'subjectName'}, {association: 'academicLevel'}, {association: 'teacher', attributes: ['id', 'name', 'lastName']}];
-            const query = this.queryParameter(req.query);
+            const query = this.queryParameterPagination(req.query);
             const dataFilter= ['$subjectName.name$', '$teacher.name$', '$teacher.last_name$', '$teacher.username$', '$teacher.email$'];
             this.querySearch(dataFilter, search, where);
 
@@ -25,7 +25,7 @@ class Subject extends Transactional {
             if(!id){
                 return await this.getAllElements('Subject', where, include, null, query)
             }
-            return await this.getElementWithCondicional('Subject', include, {id: id, ...where}, null, query);
+            return await this.getElementWithCondicional('Subject', include, {id: id, ...where});
         });
     }
     async create (body, academicLevelId){

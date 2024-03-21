@@ -31,7 +31,7 @@ class InstitutionalProjects extends Transactional {
         return this.withTransaction(async (transaction) => {
             const where= this.checkPermissionToGet(req);
             const { search, important, visible } = req.query;
-            const query = this.queryParameter(req.query);
+            const query = this.queryParameterPagination(req.query);
             const attributes = {attributes: ['id', 'name', 'lastName']}
             const dataFilter= ['title', '$categories.categories.clasification.name$', '$subcategories.subcategories.clasification.name$', '$tags.tags.clasification.name$'];
             this.querySearch(dataFilter, search, where);
@@ -47,7 +47,7 @@ class InstitutionalProjects extends Transactional {
             if(!id){
                 return await this.getAllElements('InstitutionalProjects', where, includeInstitutionalProjects, this.order, query)
             }
-            return await this.getElementWithCondicional('InstitutionalProjects', includeInstitutionalProjects, {id: id, ...where}, this.order, query);
+            return await this.getElementWithCondicional('InstitutionalProjects', includeInstitutionalProjects, {id: id, ...where}, this.order);
         });
     }
     async create(req, body){
