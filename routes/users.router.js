@@ -1,32 +1,41 @@
 const express = require('express');
-const passport = require('passport');
 
 const UserService = require('../services/user.service');
 const validatorHandler = require('../middlewares/validator.handler');
-const authCombined = require('../middlewares/authCombined.handler');
 const { updateUserSchema, createUserSchema, deleteUserSchema, getUserSchema, getUpdateUserSchema, queryParameterUser } = require('./../schemas/user.schema');
-const { queryParamets } = require('../schemas/queryParamets.schema');
 const { checkFiles } = require('../schemas/files.schema');
+const authCombined = require('../middlewares/authCombined.handler');
 
 const router = express.Router();
 const service = new UserService();
 
-router.get('/:id?',
-    validatorHandler(queryParameterUser, 'query'),
+const userRoute = express.Router();
+
+
+router.get('/users/:id?',
     authCombined('access', true),
+    validatorHandler(queryParameterUser, 'query'),
     async (req, res, next) => {
         try {
             const { id } = req.params;
-            const users = await service.get(id, req);
+            const users = await service.getUsers(id, req);
             res.json(users);
         } catch (error) {
             next(error);
         }
     }
 );
-
-router.post('/',
-    authCombined('access', true),
+userRoute.get('', 
+    async (req, res, next) => {
+        try {
+            const users = await service.getUser(req);
+            res.json(users);
+        } catch (error) {
+            next(error);
+        }
+    }
+);
+userRoute.post('',
     validatorHandler(createUserSchema, null, true),
     async (req, res, next) => {
         try {
@@ -39,7 +48,13 @@ router.post('/',
     }
 );
 
-router.patch('/:id',
+userRoute.patch('/:id?',
+    (req, res, next) => {
+        if (!req.params.id) {
+            return next();  // Si no hay token en los headers, continúa sin autenticar
+        }
+        authCombined('access', true)(req, res, next);
+    },
     validatorHandler(getUpdateUserSchema, 'params'),
     validatorHandler(checkFiles, 'files.files'),
     validatorHandler(updateUserSchema, null, true),
@@ -54,7 +69,7 @@ router.patch('/:id',
     }
 );
 
-router.delete('/:id',
+userRoute.delete('/:id',
     authCombined('access', true),
     validatorHandler(getUserSchema, 'params'),
     validatorHandler(deleteUserSchema, null, true),
@@ -69,5 +84,7 @@ router.delete('/:id',
         }
     }
 );
+
+router.use('/user', userRoute);
 
 module.exports = router;

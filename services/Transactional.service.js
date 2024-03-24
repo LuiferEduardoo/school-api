@@ -68,7 +68,7 @@ class Transactional {
         })
     }
 
-    async getElementWithCondicional(model, include=null, where = {}, order = null, query = {}, attributesObject = {}){
+    async getElementWithCondicional(model, include=null, where = {}, order = null, query = {}, attributesObject = {}, errorBoom='notFound', messageError='no encontrado'){
         const attributes = Object.keys(attributesObject).length > 0 ? attributesObject : {};
         const element = await sequelize.models[model].findOne({
             where: { ...where },
@@ -78,7 +78,7 @@ class Transactional {
             ...query
         })
         if(!element){
-            throw boom.notFound(`${model} no encontrado`);
+            throw boom[errorBoom](`${messageError === 'no encontrado' ? model : ''} ${messageError}`);
         }
         return element;
     }

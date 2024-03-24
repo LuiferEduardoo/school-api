@@ -1,12 +1,17 @@
 const Joi = require('joi');
 
 const email = Joi.string().email();
-const password = Joi.string().min(8);
+const password = Joi.string()
+    .min(8)
+    .regex(/[a-z]/) // Al menos una minúscula
+    .regex(/[A-Z]/) // Al menos una mayúscula
+    .regex(/\d/) // Al menos un número
+    .regex(/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/) // Al menos un carácter especial
 const token = Joi.string().min(8);
 
 const login = Joi.object({
     email: email.required(),
-    password: password.required(),
+    password: Joi.string(),
 });
 const recovery = Joi.object({
     email: email.required(),

@@ -40,20 +40,37 @@ const deleteKeysStartingWith = async (pattern) => {
 
 const deleteTokensDevice = async (accessToken) => {
     try {
-        redis.get(accessToken, (err, refreshToken) => {
-            if(refreshToken){
-                const multi = redis.multi();
-                multi.del(accessToken);
-                if(redis.keys(refreshToken)){
-                    multi.del(refreshToken);
+        await new Promise((resolve, reject) => {
+            redis.get(accessToken, async (err, refreshToken) => {
+                if (err) reject(err);
+                if (refreshToken) {
+                    const pipeline = redis.pipeline();
+                    pipeline.del(accessToken);
+
+                    redis.keys('*', async (err, keys) => {
+                        if (err) reject(err);
+                        if (keys && keys.length > 0) {
+                            for (const key of keys) {
+                                const storedRefreshToken = await redis.get(key);
+                                if (storedRefreshToken === refreshToken) {
+                                    pipeline.del(key);
+                                }
+                            }
+                        }
+                        
+                        pipeline.del(refreshToken);
+                        await pipeline.exec();
+                        resolve();
+                    });
+                } else {
+                    resolve();
                 }
-                multi.exec();
-            }
-        })
+            });
+        });
     } catch (error) {
-        throw error
+        throw error;
     }
-}
+};
 
 module.exports = {
     getTokens,

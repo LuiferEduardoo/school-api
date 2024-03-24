@@ -18,10 +18,6 @@ const Search = require('./search.router')
 const routerApi = (app) => {
     const router = express.Router();
     app.use('/api/v1', router);
-    router.use('/users',
-        authCombined('access'),
-        usersRouter
-    );
     router.use('/auth', authRouter);
     router.use('/file', 
         authCombined('access'),
@@ -43,6 +39,10 @@ const routerApi = (app) => {
     router.use('/admission', admissionRequest);
     router.use('/calendar', calendar);
     router.use('/search', Search);
+    router.use('',
+        authCombined('access'),
+        usersRouter
+    );
 }
 
 module.exports = routerApi;

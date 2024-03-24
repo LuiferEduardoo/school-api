@@ -9,7 +9,7 @@ const { deleteKeysStartingWith, deleteTokensDevice } = require('./../config/redi
 
 class AuthService extends Transactional{
     async authenticationUser(email, password){
-        const user = await this.getElementWithCondicional('User', 'rol', {email: email});
+        const user = await this.getElementWithCondicional('User', 'rol', {email: email}, null, {}, {}, 'unauthorized', 'Contraseña o correo incorrecto');
         try {
             const checkPassword = await bcrypt.compare(password, user.password);
             if(!checkPassword){
@@ -41,9 +41,9 @@ class AuthService extends Transactional{
             const tokenRefresh = await signToken({ sub: user.id }, '180d', 'refresh'); // Generamos el refresh token
             const tokenAccess = await this.tokenAccess(user, `refresh${user.id}${tokenRefresh}`); // Generamos el access token
             return {
-                user,
-                tokenAccess,
-                tokenRefresh
+                message: 'Inicio de sesión exitoso',
+                tokenAccess: {token: tokenAccess, expiresIn: '8h'},
+                tokenRefresh: {token: tokenRefresh, expiresIn: '180d'}
             };
         } catch (error) {
             throw error
@@ -66,7 +66,7 @@ class AuthService extends Transactional{
             const token = await this.tokenAccess(user, `refresh${user.id}${tokenRefresh}`) // generamos el access token
             return {
                 message: 'Token creado con exito',
-                token,
+                tokenAccess: {token, expiresIn: '8h'},
             };
         });
     }

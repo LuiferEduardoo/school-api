@@ -12,16 +12,13 @@ const Rol = new RolService();
 const serviceImageAssociation = new ImageAssociation();
 
 class UserService extends Transactional {
-    async create(data) {
+    async handleGetUser (id, req) {
         return this.withTransaction(async (transaction) => {
-            const newUser = await sequelize.models.User.create(data, { transaction });
-            const role = await Rol.create(data.rol, { transaction });
-            await newUser.addRol(role.id, { transaction });
-            return 'Usuario creado exitosamente';
-        })
-    }
-    async get (id, req){
-        return this.withTransaction(async (transaction) => {
+            const attributes = { attributes: { exclude: ['recoveryToken', 'password']}}
+            const include = [{association: 'rol'}, {association: 'image', include: [{association: 'image', include: 'file'}]}];
+            if(id){
+                return await this.getElementWithCondicional('User', include, {id: id}, null, null, attributes);
+            }
             const query = this.queryParameterPagination(req.query);
             const { search, active, rol} = req.query;
             const whereClause = {};
@@ -35,22 +32,37 @@ class UserService extends Transactional {
             if (rol) {
                 whereClause['$rol.rol$'] = rol;
             }
-            const attributes = { attributes: { exclude: ['recoveryToken', 'password']}}
-            const include = [{association: 'rol'}, {association: 'image', include: [{association: 'image', include: 'file'}]}];
-            if(id){
-                return await this.getElementWithCondicional('User', include, {}, null, null, attributes);
-            } 
             return await this.getAllElements('User', whereClause, include, null, query, attributes);
         });
     }
+    async create(data) {
+        return this.withTransaction(async (transaction) => {
+            const newUser = await sequelize.models.User.create(data, { transaction });
+            const role = await Rol.create(data.rol, { transaction });
+            await newUser.addRol(role.id, { transaction });
+            return 'Usuario creado exitosamente';
+        })
+    }
+    async getUser (req){
+        const idUser = req.user.sub
+        return this.handleGetUser(idUser, req)
+    }
+    async getUsers (id, req){
+        return await this.handleGetUser(id, req);
+    }
 
     async update(req, changes){
+        let changesToUpdate = changes
         async function validateUserChanges (req, changes, idUser, user, transaction) {
-            let changesToUpdate = changes;
             if (!idUser) {
                 await validateCurrentPassword(changesToUpdate, user, req);
                 await serviceImageAssociation.update(req, 'ImageUser', {userId: req.user.sub}, changes.idNewImage, `profile/picture`, changes.idsImagesEliminate, changes.elimianteImage, transaction);
+                delete changesToUpdate.active;
             } else if (superAdmin.includes(req.user.role)) {
+                delete changesToUpdate.name;
+                delete changesToUpdate.lastName;
+                delete changesToUpdate.username;
+                delete changesToUpdate.password;
                 await handleSuperAdminChanges(changes, changesToUpdate, user);
             } else {
                 throw boom.unauthorized();
@@ -70,13 +82,13 @@ class UserService extends Transactional {
             }
         }
         async function handleSuperAdminChanges(changes, changesToUpdate, user) {
-            if (changes.active !== null) {
-                changesToUpdate = { active: changesToUpdate.active };
-            }
-            if (changes.rol !== user.rol[0].rol) {
-                const role = await Rol.create(changes.rol);
-                await user.setRol([role.id]);
+            if((changes.active !== null) || (changes.rol)){
+                if (changes.rol && changes.rol !== user.rol[0].rol) {
+                    const role = await Rol.create(changes.rol);
+                    await user.setRol([role.id]);
+                }
                 await deleteKeysStartingWith(`access${user.id}`);
+                await deleteKeysStartingWith(`refresh${user.id}`);
             }
         }
         async function closeOtherDevices(isClose, req){
@@ -95,7 +107,7 @@ class UserService extends Transactional {
             const id = idUser || req.user.sub; 
             const user = await this.getElementById(id, 'User', 'rol');
             await validateUserChanges(req, changes, idUser, user, transaction);
-            await user.update(changes, { transaction });
+            await user.update(changesToUpdate, { transaction });
             return { message: 'Usuario actualizado con éxito' };
         });
     }
