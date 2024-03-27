@@ -78,7 +78,7 @@ class Transactional {
             ...query
         })
         if(!element){
-            throw boom[errorBoom](`${messageError === 'no encontrado' ? model : ''} ${messageError}`);
+            throw boom[errorBoom](`${messageError === 'no encontrado ' ? model : ''}${messageError}`);
         }
         return element;
     }

@@ -10,8 +10,8 @@ const password = Joi.string()
 const token = Joi.string().min(8);
 
 const login = Joi.object({
-    email: email.required(),
-    password: Joi.string(),
+    credential: Joi.string().required(),
+    password: Joi.string().required(),
 });
 const recovery = Joi.object({
     email: email.required(),

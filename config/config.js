@@ -23,7 +23,8 @@ const config = {
     defaultUserLastName: process.env.DEFAULT_USER_LASTNAME,
     defaultUserEmail: process.env.DEFAULT_USER_EMAIL,
     defaultUserUserUsername: process.env.DEFAULT_USER_USERNAME,
-    defaultUserPassword: process.env.DEFAULT_USER_PASSWORD
+    defaultUserPassword: process.env.DEFAULT_USER_PASSWORD,
+    frontendUrl: process.env.FRONTEND_URL
 }
 
 module.exports = { config };

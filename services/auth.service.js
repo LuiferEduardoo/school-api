@@ -1,5 +1,6 @@
 const boom = require('@hapi/boom');
 const bcrypt = require('bcrypt');
+const { config } = require('./../config/config')
 const Transactional = require('./Transactional.service');
 const { signToken } = require('../libs/token-sing');
 const { tokenVerify } = require('../libs/token-verify');
@@ -8,8 +9,14 @@ const { deleteKeysStartingWith, deleteTokensDevice } = require('./../config/redi
 
 
 class AuthService extends Transactional{
-    async authenticationUser(email, password){
-        const user = await this.getElementWithCondicional('User', 'rol', {email: email}, null, {}, {}, 'unauthorized', 'Contraseña o correo incorrecto');
+    async authenticationUser(credential, password){
+        const where = {};
+        if (credential.includes('@')) {
+            where.email = credential;
+        } else {
+            where.username = credential;
+        }
+        const user = await this.getElementWithCondicional('User', 'rol', where, null, {}, {}, 'unauthorized', 'Contraseña o correo incorrecto');
         try {
             const checkPassword = await bcrypt.compare(password, user.password);
             if(!checkPassword){
@@ -75,12 +82,14 @@ class AuthService extends Transactional{
             const user = await this.getElementWithCondicional('User', [], {email: email});
             const token = await signToken({ sub: user.id }, '25min', 'recovery');
             await user.update({ recoveryToken: token });
-            await SendMain(user.email, '¿Has solicitado un cambio de contraseña en su cuenta?', 'recoveryPassword', {name: user.name, linkRecoveryPassword: `http://localhost:3000/recovery?toke=${token}` }); 
+            await SendMain(user.email, '¿Has solicitado un cambio de contraseña en su cuenta?', 'recoveryPassword', {name: user.name, linkRecoveryPassword: `${config.frontendUrl}/auth/change-password?token=${token}` }); 
             return {
                 message: 'mail enviado'
             }
         } catch (error) {
-            throw boom.notFound();
+            return {
+                message: 'mail enviado'
+            }
         }
     }
 
