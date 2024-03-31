@@ -9,7 +9,8 @@ const date = Joi.date().iso();
 const queryInstitutionalProjectsPublications = Joi.object({
     ...query,
     important: Joi.boolean(),
-    visible: Joi.boolean()
+    visible: Joi.boolean(),
+    author: Joi.number()
 })
 
 const createInstitutionalProjectsPublicationns = Joi.object({

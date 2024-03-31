@@ -48,7 +48,7 @@ class InstitutionalProjectsMember extends Model {
             foreignKey: 'userId'
         });
         this.belongsTo(models.InstitutionalProjects, {
-            as: 'InstitutionalProjects',
+            as: 'institutionalProjects',
             foreignKey: 'institutionalProjectsId'
         });
     }

@@ -16,7 +16,7 @@ class Transactional {
         const { limit, offset } = query;
         let queryToReturn = {}
         queryToReturn.limit = limit || 10;
-        queryToReturn.offset = offset || undefined;
+        queryToReturn.offset = offset || 0;
         return queryToReturn;
     }
 
@@ -75,7 +75,8 @@ class Transactional {
             include: include,
             order: order,
             ...attributes,
-            ...query
+            limit: query.limit,
+            offset: query.offset
         })
         if(!element){
             throw boom[errorBoom](`${messageError === 'no encontrado ' ? model : ''}${messageError}`);
@@ -88,11 +89,13 @@ class Transactional {
             const attributes = Object.keys(attributesObject).length > 0 ? attributesObject : {};
             const totalCount = await sequelize.models[model].count();
             const elements = await sequelize.models[model].findAll({
-                where: { ...where },
-                order: order,
+                where: where,
                 include: include,
+                order: order,
                 ...attributes,
-                ...query,
+                limit: query.limit,
+                offset: query.offset,
+                subQuery: false,
                 ...otherElements
             });
             const totalPages = Math.ceil(totalCount / query.limit);

@@ -30,11 +30,16 @@ class InstitutionalProjects extends Transactional {
     async get(id, req){
         return this.withTransaction(async (transaction) => {
             const where= this.checkPermissionToGet(req);
-            const { search, important, visible } = req.query;
+            const { search, important, visible, member } = req.query;
             const query = this.queryParameterPagination(req.query);
             const attributes = {attributes: ['id', 'name', 'lastName']}
+            const includeInstitutionalProjects = [{ association: 'members', include: [{association: 'user', ...attributes}] }, { association: 'ImageInstitutionalProjects', include: [{ association: 'image', include: 'file' }] },...this.includeClassification];
             const dataFilter= ['title', '$categories.categories.clasification.name$', '$subcategories.subcategories.clasification.name$', '$tags.tags.clasification.name$'];
             this.querySearch(dataFilter, search, where);
+
+            if(member){
+                where['$members.user_id$'] = member
+            }
 
             if (important) {
                 where.important = important;
@@ -43,7 +48,6 @@ class InstitutionalProjects extends Transactional {
             if (visible) {
                 where.visible = visible;
             }
-            const includeInstitutionalProjects = [{ association: 'InstitutionalProjectsMember', include: [{association: 'user', ...attributes}] }, { association: 'ImageInstitutionalProjects', include: [{ association: 'image', include: 'file' }] },...this.includeClassification];
             if(!id){
                 return await this.getAllElements('InstitutionalProjects', where, includeInstitutionalProjects, this.order, query)
             }

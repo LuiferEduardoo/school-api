@@ -65,7 +65,7 @@ class InstitutionalProjectsPublications extends Transactional {
     async get(req, id, institutionalProjectId) {
         return this.withTransaction(async (transaction) => {
             const where= this.checkPermissionToGet(req);
-            const { search, important, visible } = req.query;
+            const { search, important, visible, author } = req.query;
             const whereClause = {}
             const dataFilter = ['$publication.title$', '$publication.categories.categories.clasification.name$', '$publication.subcategories.subcategories.clasification.name$', '$publication.tags.tags.clasification.name$']
             const query = this.queryParameterPagination(req.query);
@@ -79,6 +79,10 @@ class InstitutionalProjectsPublications extends Transactional {
 
             if (visible) {
                 whereClause['$publication.visible$'] = visible;
+            }
+            
+            if(author) {
+                whereClause['$InstitutionalProjectsPublicationsAuthors.author.user.id$'] = author;
             }
             
             if(id){

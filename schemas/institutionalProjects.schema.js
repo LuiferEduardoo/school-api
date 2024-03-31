@@ -10,7 +10,8 @@ const date = Joi.date().iso();
 const queryInstitutionalProjects = Joi.object({
     ...query,
     important: Joi.boolean(),
-    visible: Joi.boolean()
+    visible: Joi.boolean(),
+    member: Joi.number()
 })
 
 const createInstitutionalProjects = Joi.object({
