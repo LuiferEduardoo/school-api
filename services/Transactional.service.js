@@ -75,8 +75,7 @@ class Transactional {
             include: include,
             order: order,
             ...attributes,
-            limit: query.limit,
-            offset: query.offset
+            ...query
         })
         if(!element){
             throw boom[errorBoom](`${messageError === 'no encontrado ' ? model : ''}${messageError}`);
