@@ -55,7 +55,8 @@ class SaveFileInServer {
             const filePath = path.join(fullPath, file.name);
 
             const uniqueFilePath = this.getUniqueFilename(filePath); // creamos un unico path para los archivos
-            await renameAsync(tempPath, uniqueFilePath.uniquePath); // Utilizando promisify para fs.rename
+            await fs.copyFileSync(tempPath, uniqueFilePath.uniquePath); // Utilizando promisify para fs.rename
+            await fs.unlinkSync(tempPath);
             return uniqueFilePath;
         } catch (error) {
             throw error;
