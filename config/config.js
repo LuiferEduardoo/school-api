@@ -10,6 +10,7 @@ const config = {
     dbPort:  process.env.DB_PORT,
     redisHost: process.env.REDIS_HOST,
     redisPort: process.env.REDIS_PORT,
+    redisUser: process.env.REDIS_USER,
     redisPassword: process.env.REDIS_PASSWORD,
     apiKey: process.env.API_KEY,
     jwtSecretRecoveryPassword: process.env.JWT_SECRET_RECOVERY_PASSWORD,

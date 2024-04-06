@@ -6,6 +6,7 @@ const Redis = require('ioredis');
 const redisConfig = {
     host: config.redisHost,
     port: config.redisPort,
+    user: config.redisUser || null,
     password: config.redisPassword || null
 };
 const redis = new Redis(redisConfig); // Esto conecta con un servidor Redis local por defecto
