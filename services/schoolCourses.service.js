@@ -24,12 +24,14 @@ class SchoolCourses extends Transactional {
             const where = { };
             const { search } = req.query;
             const dataFilter = ['course', '$schoolGrade.grade$'];
-            const include = [{association: 'schoolGrade', include: {association: 'academic', where: { id: academicLevelId }, include: ['campus', 'educationDay', 'modality']}}];
+            const include = [{association: 'schoolGrade', include: {association: 'academic', include: ['campus', 'educationDay', 'modality']}}];
+            where['$schoolGrade.academic_level$'] = academicLevelId;
             this.querySearch(dataFilter, search, where);
             const query = this.queryParameterPagination(req.query);
             if(!id){
                 return await this.getAllElements('SchoolCourses', where, include, null, query)
             }
+            console.log(where)
             return await this.getElementWithCondicional('SchoolCourses', include, {id: id});
         });
     }

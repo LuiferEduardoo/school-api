@@ -13,6 +13,10 @@ const getSchoolCourses  = Joi.object({
     id: id
 });
 
+const parameterUpdateOrDelete = Joi.object({
+    id: id.required()
+});
+
 const createSchoolCourses = Joi.object({
     grade: number.required(),
     course: number.required()
@@ -26,4 +30,4 @@ const updateSchoolCourses  = Joi.object({
 });
 
 
-module.exports = { getSchoolCourses, createSchoolCourses, updateSchoolCourses, parameterSchoolCourses, queryParameterSchoolCourse }
+module.exports = { getSchoolCourses, parameterUpdateOrDelete, createSchoolCourses, updateSchoolCourses, parameterSchoolCourses, queryParameterSchoolCourse }

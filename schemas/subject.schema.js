@@ -10,9 +10,12 @@ const queryParameterSubject = Joi.object({
     teacher: string
 })
 
-const getSubject = Joi.object({
+const parametersGetSubject= Joi.object({
     academicLevelId: number.required(),
     id: id
+});
+const parametersUpdateOrDeleteSubject = Joi.object({
+    id: id.required()
 });
 const parameterSubject = Joi.object({
     academicLevelId: number.required()
@@ -23,9 +26,8 @@ const createSubject = Joi.object({
 });
 const updateSubject = Joi.object({
     name: string,
-    academicLevelId: id,
     teacherId: number,
 });
 
 
-module.exports = { getSubject, createSubject, updateSubject, parameterSubject, queryParameterSubject }
+module.exports = { parametersGetSubject, parametersUpdateOrDeleteSubject, createSubject, updateSubject, parameterSubject, queryParameterSubject }

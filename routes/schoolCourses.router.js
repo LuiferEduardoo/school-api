@@ -1,6 +1,6 @@
 const express = require('express'); 
 const validatorHandler = require('../middlewares/validator.handler');
-const { getSchoolCourses, createSchoolCourses, updateSchoolCourses, parameterSchoolCourses, queryParameterSchoolCourse } = require('../schemas/schoolCourses.schema');
+const { getSchoolCourses, parameterUpdateOrDelete, createSchoolCourses, updateSchoolCourses, parameterSchoolCourses, queryParameterSchoolCourse } = require('../schemas/schoolCourses.schema');
 
 const SchoolCourses = require('../services/schoolCourses.service');
 const service = new SchoolCourses();
@@ -35,6 +35,7 @@ router.post('/:academicLevelId',
 );
 
 router.patch('/:id',
+    validatorHandler(parameterUpdateOrDelete, 'params'),
     validatorHandler(updateSchoolCourses, null, true),
     async (req, res, next) => {
         try {
@@ -49,6 +50,7 @@ router.patch('/:id',
 );
 
 router.delete('/:id',
+    validatorHandler(parameterUpdateOrDelete, 'params'),
     async (req, res, next) => {
         try {
             const { id } = req.params;

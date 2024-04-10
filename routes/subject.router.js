@@ -1,7 +1,6 @@
 const express = require('express'); 
 const validatorHandler = require('../middlewares/validator.handler');
-const { getSubject, createSubject, updateSubject, parameterSubject, queryParameterSubject } = require('../schemas/subject.schema');
-const { queryParamets } = require('../schemas/queryParamets.schema');
+const { parametersUpdateOrDeleteSubject, parametersGetSubject, createSubject, updateSubject, parameterSubject, queryParameterSubject } = require('../schemas/subject.schema');
 
 const Subject = require('../services/subject.service');
 const service = new Subject();
@@ -9,7 +8,7 @@ const router = express.Router();
 
 router.get('/:academicLevelId/:id?',
     validatorHandler(queryParameterSubject, 'query'),
-    validatorHandler(getSubject, 'params'),
+    validatorHandler(parametersGetSubject, 'params'),
     async (req, res, next) => {
         try {
             const { academicLevelId, id } = req.params;
@@ -36,7 +35,7 @@ router.post('/:academicLevelId',
 );
 
 router.patch('/:id',
-    validatorHandler(getSubject, 'params'),
+    validatorHandler(parametersUpdateOrDeleteSubject, 'params'),
     validatorHandler(updateSubject, null, true),
     async (req, res, next) => {
         try {
@@ -51,7 +50,7 @@ router.patch('/:id',
 );
 
 router.delete('/:id',
-    validatorHandler(getSubject, 'params'),
+    validatorHandler(parametersUpdateOrDeleteSubject, 'params'),
     async (req, res, next) => {
         try {
             const { id } = req.params;
