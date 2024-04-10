@@ -12,6 +12,7 @@ class SchoolCourses extends Transactional {
                 academicLevel: academicLevelId
             }, 
             defaults: {
+                grade: body.grade,
                 academicLevel: academicLevelId
             },
             transaction: transaction
@@ -37,7 +38,7 @@ class SchoolCourses extends Transactional {
             const createSchoolGrade = await this.createSchoolGrade(body, academicLevelId, transaction);
             await sequelize.models.SchoolCourses.create({...body, schoolGradeId: createSchoolGrade.id }, {transaction});
             return {
-                message: 'Asignatura creada con exito'
+                message: 'Curso creado con exito'
             }
         })
     }

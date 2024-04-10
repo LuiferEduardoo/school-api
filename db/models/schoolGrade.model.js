@@ -14,12 +14,12 @@ const schoolGradeSchema = {
     grade: {
         allowNull: false,
         type: DataTypes.INTEGER,
+        unique: true,
     },
     academicLevel:{
         field: 'academic_level',
         allowNull: false,
         type: DataTypes.INTEGER,
-        unique: true,
         references: {
             model: ACADEMIC_LEVELS_TABLE,
             key: 'id'

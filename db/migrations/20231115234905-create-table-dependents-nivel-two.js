@@ -57,12 +57,12 @@ module.exports = {
       grade: {
         allowNull: false,
         type: Sequelize.DataTypes.INTEGER,
+        unique: true,
       },
       academicLevel: {
         field: 'academic_level',
         allowNull: false,
         type: Sequelize.DataTypes.INTEGER,
-        unique: true,
         references: {
           model: ACADEMIC_LEVELS_TABLE,
           key: 'id',
