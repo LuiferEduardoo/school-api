@@ -34,8 +34,7 @@ router.post('/:academicLevelId',
     }
 );
 
-router.patch('/:id?',
-    validatorHandler(getSchoolCourses, 'params'),
+router.patch('/:id',
     validatorHandler(updateSchoolCourses, null, true),
     async (req, res, next) => {
         try {
@@ -50,7 +49,6 @@ router.patch('/:id?',
 );
 
 router.delete('/:id',
-    validatorHandler(getSchoolCourses, 'params'),
     async (req, res, next) => {
         try {
             const { id } = req.params;

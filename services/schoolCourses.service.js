@@ -45,12 +45,15 @@ class SchoolCourses extends Transactional {
 
     async update (id, body){
         return this.withTransaction(async (transaction) => {
-            const getSchoolCourses = await this.getElementById(id, 'SchoolCourses');
-            if(body.grade && body.academicLevelId){
-                const createSchoolGrade = await this.createSchoolGrade(body, body.academicLevelId, transaction);
+            const getSchoolCourses = await this.getElementById(id, 'SchoolCourses', ['schoolGrade']);
+            if(body.grade){
+                const createSchoolGrade = await this.createSchoolGrade(body, getSchoolCourses.schoolGrade.academicLevel, transaction);
                 body.schoolGradeId = createSchoolGrade.id;
             }
             await getSchoolCourses.update(body, {transaction});
+            return {
+                message: 'Curso actualizado con exito'
+            }
         });
     }
 
@@ -58,6 +61,9 @@ class SchoolCourses extends Transactional {
         return this.withTransaction(async (transaction) => {
             const getSchoolCourses = await this.getElementById(id, 'SchoolCourses');
             await getSchoolCourses.destroy({transaction})
+            return {
+                message: 'Curso eliminado con exito'
+            }
         });
     }
 }
