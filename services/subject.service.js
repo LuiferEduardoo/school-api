@@ -42,6 +42,13 @@ class Subject extends Transactional {
     async update (body, id){
         return this.withTransaction(async (transaction) => {
             const getSubjectName = await this.getElementById(id, 'Subject');
+            if(body.teacherId){
+                await this.getElementWithCondicional('User', [{association: 'rol', where: { rol: 'docente' }}], {id: body.teacherId}, null, {});
+            }
+            if(body.name){
+                const createSubjectName = await this.createSubjectName(body.name, transaction);
+                body.subjectNameId = createSubjectName.id;
+            }
             await getSubjectName.update(body, {transaction});
             return {
                 message: 'Asignatura actualizada con exito'
