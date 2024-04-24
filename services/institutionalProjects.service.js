@@ -69,7 +69,7 @@ class InstitutionalProjects extends Transactional {
 
     async update(req, body, id){
         return this.withTransaction(async (transaction) => {
-            const getInstitutionalProject = await this.getElementById(id, 'InstitutionalProjects', ['InstitutionalProjectsMember']);
+            const getInstitutionalProject = await this.getElementById(id, 'InstitutionalProjects', ['members']);
             await this.checkPermission(req, getInstitutionalProject);
             const idsNewMembers = body.idsNewMembers ? body.idsNewMembers.split(',') : [];
             const isCoordinator = this.isCoordinator(body);
