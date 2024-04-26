@@ -19,7 +19,13 @@ class IndividualEntity extends Transactional {
     }
 
     async deleteIndividualEntity(deleteAll, individualEntityToDelete, elementId, modelIndividualEntity, fieldNameElement, transaction){
-        const deleteAllArray = deleteAll ? await this.getAllElements(modelIndividualEntity, {[fieldNameElement]: elementId}) : false;
+        let deleteAllArray;
+        if(deleteAll){
+            const {elements} = await this.getAllElements(modelIndividualEntity, {[fieldNameElement]: elementId});
+            deleteAllArray = elements 
+        } else {
+            deleteAllArray = false;
+        }
         const idsEliminateIndividualEntityArray = deleteAllArray ? deleteAllArray.map(IndividualEntity => IndividualEntity.id) : Array.isArray(individualEntityToDelete) ? individualEntityToDelete : individualEntityToDelete.split(',');
         for(const idEliminateIndividualEntity of idsEliminateIndividualEntityArray){
             const getIndividualEntity = await this.getElementById(idEliminateIndividualEntity, modelIndividualEntity);

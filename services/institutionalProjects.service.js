@@ -33,7 +33,7 @@ class InstitutionalProjects extends Transactional {
             const { search, important, visible, member } = req.query;
             const query = this.queryParameterPagination(req.query);
             const attributes = {attributes: ['id', 'name', 'lastName']}
-            const includeInstitutionalProjects = [{ association: 'members', include: [{association: 'user', ...attributes}] }, { association: 'ImageInstitutionalProjects', include: [{ association: 'image', include: 'file' }] },...this.includeClassification];
+            const includeInstitutionalProjects = [{ association: 'members', include: [{association: 'user', ...attributes, include: [{association: 'rol'}, {association: 'image', include: [{association: 'image', include: 'file'}]}]}] }, { association: 'ImageInstitutionalProjects', include: [{ association: 'image', include: 'file' }] },...this.includeClassification];
             const dataFilter= ['title', '$categories.categories.clasification.name$', '$subcategories.subcategories.clasification.name$', '$tags.tags.clasification.name$'];
             this.querySearch(dataFilter, search, where);
 

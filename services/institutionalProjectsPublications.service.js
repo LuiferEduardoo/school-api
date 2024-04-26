@@ -17,9 +17,9 @@ class InstitutionalProjectsPublications extends Transactional {
         const authorArray = authorIds ? authorIds.split(',').map(author => author.trim()) : [];
         const authorsToCheck = [...(mainAuthorId ? [mainAuthorId] : []), ...authorArray];
         for(const author of authorsToCheck){
-            const getInMember = await sequelize.models.InstitutionalProjectsMember.findOne({
+            const getInMember = await sequelize.models.members.findOne({
                 where: {userId: author},
-                include: ['InstitutionalProjects'],
+                include: ['institutionalProjects'],
             })
             if(!getInMember){
                 throw boom.unauthorized();
@@ -34,7 +34,7 @@ class InstitutionalProjectsPublications extends Transactional {
 
     checkPermission(req, institutionalProjectPublication) {
         const verifyAuthor = institutionalProjectPublication.InstitutionalProjectsPublicationsAuthors.some(author => author.author.userId === req.user.sub); // Verificamos si la persona es autora del post
-        const verifyCoordinator = institutionalProjectPublication.institutionalProjects.InstitutionalProjectsMember.some(member => member.userId === req.user.sub && member.isCoordinator); // verificamos si la persona es coordinadora del proyecto
+        const verifyCoordinator = institutionalProjectPublication.institutionalProjects.members.some(member => member.userId === req.user.sub && member.isCoordinator); // verificamos si la persona es coordinadora del proyecto
         switch (true) {
             case verifyAuthor:
                 break;
@@ -53,7 +53,7 @@ class InstitutionalProjectsPublications extends Transactional {
                 association: 'InstitutionalProjectsPublicationsAuthors', include: 'author'
             },
             {
-                association: 'institutionalProjects', include: 'InstitutionalProjectsMember'
+                association: 'institutionalProjects', include: 'members'
             }
         ]);
         if(getInstitutionalProjectsPublication.institutionalProjects.id != idProject){
@@ -108,7 +108,7 @@ class InstitutionalProjectsPublications extends Transactional {
         return this.withTransaction(async (transaction) => {
             const getInstitutionalProjectsPublication = await this.checkProjectAndPublicaton(idProyect, idPublication);
             this.checkPermission(req, getInstitutionalProjectsPublication);
-            if(getInstitutionalProjectsPublication.institutionalProjects.InstitutionalProjectsMember.some(member => member.userId === req.user.sub && member.isCoordinator) || superAdmin.includes(req.user.role)){
+            if(getInstitutionalProjectsPublication.institutionalProjects.members.some(member => member.userId === req.user.sub && member.isCoordinator) || superAdmin.includes(req.user.role)){
                 const authors = await this.checkAuthors(body.idsNewAuthors, idProyect);
                 const updateMembers = await serviceIndidualEntity.updateIndividualEntity(authors, body.idsEliminateAuthors, 'authorId', idPublication, 'InstitutionalProjectsPublicationsAuthors', 'institutionalProjectsPublicationId', {}, transaction);
             }
@@ -122,7 +122,7 @@ class InstitutionalProjectsPublications extends Transactional {
     async delete (req, body, idProyect, idPublication){
         return this.withTransaction(async (transaction) => {
             const getInstitutionalProjectsPublication = await this.checkProjectAndPublicaton(idProyect, idPublication);
-            if(getInstitutionalProjectsPublication.institutionalProjects.InstitutionalProjectsMember.some(member => member.userId === req.user.sub && member.isCoordinator) || superAdmin.includes(req.user.role)){
+            if(getInstitutionalProjectsPublication.institutionalProjects.members.some(member => member.userId === req.user.sub && member.isCoordinator) || superAdmin.includes(req.user.role)){
                 const idsImagesEliminate = getInstitutionalProjectsPublication.ImageInstitutionalProjectPublication.map(image => (image.id));
                 const deleteMembers = await serviceIndidualEntity.deleteIndividualEntity(true, null, idPublication, 'InstitutionalProjectsPublicationsAuthors', 'institutionalProjectsPublicationId', transaction);
                 const deleteimagesInstitucionalProjects = await serviceImageAssociation.delete(idsImagesEliminate, 'ImageInstitutionalProjectsPublications', body.eliminateImage, req, transaction);
