@@ -84,7 +84,7 @@ class InstitutionalProjects extends Transactional {
 
     async delete(req, body, id){
         return this.withTransaction(async (transaction) => {
-            const getInstitutionalProject = await this.getElementById(id, 'InstitutionalProjects', ['InstitutionalProjectsMember', 'InstitutionalProjectPublication']);
+            const getInstitutionalProject = await this.getElementById(id, 'InstitutionalProjects', ['members', 'InstitutionalProjectPublication']);
             await this.checkPermission(req, getInstitutionalProject);
             const getNewsPublications = await this.getElementById(id, 'InstitutionalProjects', ['ImageInstitutionalProjects']);
             const idsImagesEliminate = getNewsPublications.ImageInstitutionalProjects.map(image => (image.id));
