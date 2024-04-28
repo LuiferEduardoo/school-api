@@ -29,7 +29,7 @@ const BannersInstitutionalProjectsSchema = {
 class BannersInstitutionalProjects extends Model {
     static associate(models){ 
         this.belongsTo(models.ImageBanners, {
-            as: 'imageBanners',
+            as: 'imageBanner',
             foreignKey: 'bannerId'
         });
     }

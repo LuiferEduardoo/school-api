@@ -2,7 +2,7 @@ const { Model, DataTypes, Sequelize } = require('sequelize');
 
 const { IMAGE_BANNERS_TABLE } = require('./imageBanners.model'); 
 
-const BANNERS_ACADEMIC_LEVELS_TABLE = "image_academic_levels"; 
+const BANNERS_ACADEMIC_LEVELS_TABLE = "banners_academic_levels"; 
 
 const BannersAcademicLevelsSchema = {
     id: {
@@ -38,7 +38,7 @@ class BannerAcademicLevels extends Model {
         return {
         sequelize,
         tableName: BANNERS_ACADEMIC_LEVELS_TABLE,
-        modelName: 'BannerAcademicLevels',
+        modelName: 'BannersAcademicLevels',
         timestamps: false
         }    
     }
