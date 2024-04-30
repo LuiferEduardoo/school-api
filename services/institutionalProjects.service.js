@@ -37,6 +37,8 @@ class InstitutionalProjects extends Transactional {
             const dataFilter= ['title', '$categories.categories.clasification.name$', '$subcategories.subcategories.clasification.name$', '$tags.tags.clasification.name$'];
             this.querySearch(dataFilter, search, where);
 
+            this.handleElementPrivacy(req, where, 'visible', visible);
+
             if(member){
                 where['$members.user_id$'] = member
             }
@@ -45,9 +47,6 @@ class InstitutionalProjects extends Transactional {
                 where.important = important;
             }
 
-            if (visible) {
-                where.visible = visible;
-            }
             if(!id){
                 return await this.getAllElements('InstitutionalProjects', where, includeInstitutionalProjects, this.order, query)
             }
@@ -74,7 +73,7 @@ class InstitutionalProjects extends Transactional {
             const idsNewMembers = body.idsNewMembers ? body.idsNewMembers.split(',') : [];
             const isCoordinator = this.isCoordinator(body);
             const updateInstitutionalProjects = await serviceContentManagement.upate(body, id, 'InstitutionalProjects', 'institutionalProjectId', transaction);
-            const updateMembers = await serviceIndidualEntity.updateIndividualEntity(idsNewMembers, body.idsEliminateMembers, 'userId', id, 'InstitutionalProjectsMember', 'institutionalProjectsId', isCoordinator, transaction);
+            const updateMembers = await serviceIndidualEntity.updateIndividualEntity(idsNewMembers, body.idsEliminateMembers, body.updateMembers, body.updateIsCoordinator,'userId', id, 'InstitutionalProjectsMember', 'institutionalProjectsId', isCoordinator, transaction);
             const updateimagesNewsPublications = await serviceImageAssociation.update(req, 'ImageInstitutionalProjects', {institutionalProjectsId: id}, body.idNewImage, `institutionalProjects/${id}`, body.idImageEliminate, body.eliminateImage, transaction);
             return {
                 message: 'Proyecto institucional actualizado con exito'

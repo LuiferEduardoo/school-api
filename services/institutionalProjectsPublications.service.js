@@ -73,12 +73,10 @@ class InstitutionalProjectsPublications extends Transactional {
             const include = [{association: 'publication', where: where, order: this.order, include: this.includeClassification}, {association: 'ImageInstitutionalProjectPublication', include: [{ association: 'image', include: 'file' }]}, {association: 'InstitutionalProjectsPublicationsAuthors', include:[{association: 'author', include: [{association: 'user', ...attributes}]}]}];
             this.querySearch(dataFilter, search, whereClause);
 
+            this.handleElementPrivacy(req, where, '$publication.visible$', visible);
+
             if (important) {
                 whereClause['$publication.important$'] = important;
-            }
-
-            if (visible) {
-                whereClause['$publication.visible$'] = visible;
             }
             
             if(author) {
@@ -110,7 +108,7 @@ class InstitutionalProjectsPublications extends Transactional {
             this.checkPermission(req, getInstitutionalProjectsPublication);
             if(getInstitutionalProjectsPublication.institutionalProjects.members.some(member => member.userId === req.user.sub && member.isCoordinator) || superAdmin.includes(req.user.role)){
                 const authors = await this.checkAuthors(body.idsNewAuthors, idProyect);
-                const updateMembers = await serviceIndidualEntity.updateIndividualEntity(authors, body.idsEliminateAuthors, 'authorId', idPublication, 'InstitutionalProjectsPublicationsAuthors', 'institutionalProjectsPublicationId', {}, transaction);
+                const updateMembers = await serviceIndidualEntity.updateIndividualEntity(authors, body.idsEliminateAuthors, null, null, 'authorId', idPublication, 'InstitutionalProjectsPublicationsAuthors', 'institutionalProjectsPublicationId', {}, transaction);
             }
             const updateInstitutionalProjectsPublication = await servicePublications.upate(body, getInstitutionalProjectsPublication.publicationId, transaction);
             const updateimagesInstitutionalProjectsPublication = await serviceImageAssociation.update(req, 'ImageInstitutionalProjectsPublications', {institutionalProjectsPublicationsId: getInstitutionalProjectsPublication.id}, body.idNewImage, `institutionalProjects/${idProyect}/publications/${idPublication}`, body.idImageEliminate, body.eliminateImage, transaction);

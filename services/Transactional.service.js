@@ -34,11 +34,19 @@ class Transactional {
             }));
             where[Op.and] = searchConditions;
         }
-    }        
+    } 
+    checkPermissionToPrivacy(req){
+        return superAdmin.includes(req?.user?.role);
+    }       
 
     checkPermissionToGet(req, property = 'visible'){
-        const where = req.user ? superAdmin.includes(req.user.role) ? {} : {[property]: true} : {[property]: true};
-        return where;
+        return this.checkPermissionToPrivacy(req) ? {} : {[property]: true};
+    }
+
+    handleElementPrivacy(req, where, field, value){
+        if(this.checkPermissionToPrivacy(req)){
+            where[field] = value;
+        }
     }
 
     async withTransaction(callback) {
@@ -99,6 +107,15 @@ class Transactional {
             });
             const totalPages = Math.ceil(totalCount / query.limit);
             return {totalPages, elements}
+        });
+    }
+    async getAllElementsWithoutQuery(model, include = null, where = {}){
+        return this.withTransaction(async (transaction) => {
+            const elements = await sequelize.models[model].findAll({
+                where: where,
+                include: include,
+            });
+            return elements
         });
     }
     async checkModel(model, nameModel){

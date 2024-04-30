@@ -1,5 +1,6 @@
 const express = require('express');
 const authCombined = require('../middlewares/authCombined.handler');
+const checkIfThereIsToken = require('../middlewares/checkIfThereIsToken.handler');
 const validatorHandler = require('../middlewares/validator.handler');
 const { getNewsPublications, createNewsPublication, updateNewsPublication, deleteNewsPublication, queryNewsPublications } = require('../schemas/newsPublication.schema');
 const { checkFiles } = require('../schemas/files.schema');
@@ -10,6 +11,7 @@ const router = express.Router();
 
 router.get('/:id?',
     validatorHandler(queryNewsPublications, 'query'),
+    checkIfThereIsToken(),
     async (req, res, next) => {
         try {
             const { id } = req.params;

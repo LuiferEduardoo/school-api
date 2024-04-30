@@ -36,6 +36,12 @@ const updateInstitutionalProjects = Joi.object({
         then: Joi.string().required(), // Si existe, isCoordinator es requerido
         otherwise: Joi.forbidden() // Si no existe, isCoordinator está prohibido
     }),
+    updateMembers: members,
+    updateIsCoordinator: Joi.when('updateMembers', {
+        is: Joi.exist(),
+        then: Joi.string().required(),
+        otherwise: Joi.forbidden()
+    }),
     idsEliminateMembers: members
 });
 

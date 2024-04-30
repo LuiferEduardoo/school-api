@@ -24,13 +24,11 @@ class News extends Transactional {
             { association: 'imageNews', include: [{association: 'image', include: 'file'}] }
         ]
         this.querySearch(dataFilter, search, whereClause);
+
+        this.handleElementPrivacy(req, where, '$publication.visible$', visible);
         
         if (important) {
             whereClause['$publication.important$'] = important;
-        }
-
-        if (visible) {
-            whereClause['$publication.visible$'] = visible;
         }
 
         return this.withTransaction(async (transaction) => {

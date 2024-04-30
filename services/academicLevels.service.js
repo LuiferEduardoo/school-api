@@ -16,9 +16,7 @@ class AcademicLevels extends Transactional {
             const dataFilter= ['nameLevel', 'levelCode'];
             this.querySearch(dataFilter, search, where);
 
-            if (visible) {
-                where.visible = visible;
-            }
+            this.handleElementPrivacy(req, where, 'visible', visible);
 
             if (campusNumber) {
                 where['$campus.campus_number$'] = campusNumber;

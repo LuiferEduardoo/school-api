@@ -21,8 +21,8 @@ class IndividualEntity extends Transactional {
     async deleteIndividualEntity(deleteAll, individualEntityToDelete, elementId, modelIndividualEntity, fieldNameElement, transaction){
         let deleteAllArray;
         if(deleteAll){
-            const {elements} = await this.getAllElements(modelIndividualEntity, {[fieldNameElement]: elementId});
-            deleteAllArray = elements 
+            const individualEntities = await this.getAllElementsWithoutQuery(modelIndividualEntity, null, {[fieldNameElement]: elementId});
+            deleteAllArray = individualEntities 
         } else {
             deleteAllArray = false;
         }
@@ -36,9 +36,17 @@ class IndividualEntity extends Transactional {
         }
     }
 
-    async updateIndividualEntity(idsNewIndividualEntity, idsEliminateIndividualEntityArray, fieldNameIndividualEntity,  elementId, modelIndividualEntity, fieldNameElement, optionalData, transaction){
+    async updateIndividualEntity(idsNewIndividualEntity, idsEliminateIndividualEntityArray, idsUpdateIndividualEntity, updateIsCoordinator, fieldNameIndividualEntity,  elementId, modelIndividualEntity, fieldNameElement, optionalData, transaction){
         if(idsNewIndividualEntity){
             await this.createIndividualEntity(idsNewIndividualEntity,fieldNameIndividualEntity, elementId, modelIndividualEntity, fieldNameElement, optionalData, transaction);
+        }
+        if(idsUpdateIndividualEntity){
+            const arrayIdsUpdateIndividualEntity = idsUpdateIndividualEntity.split(',');
+            const isCoordinator = updateIsCoordinator.split(',').map(value => value === 'true');
+            for (let index = 0; index < arrayIdsUpdateIndividualEntity.length; index++) {
+                const getIndividualEntity = await this.getElementById(arrayIdsUpdateIndividualEntity[index], modelIndividualEntity);
+                getIndividualEntity.update({isCoordinator: isCoordinator[index]});
+            }
         }
         if(idsEliminateIndividualEntityArray){
             await this.deleteIndividualEntity(false, idsEliminateIndividualEntityArray, elementId, modelIndividualEntity, fieldNameElement, transaction);

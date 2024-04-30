@@ -9,6 +9,17 @@ const router = express.Router();
 const serviceImageBanners = new ImageBanners();
 
 
+router.get('/', 
+    authCombined('access', true),
+    async (req, res, next) => {
+        try {
+            const getAllBanners = await serviceImageBanners.getAll();
+            res.json(getAllBanners)
+        } catch (error) {
+            next(error);
+        }
+    }
+)
 router.get('/:banners/:id?',
     validatorHandler(getBanner, 'params'),
     async (req, res, next) => {

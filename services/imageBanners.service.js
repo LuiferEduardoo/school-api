@@ -7,13 +7,64 @@ const serviceImageAssociation = new ImageAssociation();
 class ImageBanners extends Transactional {
     async get(id, banner, req){
         return this.withTransaction(async (transaction) => {
-            const query = this.queryParameterPagination(req.query);
             const include = [{ association: 'imageBanner', include: [{ association: 'image', include: 'file' }] }]
             await this.checkModel(banner, 'Banner')
             if(id){
                 return await this.getElementWithCondicional(banner, include, {id: id})
             }
-            return await this.getAllElements(banner, {}, include, null, query)
+            return await this.getAllElementsWithoutQuery(banner, include)
+        })
+    }
+
+    async getAll(req){
+        return this.withTransaction(async (transaction) => {
+            const banners = [{
+                title: "Banner Home",
+                endpoint: 'BannersHome',
+                description: "Bannner principal que se visualiza en la página de inicio, capturando la atención del visitante con contenido relevante y atractivo.",
+            },
+            {
+                title: "Banner Nuestra Escuela",
+                endpoint: 'BannersOurSchool',
+                description: "Destaca los aspectos más destacados y distintivos de nuestra institución educativa, ofreciendo una visión única de lo que somos y lo que ofrecemos.",
+            },
+            {
+                title: "Banner Proyectos Institucionales",
+                endpoint: 'BannersInstitutionalProjects',
+                description: "Muestra nuestras iniciativas clave y proyectos en desarrollo, reflejando nuestro compromiso con la innovación y la excelencia educativa.",
+            },
+            {
+                title: "Banner Niveles Académicos",
+                endpoint: 'BannersAcademicLevels',
+                description: "Ofrece una visión general de los diversos niveles de educación que ofrecemos, desde preescolar hasta educación superior, destacando nuestras fortalezas en cada etapa del aprendizaje.",
+            },
+            {
+                title: "Banner Noticias",
+                endpoint: 'BannersNews',
+                description: "Mantiene a nuestra comunidad informada sobre las últimas novedades, eventos y logros destacados dentro de nuestra institución educativa y más allá.",
+            },
+            {
+                title: "Banner Admisiones",
+                endpoint: 'BannersAdmissions',
+                description: "Proporciona información crucial para aquellos interesados en unirse a nuestra comunidad educativa, detallando los procesos de admisión, fechas importantes y requisitos.",
+            },
+            {
+                title: "Banner Contacto",
+                endpoint: 'BannersContact',
+                description: "Facilita el acceso directo a nuestras vías de comunicación, brindando a nuestros visitantes la oportunidad de ponerse en contacto con nosotros de manera rápida y sencilla.",
+            }];
+            const response = [];
+            for (let index = 0; index < banners.length; index++) {
+                const banner = await this.get(null, banners[index].endpoint);
+                const data = {
+                    title: banners[index].title,
+                    endpoit: banners[index].endpoint,
+                    description: banners[index].description,
+                    banners: banner
+                }
+                response.push(data);
+            }
+            return response
         })
     }
     async create(req, data, banner){

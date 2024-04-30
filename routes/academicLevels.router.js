@@ -1,5 +1,6 @@
 const express = require('express');
 const authCombined = require('../middlewares/authCombined.handler');
+const checkIfThereIsToken = require('../middlewares/checkIfThereIsToken.handler');
 const validatorHandler = require('../middlewares/validator.handler');
 const { getAcademicLevels, createAcademicLevels, updateAcademicLevels, deleteAcademicLevels, queryParameterUser } = require('../schemas/academicLevels.schema');
 const { checkFiles } = require('../schemas/files.schema');
@@ -10,12 +11,7 @@ const router = express.Router();
 
 router.get('/:id?',
     validatorHandler(queryParameterUser, 'query'),
-    (req, res, next) => {
-        if (!req.headers.authorization) {
-            return next();  // Si no hay token en los headers, continúa sin autenticar
-        }
-        authCombined('access')(req, res, next)
-    },
+    checkIfThereIsToken(),
     async (req, res, next) => {
         try {
             const { id } = req.params;

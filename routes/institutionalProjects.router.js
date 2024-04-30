@@ -1,6 +1,7 @@
 const express = require('express');
 
 const authCombined = require('../middlewares/authCombined.handler');
+const checkIfThereIsToken = require('../middlewares/checkIfThereIsToken.handler');
 const validatorHandler = require('../middlewares/validator.handler');
 const { createInstitutionalProjects, updateInstitutionalProjects, queryInstitutionalProjects } = require('../schemas/institutionalProjects.schema');
 const { createInstitutionalProjectsPublicationns, updateInstitutionalProjectsPublicationns, deleInstitutionalProjectsPublications, queryInstitutionalProjectsPublications } = require('../schemas/institutionalProjectsPublications.schema');
@@ -14,12 +15,7 @@ const router = express.Router();
 
 router.get('/:id?',
     validatorHandler(queryInstitutionalProjects, 'query'),
-    (req, res, next) => {
-        if (!req.headers.authorization) {
-            return next();  // Si no hay token en los headers, continúa sin autenticar
-        }
-        authCombined('access')(req, res, next);
-    },
+    checkIfThereIsToken(),
     async (req, res, next) => {
         try {
             const { id } = req.params;
@@ -32,12 +28,7 @@ router.get('/:id?',
 );
 router.get('/:institutionalProjectsId/publication/:id?',
     validatorHandler(queryInstitutionalProjectsPublications, 'query'),
-    (req, res, next) => {
-        if (!req.headers.authorization) {
-            return next();  // Si no hay token en los headers, continúa sin autenticar
-        }
-        authCombined('access')(req, res, next);
-    },
+    checkIfThereIsToken(),
     async (req, res, next) => {
         try {
             const { institutionalProjectsId, id } = req.params;
