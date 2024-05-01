@@ -44,7 +44,7 @@ class Transactional {
     }
 
     handleElementPrivacy(req, where, field, value){
-        if(this.checkPermissionToPrivacy(req)){
+        if(this.checkPermissionToPrivacy(req) && (value !== undefined && value !== null && value !== '')){
             where[field] = value;
         }
     }
