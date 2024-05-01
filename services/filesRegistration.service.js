@@ -23,7 +23,7 @@ class FilesRegistration extends Transactional{
             let counter = 0;
             const relationFile = []
             for (const data of methodDatabase) {
-                const relationInTable = await save[counter].fileType === 'image' ?
+                const relationInTable = await save[counter].fileTypeFile === 'image' ?
                 await sequelize.models.ImageRegistration.create({ fileId: data.id, imageCredits: save[counter].imageCredits }, {transaction}) :
                 await sequelize.models.DocumentRegistration.create({ fileId: data.id }, {transaction});
                 relationFile.push(relationInTable);

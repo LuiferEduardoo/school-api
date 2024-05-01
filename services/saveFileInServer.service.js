@@ -3,6 +3,7 @@ const boom = require('@hapi/boom');
 const { promisify } = require('util');
 const fs = require('fs');
 const renameAsync = promisify(fs.rename);
+const imageSize = require('image-size');
 const path = require('path');
 const { convertToWebP } = require('./../libs/sharp');
 
@@ -20,7 +21,8 @@ class SaveFileInServer {
         const uniquePathParse = path.parse(uniquePath);
         return {
             uniquePath,
-            fileName: path.format({ name: uniquePathParse.name, ext: uniquePathParse.ext })
+            fileName: path.format({ name: uniquePathParse.name, ext: uniquePathParse.ext }),
+            ext: uniquePathParse.ext
         };
     }
     baseUrl(req){
@@ -44,9 +46,11 @@ class SaveFileInServer {
                 }
             }
             const tempPath = file.path;
+            let dimensions;
             const fileTypeFile = file.type;
             if (fileTypeFile.startsWith('image/') && fileType === 'image') {
                 const fileBuffer = fs.readFileSync(tempPath);
+                dimensions = imageSize(fileBuffer);
                 const webpFilePath = await convertImageToWebp(tempPath); // Convierte la imagen a WebP
                 file.name = file.name.replace(/\.[^.]+$/, '.webp'); // remplazamos la extensión por .webp
                 file.type = 'image/webp'; // Y el tipo de archivo
@@ -57,7 +61,12 @@ class SaveFileInServer {
             const uniqueFilePath = this.getUniqueFilename(filePath); // creamos un unico path para los archivos
             await fs.copyFileSync(tempPath, uniqueFilePath.uniquePath); // Utilizando promisify para fs.rename
             await fs.unlinkSync(tempPath);
-            return uniqueFilePath;
+            return {
+                uniqueFilePath: uniqueFilePath,
+                width: dimensions?.width,
+                height: dimensions?.height,
+                fileType: file.type
+            };
         } catch (error) {
             throw error;
         }
@@ -97,9 +106,21 @@ class SaveFileInServer {
                 uploadPath += getDestinationPath(req.user.sub, folder) // se asigna la ruta con el id del usuario el año y el mes
                 const fullPath = path.join(__dirname, uploadPath);
                 const upload = await this.uploadFileInServer(file, fileType, fullPath);
-                const url = `${this.baseUrl(req)}${uploadPath.substring(2)}/${upload.fileName}`;
+                const url = `${this.baseUrl(req)}${uploadPath.substring(2)}/${upload.uniqueFilePath.fileName}`;
 
-                informationFile.push({  name: upload.fileName, folder: uploadPath.substring(2), url, userId: req.user.sub, fileType, imageCredits: imageCreditsArray[counter], isPublic: isPublicArray[counter] });
+                informationFile.push({  
+                    name: upload.uniqueFilePath.fileName,
+                    ext: upload.uniqueFilePath.ext, 
+                    width: upload.width,
+                    height: upload.height,
+                    folder: uploadPath.substring(2), 
+                    url, 
+                    userId: req.user.sub, 
+                    fileTypeFile: fileType, 
+                    fileType: upload.fileType, 
+                    imageCredits: imageCreditsArray[counter], 
+                    isPublic: isPublicArray[counter] 
+                });
                 counter ++;
             }
     
@@ -155,7 +176,11 @@ class SaveFileInServer {
                 const upload = await this.uploadFileInServer(file, data.fileType, fullPathNewFile)
                 await this.deleteFile(fullPath);
                 response.name = file.name
-                response.url =  `${this.baseUrl(req)}${data.folder}/${upload.fileName}`
+                response.url =  `${this.baseUrl(req)}${data.folder}/${upload.uniqueFilePath.fileName}`
+                response.fileType = upload.fileType
+                response.ext = upload.uniqueFilePath.ext, 
+                response.width = upload.width,
+                response.height = upload.height
             }
             return response;
         } catch (error) {

@@ -14,6 +14,23 @@ const filesRegistrationSchema = {
         type: DataTypes.TEXT,
         allowNull: false,
     },
+    ext: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+    },
+    fileType: {
+        field: 'file_type',
+        type: DataTypes.TEXT,
+        allowNull: false,
+    },
+    width: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+    },
+    height: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+    },
     folder: {
         type: DataTypes.TEXT,
         allowNull: false,

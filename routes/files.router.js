@@ -36,7 +36,6 @@ router.post('/upload',
 
 router.patch('/update/:id',
     validatorHandler(getFiles, 'params'),
-    validatorHandler(createFiles, 'fields'),
     validatorHandler(updateFiles, null, true),
     async (req, res, next) => {
         try {

@@ -10,15 +10,17 @@ class Files extends Transactional {
     async get (req, id, type){
         return this.withTransaction(async (transaction) => {
             const model = type === 'image' ? 'ImageRegistration' : type === 'document' ? 'DocumentRegistration' : null;
+            const where = superAdmin.includes(req.user.role) ? {} : {userId: req.user.sub}
+            const include = [{association: 'file', include:[{association: 'user', attributes: ['id', 'name', 'lastName'], where: where, include:[{association: 'rol'}, {association: 'image'}]}]}]
             if(!model){
                 throw boom.notFound(`Cannot ${req.method} ${req.originalUrl}`);
             }
-            const where = superAdmin.includes(req.user.role) ? {} : {userId: req.user.sub}
             const query = this.queryParameterPagination(req.query);
             if(id){
-                return await this.getElementWithCondicional(model, [{association: 'file', where: where}], {id: id});
+                return await this.getElementWithCondicional(model, include, {id: id});
             }
-            return await this.getAllElements(model, {}, [{association: 'file', where: where}], null, query)
+            
+            return await this.getAllElements(model, {}, include, null, query)
         });
     }
     async create (req){

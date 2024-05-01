@@ -37,6 +37,23 @@ module.exports = {
         type: Sequelize.DataTypes.TEXT,
         allowNull: false,
       },
+      ext: {
+        type: Sequelize.DataTypes.TEXT,
+        allowNull: false,
+      },
+      fileType: {
+        field: 'file_type',
+        type: Sequelize.DataTypes.TEXT,
+        allowNull: false,
+      },
+      width: {
+        type: Sequelize.DataTypes.TEXT,
+        allowNull: true,
+      },
+      height: {
+        type: Sequelize.DataTypes.TEXT,
+        allowNull: true,
+      },
       folder: {
         type: Sequelize.DataTypes.TEXT,
         allowNull: false,
