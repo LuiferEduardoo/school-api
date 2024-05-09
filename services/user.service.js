@@ -56,7 +56,7 @@ class UserService extends Transactional {
         async function validateUserChanges (req, changes, idUser, user, transaction) {
             if (!idUser) {
                 await validateCurrentPassword(changesToUpdate, user, req);
-                if(!user.image?.[0]?.imageId){
+                if(!user.image?.[0]?.imageId && (req.files.files || changes.idNewImage)){
                     await serviceImageAssociation.createOrAdd(req, 'ImageUser', {userId: req.user.sub}, `profile/picture`, changes.idNewImage, transaction);
                 } else {
                     await serviceImageAssociation.updateInDataBase(req, 'ImageUser', user.image?.[0]?.imageId, changes.idNewImage, `profile/picture` ,transaction);
