@@ -56,7 +56,11 @@ class UserService extends Transactional {
         async function validateUserChanges (req, changes, idUser, user, transaction) {
             if (!idUser) {
                 await validateCurrentPassword(changesToUpdate, user, req);
-                await serviceImageAssociation.update(req, 'ImageUser', {userId: req.user.sub}, changes.idNewImage, `profile/picture`, changes.idsImagesEliminate, changes.elimianteImage, transaction);
+                if(!user.image?.[0]?.imageId){
+                    await serviceImageAssociation.createOrAdd(req, 'ImageUser', {userId: req.user.sub}, `profile/picture`, changes.idNewImage, transaction);
+                } else {
+                    await serviceImageAssociation.updateInDataBase(req, 'ImageUser', user.image?.[0]?.imageId, changes.idNewImage, `profile/picture` ,transaction);
+                }
                 delete changesToUpdate.active;
             } else if (superAdmin.includes(req.user.role)) {
                 delete changesToUpdate.name;
@@ -105,7 +109,7 @@ class UserService extends Transactional {
         return this.withTransaction(async (transaction) => {
             const idUser = req.params.id;
             const id = idUser || req.user.sub; 
-            const user = await this.getElementById(id, 'User', 'rol');
+            const user = await this.getElementById(id, 'User', ['rol', 'image']);
             await validateUserChanges(req, changes, idUser, user, transaction);
             await user.update(changesToUpdate, { transaction });
             return { message: 'Usuario actualizado con éxito' };

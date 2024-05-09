@@ -31,7 +31,6 @@ class SchoolCourses extends Transactional {
             if(!id){
                 return await this.getAllElements('SchoolCourses', where, include, null, query)
             }
-            console.log(where)
             return await this.getElementWithCondicional('SchoolCourses', include, {id: id});
         });
     }
