@@ -77,7 +77,7 @@ class UserService extends Transactional {
                 const passwordUser = user.password;
                 const isMatch = await bcrypt.compare(changesToUpdate.currentPassword, passwordUser);
                 if (!isMatch) {
-                    throw boom.unauthorized('Contraseña incorrecta');
+                    throw boom.badData('Contraseña incorrecta');
                 }
                 await SendMain(user.email, '¿Has cambiado la contraseña de tu cuenta?', 'changePassword', {name: user.name }); 
                 await closeOtherDevices(changesToUpdate.closeOtherDevices, req)
@@ -123,6 +123,8 @@ class UserService extends Transactional {
             await serviceImageAssociation.delete(idsImagesEliminate, 'ImageUser', body.elimianteImage, req, transaction)
             await user.removeRol(user.rol[0].id, transaction)
             await user.destroy(transaction);
+            await deleteKeysStartingWith(`access${id}`);
+                await deleteKeysStartingWith(`refresh${id}`);
             return { id };
         });
     }

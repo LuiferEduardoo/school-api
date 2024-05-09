@@ -78,7 +78,7 @@ userRoute.delete('/:id',
         const { id } = req.params;
         const body = req.body || req.fields;
         await service.delete(req, id, body);
-        res.status(201).json({id});
+        res.status(200).json({id});
         } catch (error) {
         next(error);
         }
