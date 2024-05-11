@@ -149,7 +149,7 @@ class SaveFileInServer {
             } 
             if(data.newName || data.newFolder){
                 const extenFile = path.extname(data.path);
-                const originalFileName = path.basename(data.path, extenFile);
+                const originalFileName = path.basename(data.path);
                 const pathNumber = data.path.match(/\/\d+\/\d+\/\d+/);
 
                 const pathFolder = data.newFolder ? path.join(`/uploads/${data.fileType}`, `${data.newFolder}${pathNumber}`) : data.folder;

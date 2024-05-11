@@ -56,7 +56,7 @@ class FilesRegistration extends Transactional{
             if(req.user.sub !== file.userId && !superAdmin.includes(req.user.role) ){
                 throw boom.unauthorized();
             }
-            const fileType = file.image[0] || file.document[0]
+            const fileType = file.image[0] ? 'image' : file.document[0] && 'document'
             const dataUpdate = {
                 path: path.join(file.folder, file.name),
                 folder: file.folder,
