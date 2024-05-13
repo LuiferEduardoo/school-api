@@ -10,13 +10,9 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(handleAttachmentsOrJSON);
-const options = {
-    origin: (origin, callback) => {
-        callback(null, true);
-        }
-    }
-app.use(cors(options));
+
 require('./utils/auth');
+app.use(cors());
 
 
 routerApi(app);
