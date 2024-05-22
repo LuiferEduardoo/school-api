@@ -2,14 +2,12 @@ const express = require('express');
 const authCombined = require('../middlewares/authCombined.handler');
 const validatorHandler = require('../middlewares/validator.handler');
 const { getSchedule, createSchedule, updateSchedule, parametersSchedule } = require('../schemas/schedule.schema');
-const { queryParamets } = require('../schemas/queryParamets.schema');
 
 const Schedule = require('../services/schedule.service');
 const service = new Schedule();
 const router = express.Router();
 
 router.get('/:schoolCoursesId/:id?',
-    validatorHandler(queryParamets, 'query'),
     validatorHandler(getSchedule, 'params'),
     async (req, res, next) => {
         try {

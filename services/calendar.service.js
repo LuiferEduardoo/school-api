@@ -7,9 +7,8 @@ class Calendar extends Transactional {
     async get(req, id){
         return this.withTransaction(async (transaction) => {
             const where = this.checkPermissionToGet(req);
-            const query = this.queryParameterPagination(req.query);
             if(!id){
-                return await this.getAllElements('Calendar', where, null, null, query)
+                return await this.getAllElementsWithoutQuery('Calendar', null, where);
             }
             return await this.getElementWithCondicional('Calendar', null, {id: id, ...where});
         });

@@ -31,10 +31,7 @@ const routerApi = (app) => {
         authCombined('access', true),
         subject
     );
-    router.use('/school-courses',
-        authCombined('access', true),
-        schoolCourses
-    );
+    router.use('/school-courses', schoolCourses);
     router.use('/schedule', schedule);
     router.use('/admission', admissionRequest);
     router.use('/calendar', calendar);

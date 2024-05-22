@@ -13,11 +13,10 @@ class Schedule extends Transactional {
         return this.withTransaction(async (transaction) => {
             const { id, schoolCoursesId } = req.params;
             const include = [{association: 'dayWeek'}, {association: 'schoolCourses', where: { id: schoolCoursesId }, include: [{association: 'schoolGrade'}]}, {association: 'subject', include: [ {association:'subjectName'}, {association: 'teacher', attributes: ['id', 'name', 'lastName']}]}];
-            const query = this.queryParameterPagination(req.query);
             if(id){
                 return await this.getElementById(id, 'Schedule', include);
             }
-            return await this.getAllElements('Schedule', {}, include, null, query);
+            return await this.getAllElementsWithoutQuery('Schedule', include);
         })
     }
     async create (body, schoolCoursesId){

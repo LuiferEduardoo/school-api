@@ -1,4 +1,5 @@
 const express = require('express'); 
+const authCombined = require('../middlewares/authCombined.handler');
 const validatorHandler = require('../middlewares/validator.handler');
 const { getSchoolCourses, parameterUpdateOrDelete, createSchoolCourses, updateSchoolCourses, parameterSchoolCourses, queryParameterSchoolCourse } = require('../schemas/schoolCourses.schema');
 
@@ -20,6 +21,7 @@ router.get('/:academicLevelId/:id?',
     }
 );
 router.post('/:academicLevelId',
+    authCombined('access', true),
     validatorHandler(parameterSchoolCourses, 'params'),
     validatorHandler(createSchoolCourses, null, true),
     async (req, res, next) => {
@@ -35,6 +37,7 @@ router.post('/:academicLevelId',
 );
 
 router.patch('/:id',
+    authCombined('access', true),
     validatorHandler(parameterUpdateOrDelete, 'params'),
     validatorHandler(updateSchoolCourses, null, true),
     async (req, res, next) => {
@@ -50,6 +53,7 @@ router.patch('/:id',
 );
 
 router.delete('/:id',
+    authCombined('access', true),
     validatorHandler(parameterUpdateOrDelete, 'params'),
     async (req, res, next) => {
         try {

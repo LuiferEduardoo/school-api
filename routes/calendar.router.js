@@ -3,14 +3,12 @@ const authCombined = require('../middlewares/authCombined.handler');
 const checkIfThereIsToken = require('../middlewares/checkIfThereIsToken.handler');
 const validatorHandler = require('../middlewares/validator.handler');
 const { getCalendar, createCalendar, updateCalendar } = require('../schemas/calendar.schema');
-const { queryParamets } = require('../schemas/queryParamets.schema');
 
 const Calendar = require('../services/calendar.service');
 const service = new Calendar();
 const router = express.Router();
 
 router.get('/:id?',
-    validatorHandler(queryParamets, 'query'),
     checkIfThereIsToken(),
     async (req, res, next) => {
         try {
