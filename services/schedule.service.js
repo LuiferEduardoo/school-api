@@ -12,7 +12,7 @@ class Schedule extends Transactional {
     async get (req){
         return this.withTransaction(async (transaction) => {
             const { id, schoolCoursesId } = req.params;
-            const include = [{association: 'dayWeek'}, {association: 'schoolCourses', where: { id: schoolCoursesId }, include: [{association: 'schoolGrade'}]}, {association: 'subject', include: [ {association:'subjectName'}, {association: 'teacher', attributes: ['id', 'name', 'lastName']}]}];
+            const include = [{association: 'dayWeek'}, {association: 'schoolCourses', where: { id: schoolCoursesId }, include: [{association: 'schoolGrade'}]}, {association: 'subject', include: [ {association:'subjectName'}, {association: 'teacher', attributes: ['id', 'name', 'lastName'], include: [{association: 'image', include: [{association: 'image', include: 'file'}]}]}]}];
             if(id){
                 return await this.getElementById(id, 'Schedule', include);
             }
@@ -40,7 +40,11 @@ class Schedule extends Transactional {
             const endTime = body.endTime || getSchedule.endTime;
             if(parseTime(endTime) <= parseTime(startTime))
                 throw boom.badData('Las horas de finalización no deben ser inferior a las de inicio y viceversa ');
-            await getSchedule.update(body, {transaction});
+            const createSchuleDay = await this.createSchuleDay(body.dayWeek, transaction);
+            await getSchedule.update({ ...body, dayWeekId: createSchuleDay.id }, {transaction});
+            return {
+                message: 'Horario actualizado con exito'
+            }
         });
     }
 

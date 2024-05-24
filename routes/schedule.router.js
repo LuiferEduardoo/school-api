@@ -1,7 +1,7 @@
 const express = require('express'); 
 const authCombined = require('../middlewares/authCombined.handler');
 const validatorHandler = require('../middlewares/validator.handler');
-const { getSchedule, createSchedule, updateSchedule, parametersSchedule } = require('../schemas/schedule.schema');
+const { getSchedule, paramsSchedule, createSchedule, updateSchedule, parametersSchedule } = require('../schemas/schedule.schema');
 
 const Schedule = require('../services/schedule.service');
 const service = new Schedule();
@@ -36,14 +36,14 @@ router.post('/:schoolCoursesId',
 
 router.patch('/:id',
     authCombined('access', true),
-    validatorHandler(getSchedule, 'params'),
+    validatorHandler(paramsSchedule, 'params'),
     validatorHandler(updateSchedule, null, true),
     async (req, res, next) => {
         try {
             const body = req.body || req.fields;
             const { id } = req.params
             const update = await service.update(id, body);
-            res.json('Horario actualizado con exito');
+            res.status(200).json(update);
         } catch (error) {
         next(error);
         }
@@ -52,7 +52,7 @@ router.patch('/:id',
 
 router.delete('/:id',
     authCombined('access', true),
-    validatorHandler(getSchedule, 'params'),
+    validatorHandler(paramsSchedule, 'params'),
     async (req, res, next) => {
         try {
             const { id } = req.params;

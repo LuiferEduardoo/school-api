@@ -15,6 +15,10 @@ const getSchedule  = Joi.object({
     id: id
 });
 
+const paramsSchedule = Joi.object({
+    id: id.required()
+})
+
 const parametersSchedule = Joi.object({
     schoolCoursesId: id.required()
 }) 
@@ -39,11 +43,10 @@ const createSchedule = Joi.object({
 
 const updateSchedule  = Joi.object({
     subjectId: id,
-    schoolCoursesId: id,
-    dayWeekId: id,
+    dayWeek: string,
     startTime: hour,
     endTime: hour
 });
 
 
-module.exports = { getSchedule, createSchedule, updateSchedule, parametersSchedule }
+module.exports = { getSchedule, paramsSchedule, createSchedule, updateSchedule, parametersSchedule }
