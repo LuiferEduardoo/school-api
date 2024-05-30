@@ -11,11 +11,15 @@ class AdmissionRequest extends Transactional {
             const { search, startDate, endDate, academicLevels, gender, grade, status } = req.query;
             const include = [{ association: 'academicLevels' }, { association: 'schoolGrade' }];
             const query = this.queryParameterPagination(req.query);
+            const endDateInclusive = new Date(endDate);
+            endDateInclusive.setHours(23, 59, 59, 999);
+
             const where = startDate && endDate ? {
                 createdAt: {
-                    [Op.between]: [startDate, endDate] // Filtra por el rango de fecha
+                    [Op.gte]: new Date(startDate),
+                    [Op.lte]: endDateInclusive
                 }
-            } : {}
+            } : {};
             const dataFilter= ['firstName', 'secondName', 'surname', 'secondSurname', 'numberDocument', 'email'];
             this.querySearch(dataFilter, search, where);
 
