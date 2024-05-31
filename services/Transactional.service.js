@@ -94,7 +94,10 @@ class Transactional {
     async getAllElements(model, where = null, include = null, order = null, query = {}, attributesObject = {}, otherElements){
         return this.withTransaction(async (transaction) => {
             const attributes = Object.keys(attributesObject).length > 0 ? attributesObject : {};
-            const totalCount = await sequelize.models[model].count();
+            const totalCount = await sequelize.models[model].count({ 
+                where: where,
+                include: include
+            });
             const elements = await sequelize.models[model].findAll({
                 where: where,
                 include: include,
