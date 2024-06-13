@@ -62,7 +62,7 @@ class InstitutionalProjectsPublications extends Transactional {
         return getInstitutionalProjectsPublication;
     }
 
-    async get(req, id, institutionalProjectId) {
+    async get(req, id, link, institutionalProjectId) {
         return this.withTransaction(async (transaction) => {
             const where= this.checkPermissionToGet(req);
             const { search, important, visible, author } = req.query;
@@ -83,8 +83,9 @@ class InstitutionalProjectsPublications extends Transactional {
                 whereClause['$InstitutionalProjectsPublicationsAuthors.author.user.id$'] = author;
             }
             
-            if(id){
-                return await this.getElementWithCondicional('InstitutionalProjectsPublications', include, {id: id, ...whereClause});
+            if(id || link){
+                const whereObtainOneElement = id ? {id: id} : {'$publication.link$': link}
+                return await this.getElementWithCondicional('InstitutionalProjectsPublications', include, {...whereObtainOneElement, ...whereClause});
             }
             return await this.getAllElements('InstitutionalProjectsPublications', { InstitutionalProjectId: institutionalProjectId, ...whereClause }, include, null, query);
         })

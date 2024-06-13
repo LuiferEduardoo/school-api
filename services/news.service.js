@@ -9,7 +9,7 @@ const servicePublications = new Publications();
 const serviceImageAssociation = new ImageAssociation();
 
 class News extends Transactional {
-    async get(id, req){
+    async get(id, link, req){
         const where = this.checkPermissionToGet(req)
         const query = this.queryParameterPagination(req.query);
         const { search, important, visible } = req.query;
@@ -32,8 +32,9 @@ class News extends Transactional {
         }
 
         return this.withTransaction(async (transaction) => {
-            if(id){
-                return await this.getElementWithCondicional('NewsPublications', include, {id: id});
+            if(id || link){
+                const where = id ? {id: id} : {'$publication.link$': link}
+                return await this.getElementWithCondicional('NewsPublications', include, where);
             }
             return await this.getAllElements('NewsPublications', whereClause, include, null, query )
         })

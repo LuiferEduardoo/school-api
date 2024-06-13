@@ -27,7 +27,7 @@ class InstitutionalProjects extends Transactional {
             isCoordinator: coordinator.trim().toLowerCase() === 'true'
         })) : [];    
     }
-    async get(id, req){
+    async get(id, link, req){
         return this.withTransaction(async (transaction) => {
             const where= this.checkPermissionToGet(req);
             const { search, important, visible, member } = req.query;
@@ -47,10 +47,11 @@ class InstitutionalProjects extends Transactional {
                 where.important = important;
             }
 
-            if(!id){
-                return await this.getAllElements('InstitutionalProjects', where, includeInstitutionalProjects, this.order, query)
+            if(id || link){
+                const whereObtainOneElement = id ? {id: id} : {link: link}
+                return await this.getElementWithCondicional('InstitutionalProjects', includeInstitutionalProjects, {...whereObtainOneElement, ...where}, this.order);
             }
-            return await this.getElementWithCondicional('InstitutionalProjects', includeInstitutionalProjects, {id: id, ...where}, this.order);
+            return await this.getAllElements('InstitutionalProjects', where, includeInstitutionalProjects, this.order, query)
         });
     }
     async create(req, body){

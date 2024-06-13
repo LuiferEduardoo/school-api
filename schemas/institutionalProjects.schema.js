@@ -9,6 +9,7 @@ const date = Joi.date().iso();
 
 const queryInstitutionalProjects = Joi.object({
     ...query,
+    link: Joi.string(),
     important: Joi.boolean(),
     visible: Joi.boolean(),
     member: Joi.number()

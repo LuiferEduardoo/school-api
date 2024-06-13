@@ -5,7 +5,8 @@ const { getPublications, createPublication, updatePublication, deletePublication
 const queryNewsPublications = Joi.object({
     ...query,
     important: Joi.boolean(),
-    visible: Joi.boolean()
+    visible: Joi.boolean(),
+    link: Joi.string()
 })
 
 const getNewsPublications = Joi.object(getPublications)

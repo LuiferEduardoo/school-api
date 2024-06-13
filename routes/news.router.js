@@ -15,7 +15,8 @@ router.get('/:id?',
     async (req, res, next) => {
         try {
             const { id } = req.params;
-            const getNewsPublications = await service.get(id, req);
+            const { link } = req.query;
+            const getNewsPublications = await service.get(id, link, req);
             res.status(200).json(getNewsPublications);
         } catch (error) {
         next(error);

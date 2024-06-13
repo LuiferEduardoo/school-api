@@ -19,7 +19,8 @@ router.get('/:id?',
     async (req, res, next) => {
         try {
             const { id } = req.params;
-            const getInstitutionalProject = await serviceInstitutionalProjects.get(id, req);
+            const { link } = req.query;
+            const getInstitutionalProject = await serviceInstitutionalProjects.get(id, link, req);
             res.status(200).json(getInstitutionalProject);
         } catch (error) {
         next(error);
@@ -32,7 +33,8 @@ router.get('/:institutionalProjectsId/publication/:id?',
     async (req, res, next) => {
         try {
             const { institutionalProjectsId, id } = req.params;
-            const getInstitutionalProject = await serviceInstitutionalProjectsPublications.get(req, id, institutionalProjectsId);
+            const { link } = req.query;
+            const getInstitutionalProject = await serviceInstitutionalProjectsPublications.get(req, id, link, institutionalProjectsId);
             res.status(200).json(getInstitutionalProject);
         } catch (error) {
         next(error);
