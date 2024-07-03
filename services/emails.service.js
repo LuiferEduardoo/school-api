@@ -29,7 +29,7 @@ async function SendMain(email, subject, type, date) {
             template = path.join(__dirname, '../views/changePassword.ejs');
             break
         default:
-            break;
+            throw new Error('Type does not have a template');
     }
     const html = await ejs.renderFile(template, date);
     const info = await transporter.sendMail({
@@ -38,6 +38,8 @@ async function SendMain(email, subject, type, date) {
           subject: subject, // Subject line
           html: html, // html body
     });
+
+    return info;
 }
 
 module.exports = { SendMain };
