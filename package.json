@@ -12,6 +12,7 @@
         "migrations:revert": "sequelize-cli db:migrate:undo",
         "migrations:delete": "sequelize-cli db:migrate:undo:all",
         "migration:delete": "sequelize-cli db:migrate:undo --name",
+        "test": "jest",
         "deploy": "npm run migrations:run && npm start"
     },
     "keywords": [],
@@ -21,9 +22,11 @@
         "eslint": "^7.32.0",
         "eslint-config-prettier": "^8.3.0",
         "eslint-plugin-prettier": "^3.4.1",
+        "jest": "^29.7.0",
         "nodemon": "^2.0.12",
         "prettier": "^2.3.2",
-        "sequelize-cli": "^6.6.2"
+        "sequelize-cli": "^6.6.2",
+        "supertest": "^7.0.0"
     },
     "dependencies": {
         "@faker-js/faker": "^7.6.0",
