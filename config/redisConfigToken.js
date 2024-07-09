@@ -2,15 +2,24 @@ const { config } = require('./config');
 
 const Redis = require('ioredis');
 
+let redis;
 
-const redisConfig = {
-    host: config.redisHost,
-    port: config.redisPort,
-    user: config.redisUser || null,
-    password: config.redisPassword || null
+if (config.env === 'test') {
+    redis = null;
+} else {
+    // Configuración para otros entornos (desarrollo, producción)
+    const redisConfig = {
+        host: config.redisHost,
+        port: config.redisPort,
+        user: config.redisUser || null,
+        password: config.redisPassword || null
+    };
+    redis = new Redis(redisConfig);
+}
+
+const setRedisInstance = (instance) => {
+    redis = instance;
 };
-const redis = new Redis(redisConfig); // Esto conecta con un servidor Redis local por defecto
-
 
 // Almacena un Access Token en Redis con un tiempo de vida (ejemplo de 1 hora)
 const saveToken = async (userId, token, information, type, expired) => {
@@ -74,6 +83,7 @@ const deleteTokensDevice = async (accessToken) => {
 };
 
 module.exports = {
+    setRedisInstance,
     getTokens,
     saveToken,
     verifyToken,
