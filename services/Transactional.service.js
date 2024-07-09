@@ -62,18 +62,16 @@ class Transactional {
         }
     }
     async getElementById(id, model, include = null, where = {}, order = null, query = {}){
-        return this.withTransaction(async (transaction) => {
-            const element = await sequelize.models[model].findByPk(id, {
-                where: { ...where},
-                order: order,
-                include: include,
-                ...query
-            });
-            if(!element){
-                throw boom.notFound(`${model} no encontrado`);
-            }
-            return element;
-        })
+        const element = await sequelize.models[model].findByPk(id, {
+            where: { ...where},
+            order: order,
+            include: include,
+            ...query
+        });
+        if(!element){
+            throw boom.notFound(`${model} no encontrado`);
+        }
+        return element;
     }
 
     async getElementWithCondicional(model, include=null, where = {}, order = null, query = {}, attributesObject = {}, errorBoom='notFound', messageError='no encontrado'){
@@ -92,7 +90,7 @@ class Transactional {
     }
 
     async getAllElements(model, where = null, include = null, order = null, query = {}, attributesObject = {}, otherElements){
-        return this.withTransaction(async (transaction) => {
+    
             const attributes = Object.keys(attributesObject).length > 0 ? attributesObject : {};
             const totalCount = await sequelize.models[model].count({ 
                 where: where,
@@ -110,16 +108,13 @@ class Transactional {
             });
             const totalPages = Math.ceil(totalCount / query.limit);
             return {totalPages, elements}
-        });
     }
     async getAllElementsWithoutQuery(model, include = null, where = {}){
-        return this.withTransaction(async (transaction) => {
             const elements = await sequelize.models[model].findAll({
                 where: where,
                 include: include,
             });
             return elements
-        });
     }
     async checkModel(model, nameModel){
         try {
