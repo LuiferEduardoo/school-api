@@ -57,15 +57,17 @@ class AuthService extends Transactional{
         }
     }
     async logOut(req){
-        return this.withTransaction(async (transaction) => {
+        try {
             const tokenAccessInformation = req.user;
             const authHeader = req.headers.authorization;
             const tokenAccess = authHeader.split(' ')[1]; // Extraer solo el token eliminando 'Bearer '
             await deleteTokensDevice(`access${tokenAccessInformation.sub}${tokenAccess}`) // se eliminan los tokens por medio del access token
-        })
+        } catch(error){
+            throw error
+        }
     }
     async returnTokenAccess(req){
-        return this.withTransaction(async (transaction) => {
+        try{
             const tokenRefreshInformation = req.user; // Traemos la información de token
             const authHeader = req.headers.authorization;
             const tokenRefresh = authHeader.split(' ')[1]; // Extraer solo el token eliminando 'Bearer '
@@ -75,7 +77,9 @@ class AuthService extends Transactional{
                 message: 'Token creado con exito',
                 tokenAccess: {token, expiresIn: '8h'},
             };
-        });
+        } catch(error){
+            throw error
+        }
     }
     async sendRecoveryPassword(email){
         try {
