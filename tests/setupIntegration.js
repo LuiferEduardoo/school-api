@@ -1,5 +1,13 @@
 const { sequelize } = require('../libs/sequelize');
-const app = require('../server')
+const app = require('../server');
+const nodemailer = require("nodemailer");
+
+jest.mock('nodemailer', () => ({
+    createTransport: jest.fn().mockReturnValue({
+        sendMail: jest.fn().mockReturnValue((mailoptions, callback) => {})
+    })
+}));
+
 
 const User = sequelize.models.User;
 const Rol = sequelize.models.Rol;
@@ -120,7 +128,7 @@ beforeAll(async () => {
         userId: userInactive.id,
         rolId: rolStudent.id
     });
-}, 40000);
+});
 
 afterAll(async () => {
     await sequelize.close();

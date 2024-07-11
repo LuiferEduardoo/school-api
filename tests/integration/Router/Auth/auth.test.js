@@ -1,10 +1,7 @@
-const { sequelize } = require('../../../../libs/sequelize');
 const Redis = require('ioredis-mock');
-const app = require('../../../../index');
-const {setRedisInstance, getTokens} = require('../../../../config/redisConfigToken')
+const {setRedisInstance, getTokens} = require('../../../../config/redisConfigToken');
 
 let redisClient;
-let server;
 
 beforeAll(async() => {
     redisClient = new Redis();
