@@ -1,13 +1,17 @@
 const { sequelize } = require('../libs/sequelize');
 const app = require('../server');
 const nodemailer = require("nodemailer");
+const fs = require('fs');
+const { rimraf } = require('rimraf');
+const path = require('path');
 
 jest.mock('nodemailer', () => ({
     createTransport: jest.fn().mockReturnValue({
-        sendMail: jest.fn().mockReturnValue((mailoptions, callback) => {})
+        sendMail: jest.fn().mockImplementation((mailoptions, callback) => {})
     })
 }));
 
+let tempDir = path.resolve('./uploads_test');
 
 const User = sequelize.models.User;
 const Rol = sequelize.models.Rol;
@@ -16,123 +20,47 @@ const RolUser = sequelize.models.RolUser;
 let server;
 
 beforeAll(async () => {
-    await sequelize.sync();
+    await sequelize.sync({ force: true });
     server = app.listen(3001, () => {});
-    const rolAdministrator = await Rol.create({rol: 'administrador'});
-    const rolCoordinator = await Rol.create({rol: 'coordinador'});
-    const rolRector = await Rol.create({rol: 'rector'});
-    const rolStudent = await Rol.create({rol: 'estudiante'});
-    const rolTeacher = await Rol.create({rol: 'docente'});
-    const rolCounselor = await Rol.create({rol: 'orientador'});
 
-    const userAdministrator = await User.create({
-        name: 'nameAdministrador',
-        lastName: 'lastNameAdministrador',
-        username: 'usernameAdministrador',
-        email: 'administrador@test.com',
-        password: 'passwordAdministrador',
-    });
-
-    await RolUser.create({
-        userId: userAdministrator.id,
-        rolId: rolAdministrator.id
-    });
-
-    const userCoordinator = await User.create({
-        name: 'nameCoordinator',
-        lastName: 'lastNameCoordinator',
-        username: 'usernameCoordinator',
-        email: 'coordinator@test.com',
-        password: 'passwordCoordinator',
-    });
-    await RolUser.create({
-        userId: userCoordinator.id,
-        rolId: rolCoordinator.id
-    });
-    const userRector = await User.create({
-        name: 'nameRector',
-        lastName: 'lastNameRector',
-        username: 'usernameRector',
-        email: 'rector@test.com',
-        password: 'passwordRector',
-    });
-    await RolUser.create({
-        userId: userRector.id,
-        rolId: rolRector.id
-    });
-    
-    const students = [
-        {
-            name: 'nameStudent1',
-            lastName: 'lastNameStudent1',
-            username: 'usernameStudent1',
-            email: 'student1@test.com',
-            password: 'passwordStudent1',
-        },
-        {
-            name: 'nameStudent2',
-            lastName: 'lastNameStudent2',
-            username: 'usernameStudent2',
-            email: 'student2@test.com',
-            password: 'passwordStudent2',
-        },
-        {
-            name: 'nameStudent3',
-            lastName: 'lastNameStudent3',
-            username: 'usernameStudent3',
-            email: 'student3@test.com',
-            password: 'passwordStudent3',
-        }
+    const roles = [
+        'administrador',
+        'coordinador',
+        'rector',
+        'estudiante',
+        'docente',
+        'orientador'
     ];
-    
-    for (const studentData of students) {
-        const student = await User.create(studentData);
-        await RolUser.create({
-            userId: student.id,
-            rolId: rolStudent.id
-        });
+
+    const roleInstances = {};
+    for (const roleName of roles) {
+        roleInstances[roleName] = await Rol.create({ rol: roleName });
     }
-    
-    const userTeacher = await User.create({
-        name: 'nameTeacher',
-        lastName: 'lastNameTeacher',
-        username: 'usernameTeacher',
-        email: 'teacher@test.com',
-        password: 'passwordTeacher',
-    });
-    await RolUser.create({
-        userId: userTeacher.id,
-        rolId: rolTeacher.id
-    });
-    
-    const userCounselor = await User.create({
-        name: 'nameCounselor',
-        lastName: 'lastNameCounselor',
-        username: 'usernameCounselor',
-        email: 'counselor@test.com',
-        password: 'passwordCounselor',
-    });
-    await RolUser.create({
-        userId: userCounselor.id,
-        rolId: rolCounselor.id
-    });
-    const userInactive = await User.create({
-        name: 'nameUserInactive',
-        lastName: 'lastNameUserInactive',
-        username: 'usernameUserInactive',
-        email: 'userinactive@test.com',
-        password: 'passworUserInactive',
-        active: false
-    });
-    await RolUser.create({
-        userId: userInactive.id,
-        rolId: rolStudent.id
-    });
+
+    const users = [
+        { role: 'administrador', name: 'nameAdministrador', lastName: 'lastNameAdministrador', email: 'administrador@test.com', username: 'usernameAdministrador', password: 'passwordAdministrador' },
+        { role: 'coordinador', name: 'nameCoordinator', lastName: 'lastNameCoordinator', email: 'coordinator@test.com', username: 'usernameCoordinator', password: 'passwordCoordinator' },
+        { role: 'rector', name: 'nameRector', lastName: 'lastNameRector', email: 'rector@test.com', username: 'usernameRector', password: 'passwordRector' },
+        { role: 'docente', name: 'nameTeacher', lastName: 'lastNameTeacher', email: 'teacher@test.com', username: 'usernameTeacher', password: 'passwordTeacher' },
+        { role: 'orientador', name: 'nameCounselor', lastName: 'lastNameCounselor', email: 'counselor@test.com', username: 'usernameCounselor', password: 'passwordCounselor' },
+        { role: 'estudiante', name: 'nameStudent1', lastName: 'lastNameStudent1', email: 'student1@test.com', username: 'usernameStudent1', password: 'passwordStudent1' },
+        { role: 'estudiante', name: 'nameStudent2', lastName: 'lastNameStudent2', email: 'student2@test.com', username: 'usernameStudent2', password: 'passwordStudent2' },
+        { role: 'estudiante', name: 'nameStudent3', lastName: 'lastNameStudent3', email: 'student3@test.com', username: 'usernameStudent3', password: 'passwordStudent3' },
+        { role: 'estudiante', name: 'nameUserInactive', lastName: 'lastNameUserInactive', email: 'userinactive@test.com', username: 'usernameUserInactive', password: 'passworUserInactive', active: false }
+    ];
+
+    for (const userData of users) {
+        const { role, ...userInfo } = userData;
+        const userInstance = await User.create(userInfo);
+        await RolUser.create({ userId: userInstance.id, rolId: roleInstances[role].id });
+    }
 });
 
 afterAll(async () => {
-    await sequelize.close();
     server.close();
+    if (fs.existsSync(tempDir)) {
+        await rimraf(tempDir);
+    }
 });
 
 global.request = require('supertest')(app);
