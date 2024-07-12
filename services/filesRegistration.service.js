@@ -58,7 +58,11 @@ class FilesRegistration extends Transactional{
             if(req.user.sub !== file.userId && !superAdmin.includes(req.user.role) ){
                 throw boom.unauthorized();
             }
-            const fileType = file.image[0] ? 'image' : file.document[0] && 'document'
+            const fileType = file.image[0] ? 'image' : file.document[0] && 'document';
+            if(fileType === 'image' && data.imageCredits){
+                const image = await this.getElementWithCondicional('ImageRegistration', null, {fileId: id});
+                image.update({imageCredits: data.imageCredits}, {transaction})
+            }
             const dataUpdate = {
                 path: path.join(file.folder, file.name),
                 folder: file.folder,
@@ -66,7 +70,7 @@ class FilesRegistration extends Transactional{
                 fileType: fileType,
                 newName: data.newName || null,
                 newFolder: data.newFolder || null,
-                isPublic: data.isPublic
+                isPublic: data.isPublic,
             }
             const updateFileInServer = await serviceSaveFileInServer.updateFileInServer(dataUpdate, req);
             await file.update(updateFileInServer, {transaction}); // Actualiza la información en la base de datos utilizando Sequelize
