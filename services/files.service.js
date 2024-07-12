@@ -8,7 +8,7 @@ const serviceFilesRegistration = new FilesRegistration();
 
 class Files extends Transactional {
     async get (req, id, type){
-        return this.withTransaction(async (transaction) => {
+        try{
             const model = type === 'image' ? 'ImageRegistration' : type === 'document' ? 'DocumentRegistration' : null;
             const where = superAdmin.includes(req.user.role) ? {} : { '$file.user_id$': req.user.sub };
             const include = [{
@@ -28,7 +28,9 @@ class Files extends Transactional {
             }
             
             return await this.getAllElements(model, where, include, null, query)
-        });
+        } catch(error) {
+            throw error
+        }
     }
     async create (req){
         return this.withTransaction(async (transaction) => {
