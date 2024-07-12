@@ -193,5 +193,6 @@ $RECYCLE.BIN/
 postgres_data
 
 uploads
+uploads_test
 
 # End of https://www.toptal.com/developers/gitignore/api/node,windows,linux,macos

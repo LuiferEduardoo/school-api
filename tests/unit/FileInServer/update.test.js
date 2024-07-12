@@ -3,6 +3,7 @@ const boom = require('@hapi/boom');
 const fs = require('fs');
 jest.mock('fs');
 const SaveFileInServer = require('../../../services/saveFileInServer.service'); // Ajusta la ruta al controlador
+const getFormattedDate = require('../../integration/helpers/getFormattedDate.js');
 
 describe('updateFileInServer', () => {
     beforeEach(() => {
@@ -27,7 +28,7 @@ describe('updateFileInServer', () => {
 
     test('should update file correctly with new name and folder', async () => {
       const data = {
-        path: 'uploads/image/123/2024/07/testImage.png',
+        path: `/uploads_test/image/testFolder/123/${getFormattedDate()}/testImage.png`,
         newName: 'newTestImage',
         newFolder: 'newTestFolder',
         fileType: 'image',
@@ -47,16 +48,16 @@ describe('updateFileInServer', () => {
   
       expect(result).toEqual({
         name: 'newTestImage.png',
-        url: 'http://localhost:3000/uploads/image/newTestFolder/123/2024/07/newTestImage.png',
-        folder: '/uploads/image/newTestFolder/123/2024/07',
+        url: `http://localhost:3000/uploads_test/image/newTestFolder/123/${getFormattedDate()}/newTestImage.png`,
+        folder: `/uploads_test/image/newTestFolder/123/${getFormattedDate()}`,
         isPublic: true
       });
     });
     
     test('should update file with new uploaded file', async () => {
       const data = {
-        path: 'uploads/image/123/2024/07/oldImage.png',
-        folder: '/uploads/image/123/2024/07',
+        path: `/uploads_test/image/testFolder/123/${getFormattedDate()}/oldImage.png`,
+        folder: `/uploads_test/image/testFolder/123/${getFormattedDate()}`,
         fileType: 'image',
         isPublic: true
       };
@@ -87,7 +88,7 @@ describe('updateFileInServer', () => {
 
       expect(result).toEqual({
         name: 'newImage.png',
-        url: 'http://localhost:3000/uploads/image/123/2024/07/newImage.png',
+        url: `http://localhost:3000/uploads_test/image/testFolder/123/${getFormattedDate()}/newImage.png`,
         fileType: 'image',
         ext: '.png',
         width: 800,

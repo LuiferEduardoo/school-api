@@ -1,3 +1,4 @@
+const { config } = require('../config/config')
 const boom = require('@hapi/boom');
 
 const { promisify } = require('util');
@@ -97,7 +98,7 @@ class SaveFileInServer {
                 }
                 const fileTypeFile = file.type;
     
-                let uploadPath = '../uploads/';
+                let uploadPath = `../${config.pathToUploads}/`;
                 if (fileTypeFile.startsWith('image/') && fileType === 'image') {
                     uploadPath += 'image/';
                 } else if (fileTypeFile.startsWith('application/') && fileType === 'document') {
@@ -152,7 +153,7 @@ class SaveFileInServer {
                 const originalFileName = path.basename(data.path);
                 const pathNumber = data.path.match(/\/\d+\/\d+\/\d+/);
 
-                const pathFolder = data.newFolder ? path.join(`/uploads/${data.fileType}`, `${data.newFolder}${pathNumber}`) : data.folder;
+                const pathFolder = data.newFolder ? path.join(`/${config.pathToUploads}/${data.fileType}`, `${data.newFolder}${pathNumber}`) : data.folder;
 
                 const fullNewPathFolder = path.join(__dirname, `..${pathFolder}`);
                 this.createFolder(fullNewPathFolder); // creamos los folder si no existen
