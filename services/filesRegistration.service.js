@@ -41,13 +41,15 @@ class FilesRegistration extends Transactional{
     }
 
     async get(id){
-        return this.withTransaction(async (transaction) => {
+        try {
             const include = ['image', 'document']
             if(id){
                 return await this.getElementById(id, 'FilesRegistration', include)
             }
             return await this.getAllElements('FilesRegistration', {}, include)
-        })
+        } catch(error){
+            throw error
+        }
     }
 
     async fileUpdate(req, data, id, transaction){
