@@ -6,18 +6,20 @@ const serviceImageAssociation = new ImageAssociation();
 
 class ImageBanners extends Transactional {
     async get(id, banner, req){
-        return this.withTransaction(async (transaction) => {
+        try {
             const include = [{ association: 'imageBanner', include: [{ association: 'image', include: 'file' }] }]
             await this.checkModel(banner, 'Banner')
             if(id){
                 return await this.getElementWithCondicional(banner, include, {id: id})
             }
             return await this.getAllElementsWithoutQuery(banner, include)
-        })
+        } catch(error){
+            throw error
+        }
     }
 
     async getAll(req){
-        return this.withTransaction(async (transaction) => {
+        try{
             const banners = [{
                 title: "Banner Home",
                 endpoint: 'BannersHome',
@@ -65,7 +67,9 @@ class ImageBanners extends Transactional {
                 response.push(data);
             }
             return response
-        })
+        } catch(error){
+            throw error
+        }
     }
     async create(req, data, banner){
         return this.withTransaction(async (transaction) => {
@@ -101,7 +105,7 @@ class ImageBanners extends Transactional {
                 if(descriptions[counter] != null){
                     dataUpdateInDataBase.description = descriptions[counter]
                 }
-                updateBanner.push(await imageBanner.update(dataUpdateInDataBase, transaction ));
+                updateBanner.push(await imageBanner.update(dataUpdateInDataBase));
                 counter ++;
             }
             return updateBanner;
