@@ -1,0 +1,27 @@
+name: School-api CI
+on: [push]
+
+jobs: 
+  unit-test: 
+    runs-on: ubuntu-latest
+    env: 
+      PORT: 3001
+      NODE_ENV:
+      PATH_TO_UPLOADS:
+      JWT_SECRET_RECOVERY_PASSWORD:
+      JWT_SECRET_REFRESH_TOKEN: 
+      JWT_SECRET_ACCESS_TOKEN: 
+    steps: 
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Nodejs
+        uses: actions/setup-node@v2
+        with: 
+          node-version: 22.3.0
+          cache: 'npm'
+      - name: install
+        shell: bash
+        run: npm ci
+      - name: run unit test
+        shell: bash 
+        run: npm run test:unit
