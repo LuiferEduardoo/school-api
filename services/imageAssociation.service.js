@@ -41,7 +41,6 @@ class ImageAssociation extends Transactional{
     async createOrAddWithId(ids, data, association, transaction){
         try {
             let dataReturn = []; 
-
             let counter = 0;
             const imagesIds = ids.split(",");
             for (const imageId of imagesIds){
@@ -50,8 +49,8 @@ class ImageAssociation extends Transactional{
                     where: { imageId },
                     defaults: {
                         ...data
-                    },
-                    transaction
+                    }, 
+                    transaction: transaction
                 });
                 dataReturn.push(create[0]);
                 counter++
@@ -63,7 +62,7 @@ class ImageAssociation extends Transactional{
     }
     async createOrAdd(req, association, data, folder, ids=null, transaction){
         try {
-            if(req.files.files){
+            if(req?.files?.files){
                 return await this.createWithImage(req, association, data, folder, transaction)
             } else if(ids){
                 return await this.createOrAddWithId(ids, data, association, transaction)

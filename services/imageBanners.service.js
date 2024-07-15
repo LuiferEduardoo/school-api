@@ -70,7 +70,7 @@ class ImageBanners extends Transactional {
     async create(req, data, banner){
         return this.withTransaction(async (transaction) => {
             await this.checkModel(banner, 'Banner');
-            const createImages = await serviceImageAssociation.createOrAdd(req, 'ImageBanners', {userId: req.user.sub}, `banners/${banner}`, data.ids, null, transaction);
+            const createImages = await serviceImageAssociation.createOrAdd(req, 'ImageBanners', {userId: req.user.sub}, `banners/${banner}`, data.ids, transaction);
             const description = data.description ? data.description.split(",") : [];
             const imagesBanner = [];
     
