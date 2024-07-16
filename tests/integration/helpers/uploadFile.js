@@ -21,9 +21,14 @@ async function uploadFile(token, fileType, isPublic = true ) {
         .attach('files', fileBuffer, fileType === 'image' ? 'fake-image.png' : 'fake-document.pdf');
 }
 
-async function uploadFilesForUser(token, isPublic) {
-    await uploadFile(token, 'image', isPublic);
-    await uploadFile(token, 'document', isPublic);
+async function uploadFilesForUser(token, isPublic=true, typeFile) {
+    if (typeFile === 'image' || typeFile !== 'document') {
+        await uploadFile(token, 'image', isPublic);
+    }
+
+    if (typeFile === 'document' || typeFile !== 'image') {
+        await uploadFile(token, 'document', isPublic);
+    }
 }
 
 module.exports = { uploadFile, uploadFilesForUser }
