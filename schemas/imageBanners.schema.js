@@ -22,7 +22,8 @@ const createBanner = Joi.object({
 });
 
 const updateBanner = Joi.object({
-    description
+    idsBanners: ids.required(),
+    description: description.required()
 })
 
 const deleteBanner = Joi.object({
