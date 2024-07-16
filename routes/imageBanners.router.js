@@ -57,7 +57,7 @@ router.patch('/:banners',
             const body = req.body || req.fields;
             const banners = req.params.banners;
             const updateBannes = await serviceImageBanners.update(req, body, banners);
-            res.status(201).json(updateBannes);
+            res.status(200).json(updateBannes);
         } catch (error) {
             next(error);
         }
