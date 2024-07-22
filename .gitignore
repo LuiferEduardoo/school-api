@@ -191,6 +191,7 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 postgres_data
+redis_data
 
 uploads
 uploads_test

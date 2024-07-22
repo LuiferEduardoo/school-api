@@ -7,7 +7,7 @@ Esta API está diseñada para gestionar las funcionalidades de una escuela, incl
 La API utiliza PostgreSQL como sistema de gestión de bases de datos. Para entornos de desarrollo local, puedes usar Docker. Ejecuta el siguiente comando para iniciar la base de datos en Docker:
 
 ```sh
-docker-compose up -d postgres
+    docker-compose up -d postgres
 ```
 
 
@@ -17,6 +17,12 @@ Para ejecutar migraciones, utiliza el siguiente comando:
 
 ```sh
     npm run migrations:run
+```
+# Redis
+La API utiliza redis como base de datos en memoria. Ejecuta el siguiente comando para iniciar la base de datos en Docker: 
+
+```sh
+    docker-compose up -d redis
 ```
 
 # Configuración de Entorno
@@ -31,8 +37,14 @@ Crea un archivo .env en la raíz del proyecto para gestionar las variables de en
     DB_HOST=your_host_db
     DB_NAME=your_name_db
     DB_PORT=your_port_db
+    DB_TEST_PORT=your_port_db
+    DB_TEST_USER=test_luifer
+    DB_TEST_PASSWORD=your_password_db
+    DB_TEST_NAME=your_name_db
     REDIS_HOST=your_host_redis
     REDIS_PORT=your_port_redis
+    REDIS_USER=your_redis_user
+    REDIS_PASSWORD=your_password_of_redis
     JWT_SECRET_RECOVERY_PASSWORD=your_secret
     JWT_SECRET_REFRESH_TOKEN=your_secret
     JWT_SECRET_ACCESS_TOKEN=your_secret
@@ -52,12 +64,12 @@ Crea un archivo .env en la raíz del proyecto para gestionar las variables de en
 
 Para iniciar la base de datos, utiliza el siguiente comando:
 ```sh
-    docker-compose up -d postgres
+    docker-compose up -d postgres && docker-compose up -d postgres_test
 ```
 
 Para iniciar Redis, utiliza el siguiente comando:
 ```sh
-    sudo service redis-server start
+    docker-compose up -d redis
 ```
 
 Para iniciar la API localmente, utiliza el siguiente comando:
