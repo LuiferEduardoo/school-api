@@ -38,21 +38,29 @@ class ImageAssociation extends Transactional{
         }
     }
 
-    async createOrAddWithId(ids, data, association, transaction){
+    async createOrAddWithId(ids, data, association, transaction, addIdImage){
         try {
             let dataReturn = []; 
             let counter = 0;
             const imagesIds = ids.split(",");
             for (const imageId of imagesIds){
                 await this.imageForId(imageId, 'ImageRegistration');
-                const create = await sequelize.models[association].findOrCreate({ 
-                    where: { imageId },
-                    defaults: {
-                        ...data
-                    }, 
-                    transaction: transaction
-                });
-                dataReturn.push(create[0]);
+                let create;
+                if(addIdImage){
+                    create = await sequelize.models[association].create({ 
+                        ...data,
+                        imageId,
+                    }, {transaction});
+                } else {
+                    create = await sequelize.models[association].findOrCreate({ 
+                        where: { imageId },
+                        defaults: {
+                            ...data
+                        }, 
+                        transaction: transaction
+                    });
+                }
+                dataReturn.push(addIdImage ? create : create[0]);
                 counter++
             }
             return dataReturn; 
@@ -60,12 +68,12 @@ class ImageAssociation extends Transactional{
             throw error
         }
     }
-    async createOrAdd(req, association, data, folder, ids=null, transaction){
+    async createOrAdd(req, association, data, folder, ids=null, transaction, addIdImage=false){
         try {
             if(req?.files?.files){
                 return await this.createWithImage(req, association, data, folder, transaction)
             } else if(ids){
-                return await this.createOrAddWithId(ids, data, association, transaction)
+                return await this.createOrAddWithId(ids, data, association, transaction, addIdImage)
             }
             throw boom.badRequest('Tienes que pasar images o ids de imagenes para crearlas o agregarlas');
         } catch (error) {
@@ -101,7 +109,7 @@ class ImageAssociation extends Transactional{
 
     async update (req, association, data, idsNewImages, folder, idsEliminate, eliminateImages, transaction){
         try {
-            if(req.files.files){
+            if(req?.files?.files){
                 await this.createWithImage(req, association, data, folder, transaction)
             } if(idsNewImages) {
                 await this.createOrAddWithId(idsNewImages, data, association, transaction)
