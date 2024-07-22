@@ -90,24 +90,25 @@ class Transactional {
     }
 
     async getAllElements(model, where = null, include = null, order = null, query = {}, attributesObject = {}, otherElements){
-    
-            const attributes = Object.keys(attributesObject).length > 0 ? attributesObject : {};
-            const totalCount = await sequelize.models[model].count({ 
-                where: where,
-                include: include
-            });
-            const elements = await sequelize.models[model].findAll({
-                where: where,
-                include: include,
-                order: order,
-                ...attributes,
-                limit: query.limit,
-                offset: query.offset,
-                subQuery: false,
-                ...otherElements
-            });
-            const totalPages = Math.ceil(totalCount / query.limit);
-            return {totalPages, elements}
+        const attributes = Object.keys(attributesObject).length > 0 ? attributesObject : {};
+        const totalCount = await sequelize.models[model].count({
+            where: where,
+            include: include,
+            distinct: true,
+            col: 'id'
+        });
+        const elements = await sequelize.models[model].findAll({
+            where: where,
+            include: include,
+            order: order,
+            ...attributes,
+            limit: query.limit,
+            offset: query.offset,
+            subQuery: false,
+            ...otherElements
+        });
+        const totalPages = Math.ceil(totalCount / query.limit);
+        return {totalPages, elements}
     }
     async getAllElementsWithoutQuery(model, include = null, where = {}){
             const elements = await sequelize.models[model].findAll({
