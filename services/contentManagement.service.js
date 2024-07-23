@@ -27,7 +27,7 @@ class ContentManagement extends Transactional {
                 body.link = await generateLink(body.title, model, sequelize);
             }
             const updateContentManagement = await contentManagement.update(body, {transaction});
-            const updateContentManagementClassification = await serviceClassificationAssociation.updateClassificationModelType(body.categories, body.subcategories, body.tags, body.idsEliminateCategories, body.idsEliminateSubcategories, body.idsEliminateTags, model, {[nameModel]: contentManagement.id}, id, transaction);
+            const updateContentManagementClassification = await serviceClassificationAssociation.updateClassificationModelType(body.categories, body.subcategories, body.tags, body.idsEliminateCategories, body.idsEliminateSubcategories, body.idsEliminateTags, model, {[nameModel]: contentManagement.id}, nameModel, id, transaction);
         } catch (error){
             throw error
         }

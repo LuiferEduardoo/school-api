@@ -9,7 +9,7 @@ const serviceClassification = new Classification();
 class ClassificationAssociation extends Transactional {
     async createTypeClassificationAssociation(name, modelTypeClassification, transaction){
         try {
-            const createClassification = await serviceClassification.createClassification(name); // Se crea la clasificación
+            const createClassification = await serviceClassification.createClassification(name, transaction); // Se crea la clasificación
             await this.checkModel(modelTypeClassification, 'Tipo de clasificación');
             const createTypeClassificaction = await sequelize.models[modelTypeClassification].findOrCreate({
                 where: { clasificationId: createClassification.id},
@@ -23,7 +23,10 @@ class ClassificationAssociation extends Transactional {
 
     async deleteTypeClassificationAssociation (id, modelClassificationElement, fieldNameElement, elementId, transaction){
         try{
-            const classificationToDelete = await serviceClassification.getClassification(modelClassificationElement, id);
+            const classificationToDelete = await this.getElementWithCondicional(modelClassificationElement, null, {
+                id,
+                [fieldNameElement]: elementId
+            });
             if(classificationToDelete[fieldNameElement] != elementId){
                 throw boom.unauthorized();
             }
@@ -84,7 +87,7 @@ class ClassificationAssociation extends Transactional {
             throw error;
         }
     }
-    async deleteClassificationOfModel(idsEliminateCategories, idsEliminateSubcategories, idsEliminateTags, modelClassificationsElement, transaction, elementId , fieldNameElement, deleteAll=false){
+    async deleteClassificationOfModel(idsEliminateCategories, idsEliminateSubcategories, idsEliminateTags, modelClassificationsElement, transaction, elementId, fieldNameElement, deleteAll=false){
         try{
             const classificationOfModelDelete =[]
             const typeClassificationToDeleteArray = []
@@ -124,10 +127,10 @@ class ClassificationAssociation extends Transactional {
         }
     }
 
-    async updateClassificationModelType(categories, subcategories, tags, idsEliminateCategories, idsEliminateSubcategories, idsEliminateTags, modelClassificationsElement, element, elementId, transaction){
+    async updateClassificationModelType(categories, subcategories, tags, idsEliminateCategories, idsEliminateSubcategories, idsEliminateTags, modelClassificationsElement, element, fieldNameElement, elementId, transaction){
         try {
             if(idsEliminateCategories || idsEliminateSubcategories || idsEliminateTags){
-                await this.deleteClassificationOfModel(idsEliminateCategories, idsEliminateSubcategories, idsEliminateTags, modelClassificationsElement, transaction, elementId)
+                await this.deleteClassificationOfModel(idsEliminateCategories, idsEliminateSubcategories, idsEliminateTags, modelClassificationsElement, transaction, elementId, fieldNameElement)
             } 
             if(categories || subcategories || tags){
                 await this.createClassificationOfModel(categories, subcategories, tags, modelClassificationsElement, element, transaction)
