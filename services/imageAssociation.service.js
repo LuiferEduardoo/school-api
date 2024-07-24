@@ -92,7 +92,7 @@ class ImageAssociation extends Transactional{
                         include: 'image'
                     });
                     if (imageAssociation) {
-                        await imageAssociation.destroy({transaction});
+                        await imageAssociation.destroy();
                         if (eliminateImagesArray[counter]) {
                             await serviceFileRegistration.handleFileDelete(imageAssociation.image.fileId, req);
                         }

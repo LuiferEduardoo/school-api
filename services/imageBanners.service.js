@@ -120,7 +120,7 @@ class ImageBanners extends Transactional {
             for(const eliminateBannerId of eliminateBannersIds){
                 const bannerToDelete = await this.getElementById(eliminateBannerId, banner);
                 imagesToDeleteAssociation.push(bannerToDelete.bannerId);
-                bannerToDelete.destroy();
+                await bannerToDelete.destroy();
                 bannersToDelete.push(bannerToDelete);
             }
             await serviceImageAssociation.delete(imagesToDeleteAssociation, 'ImageBanners', data.elimianteImages, req, { transaction });
