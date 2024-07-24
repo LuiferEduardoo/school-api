@@ -92,7 +92,7 @@ class ImageAssociation extends Transactional{
                         include: 'image'
                     });
                     if (imageAssociation) {
-                        await imageAssociation.destroy();
+                        await imageAssociation.destroy({transaction});
                         if (eliminateImagesArray[counter]) {
                             await serviceFileRegistration.handleFileDelete(imageAssociation.image.fileId, req);
                         }
@@ -107,14 +107,15 @@ class ImageAssociation extends Transactional{
         }
     }
 
-    async update (req, association, data, idsNewImages, folder, idsEliminate, eliminateImages, transaction){
+    async update (req, association, data, idsNewImages, folder, idsEliminate, eliminateImages, transaction, addIdImage){
         try {
+            if(idsEliminate){
+                await this.delete(idsEliminate, association, eliminateImages, req, transaction)
+            }
             if(req?.files?.files){
                 await this.createWithImage(req, association, data, folder, transaction)
             } if(idsNewImages) {
-                await this.createOrAddWithId(idsNewImages, data, association, transaction)
-            } if(idsEliminate){
-                await this.delete(idsEliminate, association, eliminateImages, req, transaction)
+                await this.createOrAddWithId(idsNewImages, data, association, transaction, addIdImage)
             }
         } catch (error) {
             throw error
