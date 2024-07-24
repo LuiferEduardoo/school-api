@@ -61,6 +61,7 @@ afterAll(async () => {
     if (fs.existsSync(tempDir)) {
         await rimraf(tempDir);
     }
+    await sequelize.close();
 });
 
 global.request = require('supertest')(app);

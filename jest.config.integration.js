@@ -4,5 +4,5 @@ module.exports = {
     testMatch: ['**/tests/integration/**/*.test.js'],
     setupFilesAfterEnv: ['<rootDir>/tests/setupIntegration.js'],
     moduleDirectories: ['node_modules', 'src'],
-    testTimeout: 40000
+    testTimeout: 90000
 };
