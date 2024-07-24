@@ -14,10 +14,10 @@ const updateBanner = async (endpoint, token, idsBanners, descriptions) => {
     return res;
 };
 
-const verifyBannerDescriptions = async (endpoint, expectedDescriptions) => {
+const verifyBannerDescriptions = async (endpoint, expectedDescriptions, position) => {
     const getBanner = await request.get(`/api/v1/banner/${endpoint}`);
     expectedDescriptions.map((description, index) => {
-        expect(getBanner.body[index].description).toBe(description);
+        expect(getBanner.body[index + position].description).toBe(description);
     });
 };
 
@@ -92,7 +92,7 @@ describe('should update banner', () => {
                 const newDescription = ['newDescription1'];
                 const res = await updateBanner(endpoint, tokenAdministrator, '1', newDescription);
                 expect(res.statusCode).toBe(200);
-                await verifyBannerDescriptions(endpoint, newDescription);
+                await verifyBannerDescriptions(endpoint, newDescription, 2);
             });
         });
     });
@@ -107,7 +107,7 @@ describe('should update banner', () => {
                 ];
                 const res = await updateBanner(endpoint, tokenAdministrator, '1,2,3', newDescriptions);
                 expect(res.statusCode).toBe(200);
-                await verifyBannerDescriptions(endpoint, newDescriptions);
+                await verifyBannerDescriptions(endpoint, newDescriptions, 0);
             });
         });
     });

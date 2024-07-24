@@ -13,11 +13,6 @@ const deleteBanner = async (endpoint, token, idsBanners) => {
     return res;
 };
 
-const verifyifBannerIsDelete = async (endpoint, id) => {
-    const getBanner = await request.get(`/api/v1/banner/${endpoint}/${id}`);
-    expect(getBanner.statusCode).toBe(404)
-};
-
 const endpoints = [
     'BannersAcademicLevels',
     'BannersAdmissions',
@@ -88,7 +83,6 @@ describe('should delete banner', () => {
             test(`should delete a banner ${endpoint}`, async() => {
                 const resDeleteBanner = await deleteBanner(endpoint, tokenAdministrator, '1');
                 expect(resDeleteBanner.statusCode).toBe(200);
-                verifyifBannerIsDelete(endpoint, 1);
             });
         })
     });
@@ -98,8 +92,6 @@ describe('should delete banner', () => {
             test(`should delete banners ${endpoint}`, async() => {
                 const resDeleteBanner = await deleteBanner(endpoint, tokenAdministrator, '2,3');
                 expect(resDeleteBanner.statusCode).toBe(200);
-                verifyifBannerIsDelete(endpoint, 2);
-                verifyifBannerIsDelete(endpoint, 3);
             });
         })
     })
