@@ -33,8 +33,8 @@ class InstitutionalProjects extends Transactional {
             const { search, important, visible, member } = req.query;
             const query = this.queryParameterPagination(req.query);
             const attributes = {attributes: ['id', 'name', 'lastName']}
-            const includeInstitutionalProjects = [{ association: 'members', include: [{association: 'user', ...attributes, include: [{association: 'rol'}, {association: 'image', include: [{association: 'image', include: 'file'}]}]}] }, { association: 'ImageInstitutionalProjects', include: [{ association: 'image', include: 'file' }] },...this.includeClassification];
-            const dataFilter= ['title', '$categories.categories.clasification.name$', '$subcategories.subcategories.clasification.name$', '$tags.tags.clasification.name$'];
+            const includeInstitutionalProjects = [{ association: 'members', include: [{association: 'user', ...attributes, include: [{association: 'rol'}, {association: 'image', include: [{association: 'image', include: 'file'}]}]}] }, { association: 'ImageInstitutionalProjects', include: [{ association: 'image', include: 'file' }] }];
+            const dataFilter= ['title'];
             this.querySearch(dataFilter, search, where);
 
             this.handleElementPrivacy(req, where, 'visible', visible);
@@ -48,8 +48,9 @@ class InstitutionalProjects extends Transactional {
             }
 
             if(id || link){
+                const includeInstitutionalProjectsOne = [{ association: 'members', include: [{association: 'user', ...attributes, include: [{association: 'rol'}, {association: 'image', include: [{association: 'image', include: 'file'}]}]}] }, { association: 'ImageInstitutionalProjects', include: [{ association: 'image', include: 'file' }] }, ...this.includeClassification]
                 const whereObtainOneElement = id ? {id: id} : {link: link}
-                return await this.getElementWithCondicional('InstitutionalProjects', includeInstitutionalProjects, {...whereObtainOneElement, ...where}, this.order);
+                return await this.getElementWithCondicional('InstitutionalProjects', includeInstitutionalProjectsOne, {...whereObtainOneElement, ...where}, this.order);
             }
             return await this.getAllElements('InstitutionalProjects', where, includeInstitutionalProjects, this.order, query)
         });
