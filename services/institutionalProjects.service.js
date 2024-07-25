@@ -61,7 +61,7 @@ class InstitutionalProjects extends Transactional {
             const members = body.members.split(',');
             const isCoordinator = this.isCoordinator(body);
             const createMembers = await serviceIndidualEntity.createIndividualEntity(members, 'userId', createInstitutionalProjects.id, 'InstitutionalProjectsMember', 'institutionalProjectsId', isCoordinator, transaction);
-            const imagesInstitutionalPublications = await serviceImageAssociation.createOrAdd(req, 'ImageInstitutionalProjects', {institutionalProjectsId: createInstitutionalProjects.id}, `institutionalProjects/${createInstitutionalProjects.id}`, body.idImage, transaction)
+            const imagesInstitutionalPublications = await serviceImageAssociation.createOrAdd(req, 'ImageInstitutionalProjects', {institutionalProjectsId: createInstitutionalProjects.id}, `institutionalProjects/${createInstitutionalProjects.id}`, body.idImage, transaction, true)
             return {
                 message: 'Proyecto institucional creado con exito'
             }
@@ -76,7 +76,7 @@ class InstitutionalProjects extends Transactional {
             const isCoordinator = this.isCoordinator(body);
             const updateInstitutionalProjects = await serviceContentManagement.upate(body, id, 'InstitutionalProjects', 'institutionalProjectId', transaction);
             const updateMembers = await serviceIndidualEntity.updateIndividualEntity(idsNewMembers, body.idsEliminateMembers, body.updateMembers, body.updateIsCoordinator,'userId', id, 'InstitutionalProjectsMember', 'institutionalProjectsId', isCoordinator, transaction);
-            const updateimagesNewsPublications = await serviceImageAssociation.update(req, 'ImageInstitutionalProjects', {institutionalProjectsId: id}, body.idNewImage, `institutionalProjects/${id}`, body.idImageEliminate, body.eliminateImage, transaction);
+            const updateimagesNewsPublications = await serviceImageAssociation.update(req, 'ImageInstitutionalProjects', {institutionalProjectsId: id}, body.idNewImage, `institutionalProjects/${id}`, body.idImageEliminate, body.eliminateImage, transaction, true);
             return {
                 message: 'Proyecto institucional actualizado con exito'
             }
