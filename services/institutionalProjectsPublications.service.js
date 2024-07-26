@@ -18,7 +18,7 @@ class InstitutionalProjectsPublications extends Transactional {
         const authorsToCheck = [...(mainAuthorId ? [mainAuthorId] : []), ...authorArray];
         for(const author of authorsToCheck){
             const getInMember = await sequelize.models.InstitutionalProjectsMember.findOne({
-                where: {userId: author},
+                where: {institutionalProjectsId: idInstitutionalProyect, userId: author},
                 include: ['institutionalProjects'],
             })
             if(!getInMember){
