@@ -63,14 +63,15 @@ class InstitutionalProjectsPublications extends Transactional {
     }
 
     async get(req, id, link, institutionalProjectId) {
-        return this.withTransaction(async (transaction) => {
+        try {
             const where= this.checkPermissionToGet(req);
+            await this.getElementWithCondicional('InstitutionalProjects', [], {id: institutionalProjectId, ...where});
             const { search, important, visible, author } = req.query;
             const whereClause = {}
-            const dataFilter = ['$publication.title$', '$publication.categories.categories.clasification.name$', '$publication.subcategories.subcategories.clasification.name$', '$publication.tags.tags.clasification.name$']
+            const dataFilter = ['$publication.title$']
             const query = this.queryParameterPagination(req.query);
             const attributes = {attributes: ['id', 'name', 'lastName']};
-            const include = [{association: 'publication', where: where, order: this.order, include: this.includeClassification}, {association: 'ImageInstitutionalProjectPublication', include: [{ association: 'image', include: 'file' }]}, {association: 'InstitutionalProjectsPublicationsAuthors', include:[{association: 'author', include: [{association: 'user', ...attributes}]}]}];
+            const includeAll = [{association: 'publication', where: where, order: this.order}, {association: 'ImageInstitutionalProjectPublication', include: [{ association: 'image', include: 'file' }]}, {association: 'InstitutionalProjectsPublicationsAuthors', include:[{association: 'author', include: [{association: 'user', ...attributes}]}]}];
             this.querySearch(dataFilter, search, whereClause);
 
             this.handleElementPrivacy(req, where, '$publication.visible$', visible);
@@ -84,11 +85,14 @@ class InstitutionalProjectsPublications extends Transactional {
             }
             
             if(id || link){
+                const includeOne = [{association: 'publication', where: where, order: this.order, include: this.includeClassification}, {association: 'ImageInstitutionalProjectPublication', include: [{ association: 'image', include: 'file' }]}, {association: 'InstitutionalProjectsPublicationsAuthors', include:[{association: 'author', include: [{association: 'user', ...attributes}]}]}];
                 const whereObtainOneElement = id ? {id: id} : {'$publication.link$': link}
-                return await this.getElementWithCondicional('InstitutionalProjectsPublications', include, {...whereObtainOneElement, ...whereClause});
+                return await this.getElementWithCondicional('InstitutionalProjectsPublications', includeOne, {...whereObtainOneElement, ...whereClause});
             }
-            return await this.getAllElements('InstitutionalProjectsPublications', { InstitutionalProjectId: institutionalProjectId, ...whereClause }, include, null, query);
-        })
+            return await this.getAllElements('InstitutionalProjectsPublications', { InstitutionalProjectId: institutionalProjectId, ...whereClause }, includeAll, null, query);
+        } catch(error){
+            throw error;
+        }
     }
     
     async create(req, body, id){
