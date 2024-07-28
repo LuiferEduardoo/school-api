@@ -46,7 +46,7 @@ class AcademicLevels extends Transactional {
                 modalityId: modalityAcademicLevels[0].id, 
                 educationDayId: educationDayAcademicLevels[0].id
             }, {transaction});
-            await serviceImageAssociation.createOrAdd(req, 'ImageAcademicLevels', {academicLevelsId: createAcademicLevels.id}, `academicLevels/${createAcademicLevels.id}`, body.idImage, transaction)
+            await serviceImageAssociation.createOrAdd(req, 'ImageAcademicLevels', {academicLevelsId: createAcademicLevels.id}, `academicLevels/${createAcademicLevels.id}`, body.idImage, transaction, true)
             return {
                 message: 'Nivel academico creado con exito'
             }
@@ -89,7 +89,7 @@ class AcademicLevels extends Transactional {
             
             await getAcademicLevels.update(body, { transaction });
             
-            await serviceImageAssociation.update(req, 'ImageAcademicLevels', { academicLevelsId: id }, body.idNewImage, `academicLevels/${id}`, body.idImageEliminate, body.eliminateImage, transaction);
+            await serviceImageAssociation.update(req, 'ImageAcademicLevels', { academicLevelsId: id }, body.idNewImage, `academicLevels/${id}`, body.idImageEliminate, body.eliminateImage, transaction, true);
             
             return {
                 message: 'Nivel academico actualizado con éxito'
