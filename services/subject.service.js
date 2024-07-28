@@ -11,6 +11,7 @@ class Subject extends Transactional {
     }
     async get(req, id, academicLevelId){
         return this.withTransaction(async (transaction) => {
+            await this.getElementById(academicLevelId, 'AcademicLevels');
             const where = { academicLevelId: academicLevelId };
             const { search, teacher } = req.query;
             const include = [{association: 'subjectName'}, {association: 'academicLevel'}, {association: 'teacher', attributes: ['id', 'name', 'lastName']}];
@@ -30,6 +31,7 @@ class Subject extends Transactional {
     }
     async create (body, academicLevelId){
         return this.withTransaction(async (transaction) => {
+            await this.getElementById(academicLevelId, 'AcademicLevels');
             await this.getElementWithCondicional('User', [{association: 'rol', where: { rol: 'docente' }}], {id: body.teacherId}, null, {});
             const createSubjectName = await this.createSubjectName(body.name, transaction);
             await sequelize.models.Subject.create({...body, subjectNameId: createSubjectName.id, academicLevelId: academicLevelId }, {transaction});
