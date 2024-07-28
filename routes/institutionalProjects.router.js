@@ -40,15 +40,21 @@ router.get('/:institutionalProjectsId/publication/:id?',
         next(error);
         }
     }
-)
+);
+
 router.post('/:id?',
-    authCombined('access'), 
     validatorHandler(checkFiles, 'files.files'),
     (req, res, next) => {
         if (req.params.id) {
-            validatorHandler(createInstitutionalProjectsPublicationns, null, true)(req, res, next); // Si hay un ID presente, utiliza el validador específico para publicaciones
+            validatorHandler(createInstitutionalProjectsPublicationns, null, true)(req, res, (err) => {
+                if (err) return next(err);
+                authCombined('access')(req, res, next);
+            });
         } else {
-            validatorHandler(createInstitutionalProjects, null, true)(req, res, next); // Si no hay un ID, utiliza el validador para la creación de proyectos
+            validatorHandler(createInstitutionalProjects, null, true)(req, res, (err) => {
+                if (err) return next(err);
+                authCombined('access', true)(req, res, next);
+            });
         }
     },
     async (req, res, next) => {
@@ -69,13 +75,18 @@ router.post('/:id?',
 );
 
 router.patch('/:id/:idPublication?',
-    authCombined('access'),
     validatorHandler(checkFiles, 'files.files'),
     (req, res, next) => {
-        if(req.params.idPublication) {
-            validatorHandler(updateInstitutionalProjectsPublicationns, null, true)(req, res, next);
+        if (req.params.idPublication) {
+            validatorHandler(updateInstitutionalProjectsPublicationns, null, true)(req, res, (err) => {
+                if (err) return next(err);
+                authCombined('access')(req, res, next);
+            });
         } else {
-            validatorHandler(updateInstitutionalProjects, null, true)(req, res, next);
+            validatorHandler(updateInstitutionalProjects, null, true)(req, res, (err) => {
+                if (err) return next(err);
+                authCombined('access', true)(req, res, next);
+            });
         }
     },
     async (req, res, next) => {
@@ -96,8 +107,20 @@ router.patch('/:id/:idPublication?',
 );
 
 router.delete('/:id/:idPublication?',
-    authCombined('access'),
     validatorHandler(deleInstitutionalProjectsPublications, null, true),
+    (req, res, next) => {
+        if(req.params.idPublication) {
+            validatorHandler(updateInstitutionalProjectsPublicationns, null, true)(req, res, (err) => {
+                if (err) return next(err);
+                authCombined('access')(req, res, next);
+            });
+        } else {
+            validatorHandler(updateInstitutionalProjects, null, true)(req, res, (err) => {
+                if (err) return next(err);
+                authCombined('access', true)(req, res, next);
+            });
+        }
+    },
     async (req, res, next) => {
         try {
             const body = req.body || req.fields;
