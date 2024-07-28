@@ -13,7 +13,7 @@ class IndividualEntity extends Transactional {
                 [fieldNameElement]: elementId,
                 [fieldNameIndividualEntity]: individualEntity,
                 ...optionalData[counter],
-            }, {transaction})
+            }, {transaction});
             counter ++;
         };
     }
