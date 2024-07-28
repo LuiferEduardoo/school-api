@@ -8,9 +8,9 @@ const { config } = require('../../../config/config');
 
 jest.mock('nodemailer', () => ({
     createTransport: jest.fn().mockReturnValue({
-      sendMail: jest.fn().mockReturnValue((mailoptions, callback) => {})
+        sendMail: jest.fn().mockReturnValue((mailoptions, callback) => {})
     })
-  }));
+}));
 jest.mock('ejs');
 
 

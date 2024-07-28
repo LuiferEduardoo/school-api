@@ -1,18 +1,7 @@
 const { sequelize } = require('../../../libs/sequelize');
-const boom = require('@hapi/boom');
 const Classification = require('../../../services/classification.service');
 
 const Clasification = sequelize.models.Clasification;
-
-// Sincronización del modelo con la base de datos en memoria
-beforeAll(async () => {
-    await sequelize.sync();
-});
-
-// Desconectar Sequelize después de todas las pruebas
-afterAll(async () => {
-    await sequelize.close();
-});
 
 describe('Classification Service', () => {
     let classificationService;

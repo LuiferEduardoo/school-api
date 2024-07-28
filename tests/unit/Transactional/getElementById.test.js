@@ -4,14 +4,6 @@ const { sequelize } = require('../../../libs/sequelize');
 
 const Publications = sequelize.models.Publications;
 
-beforeAll(async () => {
-    await sequelize.sync();
-});
-
-afterAll(async () => {
-    await sequelize.close();
-});
-
 describe('getElementById', () => {
     let transactionalService;
 

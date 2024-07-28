@@ -1,20 +1,9 @@
 const { sequelize } = require('../../../libs/sequelize');
-const boom = require('@hapi/boom');
 const Classification = require('../../../services/classification.service');
-
 const Clasification = sequelize.models.Clasification;
 const Categories = sequelize.models.Categories;
 const Subcategories = sequelize.models.Subcategories;
 const Tags = sequelize.models.Tags;
-
-
-beforeAll(async () => {
-    await sequelize.sync();
-});
-
-afterAll(async () => {
-    await sequelize.close();
-});
 
 describe('getClassification', () => {
     

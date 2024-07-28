@@ -5,14 +5,8 @@ const { sequelize } = require('../../../libs/sequelize');
 const clasification = sequelize.models.Clasification;
 
 beforeAll(async () => {
-    await sequelize.sync();
-
     await clasification.create({ name: 'Element 1' });
     await clasification.create({ name: 'Element 2' });
-});
-
-afterAll(async () => {
-    await sequelize.close();
 });
 
 describe('getElementById', () => {

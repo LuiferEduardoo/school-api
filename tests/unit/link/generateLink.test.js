@@ -5,13 +5,7 @@ const { faker } = require('@faker-js/faker');
 
 const Publications = sequelize.models.Publications;
 
-beforeAll(async () => {
-    await sequelize.sync();
-});
-
-// Desconectar Sequelize después de todas las pruebas
 afterAll(async () => {
-    await sequelize.close();
     const MockCleanAndLowercase = jest.fn((input) => input.toLowerCase());
     jest.mock('../../../utils/manipulation/cleanAndLowercase', () => MockCleanAndLowercase);
     jest.spyOn(slugify, 'default').mockReturnValueOnce('test-publication-title');

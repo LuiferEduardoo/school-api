@@ -7,7 +7,6 @@ const Publications = sequelize.models.Publications;
 const InstitutionalProjectsPublications = sequelize.models.InstitutionalProjectsPublications;
 
 beforeAll(async () => {
-    await sequelize.sync({ force: true });
     await InstitutionalProjects.create({
         title: "test InstitutionalProjects title",
         content: "test InstitutionalProjects content",
@@ -50,10 +49,6 @@ beforeAll(async () => {
         password: 'testPasswordThree',
     });
 }, 40000);
-
-afterAll(async () => {
-    await sequelize.close();
-});
 
 describe('IndividualEntity', () => {
     let individualEntityService;
