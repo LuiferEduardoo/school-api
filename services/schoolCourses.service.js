@@ -21,6 +21,7 @@ class SchoolCourses extends Transactional {
     }
     async get(req, academicLevelId, id){
         return this.withTransaction(async (transaction) => {
+            await this.getElementById(academicLevelId, 'AcademicLevels');
             const where = { };
             const { search } = req.query;
             const dataFilter = ['course', '$schoolGrade.grade$'];
@@ -36,6 +37,7 @@ class SchoolCourses extends Transactional {
     }
     async create (body, academicLevelId){
         return this.withTransaction(async (transaction) => {
+            await this.getElementById(academicLevelId, 'AcademicLevels');
             const createSchoolGrade = await this.createSchoolGrade(body, academicLevelId, transaction);
             await sequelize.models.SchoolCourses.create({...body, schoolGradeId: createSchoolGrade.id }, {transaction});
             return {
