@@ -46,7 +46,8 @@ beforeAll(async () => {
         { role: 'estudiante', name: 'nameStudent1', lastName: 'lastNameStudent1', email: 'student1@test.com', username: 'usernameStudent1', password: 'passwordStudent1' },
         { role: 'estudiante', name: 'nameStudent2', lastName: 'lastNameStudent2', email: 'student2@test.com', username: 'usernameStudent2', password: 'passwordStudent2' },
         { role: 'estudiante', name: 'nameStudent3', lastName: 'lastNameStudent3', email: 'student3@test.com', username: 'usernameStudent3', password: 'passwordStudent3' },
-        { role: 'estudiante', name: 'nameUserInactive', lastName: 'lastNameUserInactive', email: 'userinactive@test.com', username: 'usernameUserInactive', password: 'passworUserInactive', active: false }
+        { role: 'estudiante', name: 'nameUserInactive', lastName: 'lastNameUserInactive', email: 'userinactive@test.com', username: 'usernameUserInactive', password: 'passworUserInactive', active: false },
+        { role: 'docente', name: 'nameTeacherTwo', lastName: 'lastNameUserTeacherTwo', email: 'userTeacherTwo@test.com', username: 'usernameUserTeacherTwo', password: 'passworUserTeacherTwo', active: true }
     ];
 
     for (const userData of users) {
