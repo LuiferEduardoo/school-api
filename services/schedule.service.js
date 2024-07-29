@@ -12,6 +12,7 @@ class Schedule extends Transactional {
     async get (req){
         try{
             const { id, schoolCoursesId } = req.params;
+            await this.getElementById(schoolCoursesId, 'SchoolCourses');
             const include = [{association: 'dayWeek'}, {association: 'schoolCourses', where: { id: schoolCoursesId }, include: [{association: 'schoolGrade', include: [{association: 'academic', include: ['educationDay']}]}]}, {association: 'subject', include: [ {association:'subjectName'}, {association: 'teacher', attributes: ['id', 'name', 'lastName'], include: [{association: 'image', include: [{association: 'image', include: 'file'}]}]}]}];
             if(id){
                 return await this.getElementById(id, 'Schedule', include);
@@ -23,6 +24,7 @@ class Schedule extends Transactional {
     }
     async create (body, schoolCoursesId){
         return this.withTransaction(async (transaction) => {
+            await this.getElementById(schoolCoursesId, 'SchoolCourses');
             const createSchuleDay = await this.createSchuleDay(body.dayWeek, transaction);
             await sequelize.models.Schedule.create({...body, dayWeekId: createSchuleDay.id, schoolCoursesId: schoolCoursesId }, {transaction});
             return {
