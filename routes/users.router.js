@@ -36,6 +36,7 @@ userRoute.get('',
     }
 );
 userRoute.post('',
+    authCombined('access', true),
     validatorHandler(createUserSchema, null, true),
     async (req, res, next) => {
         try {
