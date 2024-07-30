@@ -76,7 +76,7 @@ module.exports = {
       secondName: {
         type: Sequelize.DataTypes.TEXT,
         field: 'second_name',
-        allowNull: false,
+        allowNull: true,
       },
       surname: {
         type: Sequelize.DataTypes.TEXT,
@@ -85,7 +85,7 @@ module.exports = {
       secondSurname: {
         type: Sequelize.DataTypes.TEXT,
         field: 'second_surname',
-        allowNull: false,
+        allowNull: true,
       },
       birthdate: {
         allowNull: false,

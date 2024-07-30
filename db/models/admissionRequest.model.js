@@ -40,7 +40,7 @@ const admissionRequestSchema = {
     secondName: {
         type: DataTypes.TEXT,
         field: 'second_name',
-        allowNull: false,
+        allowNull: true,
     },
     surname: {
         type: DataTypes.TEXT,
@@ -49,7 +49,7 @@ const admissionRequestSchema = {
     secondSurname: {
         type: DataTypes.TEXT,
         field: 'second_surname',
-        allowNull: false,
+        allowNull: true,
     },
     birthdate: {
         allowNull: false,

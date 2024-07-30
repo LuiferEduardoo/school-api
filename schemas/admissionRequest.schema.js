@@ -27,7 +27,7 @@ const createAdmissionRequest = Joi.object({
     firstName: string.required(),
     secondName: string,
     surname: string.required(),
-    secondSurname: string.required(),
+    secondSurname: string,
     birthdate: date.required(),
     gender: string.required(),
     documentType: string.required(),
