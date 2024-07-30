@@ -125,7 +125,7 @@ class ImageAssociation extends Transactional{
     async updateInDataBase(req, association, idImage, idNewImage, folder, transaction){
         if(idImage){
             let idUpdate;
-            if(req.files.files){
+            if(req?.files?.files){
                 req.fields.fileType = 'image';
                 req.fields.folder = folder;
                 req.fields.isPublic = [true]
@@ -141,7 +141,7 @@ class ImageAssociation extends Transactional{
                 }
             }
             const imageAssociation = await this.getElementWithCondicional(association, [], {imageId: idImage});
-            imageAssociation.update({imageId: idUpdate})
+            imageAssociation.update({imageId: idUpdate}, {transaction})
         }
     }
 }
