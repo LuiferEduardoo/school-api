@@ -57,7 +57,7 @@ jobs:
           JWT_SECRET_RECOVERY_PASSWORD: 
           JWT_SECRET_REFRESH_TOKEN: 
           JWT_SECRET_ACCESS_TOKEN: 
-          DB_HOST: localhost
+          DB_HOST: postgres-test-integrations
           DB_TEST_PORT: 5433
           DB_TEST_USER: test_user
           DB_TEST_PASSWORD: password_test_user
