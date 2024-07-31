@@ -35,7 +35,7 @@ jobs:
       postgres-test-integrations: 
         image: postgres:13
         ports:
-          - 5433:5432
+          - 5432:5432
         env:
           POSTGRES_DB: school_database_test
           POSTGRES_USER: test_user
@@ -58,7 +58,7 @@ jobs:
           JWT_SECRET_REFRESH_TOKEN: 
           JWT_SECRET_ACCESS_TOKEN: 
           DB_HOST: postgres-test-integrations
-          DB_TEST_PORT: 5433
+          DB_TEST_PORT: 5432
           DB_TEST_USER: test_user
           DB_TEST_PASSWORD: password_test_user
-          DB_TEST_NAME: school_database_test 
+          DB_TEST_NAME: school_database_test
