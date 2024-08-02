@@ -13,7 +13,7 @@ describe('queryParameterPagination', () => {
         const query = { limit: 5, offset: 10 };
         const result = transactionalService.queryParameterPagination(query);
         expect(result.limit).toBe(5);
-        expect(result.offset).toBe(10);
+        expect(result.offset).toBe(50);
     });
 
     test('should return default limit and offset when not provided', () => {

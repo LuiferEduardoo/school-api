@@ -13,10 +13,10 @@ class Transactional {
         ];
     }
     queryParameterPagination(query){
-        const { limit, offset } = query;
+        const { limit=10, offset=0 } = query;
         let queryToReturn = {}
-        queryToReturn.limit = limit || 10;
-        queryToReturn.offset = offset || 0;
+        queryToReturn.limit = limit;
+        queryToReturn.offset = (offset) * (limit);
         return queryToReturn;
     }
 
