@@ -30,7 +30,9 @@ const config = {
     defaultUserEmail: process.env.DEFAULT_USER_EMAIL,
     defaultUserUserUsername: process.env.DEFAULT_USER_USERNAME,
     defaultUserPassword: process.env.DEFAULT_USER_PASSWORD,
-    frontendUrl: process.env.FRONTEND_URL
+    frontendUrl: process.env.FRONTEND_URL,
+    emailAdmission: process.env.EMAIL_ADMISSION,
+    emailChangePassword: process.env.EMAIL_CHANGE_PASSWORD
 }
 
 module.exports = { config };

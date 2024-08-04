@@ -30,7 +30,7 @@ describe('SendMail', () => {
 
         await SendMain(email, subject, 'admissionRequest', date);
 
-        expect(ejs.renderFile).toHaveBeenCalledWith(templatePath, date);
+        expect(ejs.renderFile).toHaveBeenCalledWith(templatePath, {...date, emailAdmission: config.emailAdmission}, email);
     });
 
     test('should render the correct template and send email for admissionDecision', async () => {
@@ -39,7 +39,7 @@ describe('SendMail', () => {
 
         await SendMain(email, subject, 'admissionDecision', date);
 
-        expect(ejs.renderFile).toHaveBeenCalledWith(templatePath, date);
+        expect(ejs.renderFile).toHaveBeenCalledWith(templatePath, {...date, emailAdmission: config.emailAdmission}, email);
     });
 
     test('should render the correct template and send email for recoveryPassword', async () => {
@@ -48,7 +48,7 @@ describe('SendMail', () => {
 
         await SendMain(email, subject, 'recoveryPassword', date);
 
-        expect(ejs.renderFile).toHaveBeenCalledWith(templatePath, date);
+        expect(ejs.renderFile).toHaveBeenCalledWith(templatePath, date, email);
     });
 
     test('should render the correct template and send email for changePassword', async () => {
@@ -57,7 +57,7 @@ describe('SendMail', () => {
 
         await SendMain(email, subject, 'changePassword', date);
 
-        expect(ejs.renderFile).toHaveBeenCalledWith(templatePath, date);
+        expect(ejs.renderFile).toHaveBeenCalledWith(templatePath, {...date, emailChangePassword: config.emailChangePassword}, email);
     });
 
     test('should not send email for an unknown type', async () => {
