@@ -3,6 +3,7 @@ const boom = require('@hapi/boom');
 const { sequelize } = require('./../libs/sequelize');
 const Transactional = require('./Transactional.service');
 const { SendMain } = require('./emails.service');
+const { config } = require('../config/config')
 const { Op } = require('sequelize'); 
 
 class AdmissionRequest extends Transactional {
@@ -53,7 +54,7 @@ class AdmissionRequest extends Transactional {
     async create (body){
         return this.withTransaction(async (transaction) => {
             const createSchedule = await sequelize.models.AdmissionRequest.create(body, {transaction});
-            await SendMain(createSchedule.email, '¡Solicitud de admisión recibida con exito!', 'admissionRequest', {name: createSchedule.firstName, checkStatus: "http://localhost:3000/admisiones/estado" } )
+            await SendMain(createSchedule.email, '¡Solicitud de admisión recibida con exito!', 'admissionRequest', {name: createSchedule.firstName, checkStatus: `${config.frontendUrl}/admisiones/estado`} )
             return {
                 message: 'Solicitud de admisión creada con exito'
             }
@@ -64,7 +65,7 @@ class AdmissionRequest extends Transactional {
         return this.withTransaction(async (transaction) => {
             const getSchedule = await this.getElementById(id, 'AdmissionRequest');
             if((getSchedule.status != 'admitido' && getSchedule.status != 'No admitido') && (body.status === "admitido" || body.status === "No admitido")){
-                await SendMain(getSchedule.email, '¡Te tenemos una respuesta a tu solicitud de admisión!', 'admissionDecision', {name: getSchedule.firstName, checkStatus: "http://localhost:3000/admisiones/estado" } )
+                await SendMain(getSchedule.email, '¡Te tenemos una respuesta a tu solicitud de admisión!', 'admissionDecision', {name: getSchedule.firstName, checkStatus: `${config.frontendUrl}/admisiones/estado` } )
             }
             await getSchedule.update(body, {transaction});
             return{
