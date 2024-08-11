@@ -79,10 +79,11 @@ Para iniciar la API localmente, utiliza el siguiente comando:
 
 
 # Ejecución en Producción
-Para ejecutar la API en producción, necesitas configurar la base de datos, las credenciales en el archivo .env, configurar Redis, instalar las dependencias y ejecutar el siguiente comando:
+Para ejecutar la API en producción necesitas configurar las credenciales en el archivo .env y ejecutar los siguientes comandos:
 
 ```sh 
-    npm run deploy
+    docker-compose -f docker-compose.prod.yml build 
+    docker-compose -f docker-compose.prod.yml up -d 
 ```
 # Tests
  - **Unit Tests:** Para ejecutar los tests unitarios, utiliza el siguiente comando:
