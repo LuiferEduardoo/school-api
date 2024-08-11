@@ -1,0 +1,19 @@
+version: '3.3'
+
+services:
+  postgres_test:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: ${DB_TEST_NAME}
+      POSTGRES_USER: ${DB_TEST_USER}
+      POSTGRES_PASSWORD: ${DB_TEST_PASSWORD}
+    ports:
+      - 5433:5432
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@mail.com
+      - PGADMIN_DEFAULT_PASSWORD=root
+    ports:
+      - 5050:80
