@@ -1,8 +1,7 @@
 module.exports = {
     testEnvironment: 'node',
     setupFiles: ['<rootDir>/jest.setup.js'],
-    testMatch: ['**/tests/integration/**/*.test.js'],
-    setupFilesAfterEnv: ['<rootDir>/tests/setupIntegration.js'],
+    testMatch: ['<rootDir>/src/tests/integration/**/*.test.js'],
+    setupFilesAfterEnv: ['<rootDir>/src/tests/setupIntegration.js'],
     moduleDirectories: ['node_modules', 'src'],
-    testTimeout: 90000
 };
