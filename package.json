@@ -14,6 +14,7 @@
         "migration:delete": "sequelize-cli db:migrate:undo --name",
         "test:unit": "jest --config jest.config.unit.js --forceExit",
         "test:integration": "jest --config jest.config.integration.js --forceExit",
+        "test:e2e": "jest --config jest.config.e2e.js --forceExit",
         "deploy": "npm run migrations:run && npm start"
     },
     "keywords": [],
